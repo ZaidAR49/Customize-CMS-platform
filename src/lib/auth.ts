@@ -13,27 +13,32 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user }) {
       try {
-        const { count, error: countError } = await supabaseAdmin
+        const { count: adminCount, error: countError } = await supabaseAdmin
           .from('users')
           .select('id', { count: 'exact', head: true })
+          .eq('role', 'admin')
 
         if (countError) throw countError
 
-        const isFirstUser = count === 0
+        const noAdminsExist = adminCount === 0
 
         const { data: existingUser } = await supabaseAdmin
           .from('users')
-          .select('role')
+          .select('id, role')
           .eq('email', user.email!)
           .single()
 
         if (existingUser) {
+          if (noAdminsExist && existingUser.role !== 'admin') {
+            await supabaseAdmin.from('users').update({ role: 'admin', name: user.name!, avatar_url: user.image }).eq('id', existingUser.id)
+            return true
+          }
           if (existingUser.role === 'admin' || existingUser.role === 'editor') {
             return true
           }
           return '/unauthorized'
         } else {
-          if (isFirstUser) {
+          if (noAdminsExist) {
             const { error } = await supabaseAdmin
               .from('users')
               .insert({
@@ -86,5 +91,8 @@ export const authOptions: NextAuthOptions = {
       return session
     },
   },
-  pages: { signIn: '/auth/signin' },
+  pages: { 
+    signIn: '/auth/signin',
+    error: '/unauthorized'
+  },
 }
