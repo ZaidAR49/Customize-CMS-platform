@@ -1,0 +1,235 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-cairo), sans-serif;
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-cairo), sans-serif;
+  --font-arabic: var(--font-cairo), sans-serif;
+
+  /* shadcn color mappings */
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Custom FCPS colors */
+  --color-primary-light: #4caf50;
+  --color-primary-dark: #1b5e20;
+  --color-accent-green: #66bb6a;
+  --color-bg-soft: #f7faf7;
+  --color-gray-light: #f5f5f5;
+  --color-gray-text: #666666;
+  --color-dark: #222222;
+  --color-text: #333333;
+
+  /* Custom animations */
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-slide-in: slide-in 0.3s ease-out;
+  --animate-count-up: count-up 0.5s ease-out;
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slide-in {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+  }
+  @keyframes count-up {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}
+
+:root {
+  /* shadcn theme — green-based for FCPS */
+  --background: #ffffff;
+  --foreground: #333333;
+  --card: #ffffff;
+  --card-foreground: #333333;
+  --popover: #ffffff;
+  --popover-foreground: #333333;
+  --primary: #2e7d32;
+  --primary-foreground: #ffffff;
+  --secondary: #f7faf7;
+  --secondary-foreground: #1b5e20;
+  --muted: #f5f5f5;
+  --muted-foreground: #666666;
+  --accent: #66bb6a;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #2e7d32;
+  --chart-1: #2e7d32;
+  --chart-2: #4caf50;
+  --chart-3: #66bb6a;
+  --chart-4: #a5d6a7;
+  --chart-5: #c8e6c9;
+  --radius: 0.5rem;
+
+  /* FCPS custom tokens */
+  --fcps-primary: #2e7d32;
+  --fcps-primary-light: #4caf50;
+  --fcps-primary-dark: #1b5e20;
+  --fcps-accent: #66bb6a;
+  --fcps-white: #ffffff;
+  --fcps-bg-soft: #f7faf7;
+  --fcps-gray-light: #f5f5f5;
+  --fcps-gray-text: #666666;
+  --fcps-dark: #222222;
+  --fcps-text: #333333;
+  --fcps-shadow-card: 0 4px 20px rgba(46,125,50,0.08);
+
+  /* Sidebar */
+  --sidebar: #f7faf7;
+  --sidebar-foreground: #333333;
+  --sidebar-primary: #2e7d32;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e8f5e9;
+  --sidebar-accent-foreground: #1b5e20;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #2e7d32;
+}
+
+.dark {
+  --background: #1a1a1a;
+  --foreground: #ededed;
+  --card: #222222;
+  --card-foreground: #ededed;
+  --popover: #222222;
+  --popover-foreground: #ededed;
+  --primary: #4caf50;
+  --primary-foreground: #ffffff;
+  --secondary: #2a2a2a;
+  --secondary-foreground: #a5d6a7;
+  --muted: #2a2a2a;
+  --muted-foreground: #a0a0a0;
+  --accent: #66bb6a;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --border: rgba(255,255,255,0.1);
+  --input: rgba(255,255,255,0.15);
+  --ring: #4caf50;
+  --chart-1: #4caf50;
+  --chart-2: #66bb6a;
+  --chart-3: #81c784;
+  --chart-4: #a5d6a7;
+  --chart-5: #c8e6c9;
+  --sidebar: #222222;
+  --sidebar-foreground: #ededed;
+  --sidebar-primary: #4caf50;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2a2a2a;
+  --sidebar-accent-foreground: #a5d6a7;
+  --sidebar-border: rgba(255,255,255,0.1);
+  --sidebar-ring: #4caf50;
+}
+
+/* ─── Base Styles ─────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-cairo), sans-serif;
+    color: var(--fcps-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ─── Utility Classes ─────────────────────────── */
+.section {
+  padding: 72px 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ─── RTL Utilities ───────────────────────────── */
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ─── Custom Scrollbar ────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--fcps-gray-light);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--fcps-primary-light);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--fcps-primary);
+}
+
+/* ─── Selection Color ─────────────────────────── */
+::selection {
+  background: var(--fcps-primary-light);
+  color: white;
+}
+
+/* ─── Line Clamp Utilities ────────────────────── */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
