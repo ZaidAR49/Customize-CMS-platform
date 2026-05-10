@@ -13,17 +13,54 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user }) {
       try {
-        const { error } = await supabaseAdmin
+        const { count, error: countError } = await supabaseAdmin
           .from('users')
-          .upsert(
-            { email: user.email!, name: user.name!, avatar_url: user.image },
-            { onConflict: 'email', ignoreDuplicates: false }
-          )
-        if (error) console.error('Supabase upsert error:', error.message)
+          .select('id', { count: 'exact', head: true })
+
+        if (countError) throw countError
+
+        const isFirstUser = count === 0
+
+        const { data: existingUser } = await supabaseAdmin
+          .from('users')
+          .select('role')
+          .eq('email', user.email!)
+          .single()
+
+        if (existingUser) {
+          if (existingUser.role === 'admin' || existingUser.role === 'editor') {
+            return true
+          }
+          return '/unauthorized'
+        } else {
+          if (isFirstUser) {
+            const { error } = await supabaseAdmin
+              .from('users')
+              .insert({
+                email: user.email!,
+                name: user.name!,
+                avatar_url: user.image,
+                role: 'admin'
+              })
+            if (error) console.error('Supabase insert error:', error.message)
+            return true
+          } else {
+            const { error } = await supabaseAdmin
+              .from('users')
+              .insert({
+                email: user.email!,
+                name: user.name!,
+                avatar_url: user.image,
+                role: 'viewer'
+              })
+            if (error) console.error('Supabase insert error:', error.message)
+            return '/unauthorized'
+          }
+        }
       } catch (e) {
         console.error('Auth signIn error:', e)
+        return false
       }
-      return true
     },
     async jwt({ token }) {
       try {

@@ -1,14 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useScrollTop } from '@/hooks/useScrollTop'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { NavbarMobile } from './NavbarMobile'
 import { centers } from '@/data/centers'
 import { programs } from '@/data/programs'
-import { ChevronDown, Shield, LogIn } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
+import logo from '@/app/icon.png'
 
 const navItems = [
   { label: 'الرئيسية', href: '/' },
@@ -31,6 +33,19 @@ export function Navbar() {
   const scrolled = useScrollTop(80)
   const isMobile = useMediaQuery('(max-width: 768px)')
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const navRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        setOpenDropdown(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   if (isMobile) return <NavbarMobile />
 
@@ -44,8 +59,8 @@ export function Navbar() {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo + Name */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--fcps-primary)] text-white transition-transform group-hover:scale-110">
-            <Shield className="h-5 w-5" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white transition-transform group-hover:scale-105 overflow-hidden border border-[var(--fcps-bg-soft)] shadow-sm">
+            <Image src={logo} alt="Logo" width={48} height={48} className="object-cover" />
           </div>
           <span className="text-lg font-bold text-[var(--fcps-primary-dark)]">
             جمعية حماية الأسرة والطفولة
@@ -53,13 +68,11 @@ export function Navbar() {
         </Link>
 
         {/* Nav Links */}
-        <nav className="flex items-center gap-1">
+        <nav ref={navRef} className="flex items-center gap-1">
           {navItems.map((item) => (
             <div
               key={item.label}
               className="relative"
-              onMouseEnter={() => item.children && setOpenDropdown(item.label)}
-              onMouseLeave={() => setOpenDropdown(null)}
             >
               <Link
                 href={item.href}
@@ -67,7 +80,14 @@ export function Navbar() {
                   'flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                   'text-[var(--fcps-text)] hover:text-[var(--fcps-primary)] hover:bg-[var(--fcps-bg-soft)]'
                 )}
-                onClick={(e) => item.children && e.preventDefault()}
+                onClick={(e) => {
+                  if (item.children) {
+                    e.preventDefault()
+                    setOpenDropdown(openDropdown === item.label ? null : item.label)
+                  } else {
+                    setOpenDropdown(null)
+                  }
+                }}
               >
                 {item.label}
                 {item.children && <ChevronDown className="h-3 w-3" />}
@@ -80,6 +100,7 @@ export function Navbar() {
                     <Link
                       key={child.href}
                       href={child.href}
+                      onClick={() => setOpenDropdown(null)}
                       className="block rounded-md px-3 py-2 text-sm text-[var(--fcps-text)] transition-colors hover:bg-[var(--fcps-bg-soft)] hover:text-[var(--fcps-primary)]"
                     >
                       {child.label}
@@ -90,14 +111,6 @@ export function Navbar() {
             </div>
           ))}
 
-          {/* Auth Button */}
-          <Link
-            href="/api/auth/signin"
-            className="mr-2 flex items-center gap-2 rounded-md border border-[var(--fcps-primary)] px-4 py-2 text-sm font-medium text-[var(--fcps-primary)] transition-all hover:bg-[var(--fcps-primary)] hover:text-white"
-          >
-            <LogIn className="h-4 w-4" />
-            تسجيل الدخول
-          </Link>
         </nav>
       </div>
     </header>

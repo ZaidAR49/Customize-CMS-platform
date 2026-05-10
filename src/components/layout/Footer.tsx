@@ -3,7 +3,7 @@ import { Shield, Phone, Mail, MapPin } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { organization } from '@/data/organization'
 
-import { FaFacebook, FaXTwitter, FaYoutube } from 'react-icons/fa6'
+import { FaFacebook, FaXTwitter, FaYoutube, FaInstagram } from 'react-icons/fa6'
 
 const quickLinks = [
   { label: 'الرئيسية', href: '/' },
@@ -14,7 +14,7 @@ const quickLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-[var(--fcps-dark)] text-white">
+    <footer className="mt-16 bg-[var(--fcps-dark)] text-white">
       <div className="container py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {/* Column 1: About */}
@@ -101,6 +101,17 @@ export function Footer() {
               >
                 <FaYoutube className="h-4 w-4" />
               </a>
+              {organization.instagram && (
+                <a
+                  href={organization.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-all hover:bg-[var(--fcps-primary)] hover:scale-110"
+                  aria-label="Instagram"
+                >
+                  <FaInstagram className="h-4 w-4" />
+                </a>
+              )}
             </div>
           </div>
         </div>

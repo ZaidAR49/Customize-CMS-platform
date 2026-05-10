@@ -2,8 +2,11 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FileText, Users, Settings, Shield, LogOut } from 'lucide-react'
+import { LayoutDashboard, FileText, Users, Settings, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { signOut } from 'next-auth/react'
+import Image from 'next/image'
+import logo from '@/app/icon.png'
 
 const sidebarItems = [
   { label: 'لوحة التحكم', href: '/dashboard', icon: LayoutDashboard },
@@ -18,8 +21,8 @@ export function Sidebar() {
     <aside className="sticky top-0 flex h-screen w-64 flex-col border-l bg-[var(--fcps-bg-soft)]">
       {/* Header */}
       <div className="flex items-center gap-3 border-b px-6 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--fcps-primary)] text-white">
-          <Shield className="h-5 w-5" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white overflow-hidden border border-[var(--fcps-bg-soft)] shadow-sm">
+          <Image src={logo} alt="Logo" width={40} height={40} className="object-cover" />
         </div>
         <div>
           <h2 className="text-sm font-bold text-[var(--fcps-dark)]">لوحة التحكم</h2>
@@ -51,13 +54,13 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="border-t p-4">
-        <Link
-          href="/"
-          className="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-[var(--fcps-gray-text)] transition-colors hover:bg-white hover:text-red-500"
+        <button
+          onClick={() => signOut({ callbackUrl: '/' })}
+          className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-[var(--fcps-gray-text)] transition-colors hover:bg-white hover:text-red-500"
         >
           <LogOut className="h-4 w-4" />
           تسجيل الخروج
-        </Link>
+        </button>
       </div>
     </aside>
   )

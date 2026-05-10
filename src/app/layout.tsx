@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import { Cairo } from 'next/font/google'
 import './globals.css'
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
+import { ConditionalHeader, ConditionalFooter } from '@/components/layout/ConditionalLayout'
 import { ScrollToTop } from '@/components/shared/ScrollToTop'
 
 const cairo = Cairo({
@@ -23,9 +22,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ar" dir="rtl" className={cairo.variable} suppressHydrationWarning>
       <body className="bg-white text-[#333] antialiased" style={{ fontFamily: 'var(--font-cairo), sans-serif' }}>
-        <Navbar />
+        <ConditionalHeader />
         <main className="min-h-screen">{children}</main>
-        <Footer />
+        <ConditionalFooter />
         <ScrollToTop />
       </body>
     </html>

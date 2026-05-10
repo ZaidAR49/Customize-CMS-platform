@@ -18,5 +18,6 @@ export interface Organization {
   facebook:     string
   twitter:      string
   youtube:      string
+  instagram?:   string
   stats:        OrgStats
 }

@@ -6,8 +6,10 @@ import { useScrollTop } from '@/hooks/useScrollTop'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { centers } from '@/data/centers'
 import { programs } from '@/data/programs'
-import { Menu, Shield, ChevronDown, LogIn, X } from 'lucide-react'
+import { Menu, ChevronDown, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
+import logo from '@/app/icon.png'
 
 export function NavbarMobile() {
   const scrolled = useScrollTop(80)
@@ -28,8 +30,8 @@ export function NavbarMobile() {
       <div className="container flex h-14 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--fcps-primary)] text-white">
-            <Shield className="h-4 w-4" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white overflow-hidden border border-[var(--fcps-bg-soft)] shadow-sm">
+            <Image src={logo} alt="Logo" width={36} height={36} className="object-cover" />
           </div>
           <span className="text-sm font-bold text-[var(--fcps-primary-dark)]">
             حماية الأسرة والطفولة
@@ -38,7 +40,7 @@ export function NavbarMobile() {
 
         {/* Mobile Menu */}
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild>
+          <SheetTrigger >
             <button
               className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-[var(--fcps-bg-soft)]"
               aria-label="القائمة"
@@ -52,8 +54,8 @@ export function NavbarMobile() {
               {/* Header */}
               <div className="flex items-center justify-between border-b px-4 py-4">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--fcps-primary)] text-white">
-                    <Shield className="h-4 w-4" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white overflow-hidden border border-[var(--fcps-bg-soft)] shadow-sm">
+                    <Image src={logo} alt="Logo" width={36} height={36} className="object-cover" />
                   </div>
                   <span className="text-sm font-bold text-[var(--fcps-primary-dark)]">القائمة</span>
                 </div>
@@ -141,18 +143,6 @@ export function NavbarMobile() {
                   اتصل بنا
                 </Link>
               </nav>
-
-              {/* Auth Button */}
-              <div className="border-t p-4">
-                <Link
-                  href="/api/auth/signin"
-                  onClick={() => setOpen(false)}
-                  className="flex w-full items-center justify-center gap-2 rounded-md bg-[var(--fcps-primary)] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[var(--fcps-primary-dark)]"
-                >
-                  <LogIn className="h-4 w-4" />
-                  تسجيل الدخول
-                </Link>
-              </div>
             </div>
           </SheetContent>
         </Sheet>

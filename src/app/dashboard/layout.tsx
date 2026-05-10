@@ -1,8 +1,15 @@
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import Image from 'next/image'
 import { Sidebar } from '@/components/dashboard/Sidebar'
+import { UserMenu } from '@/components/dashboard/UserMenu'
 
 export const metadata = { title: 'لوحة التحكم' }
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession(authOptions)
+  const user = session?.user
+
   return (
     <div className="flex min-h-screen">
       <Sidebar />
@@ -11,12 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header className="sticky top-0 z-40 border-b bg-white px-8 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-bold text-[var(--fcps-dark)]">لوحة التحكم</h1>
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--fcps-primary)] text-xs font-bold text-white">
-                م
-              </div>
-              <span className="text-sm font-medium text-[var(--fcps-text)]">مدير النظام</span>
-            </div>
+            <UserMenu user={user} />
           </div>
         </header>
         {/* Dashboard Content */}

@@ -13,6 +13,7 @@ export const organization: Organization = {
   facebook:    'https://facebook.com',
   twitter:     'https://twitter.com',
   youtube:     'https://youtube.com',
+  instagram:   'https://instagram.com',
   stats: {
     families:   920,
     children:   8766,
