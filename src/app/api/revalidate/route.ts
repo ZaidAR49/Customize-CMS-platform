@@ -11,8 +11,9 @@ export async function POST(req: NextRequest) {
   const path = body.path ?? '/'
   const tag = body.tag
 
-  if (tag) revalidateTag(tag)
-  else revalidatePath(path)
+  // @ts-ignore
+  if (tag) revalidateTag(tag as string)
+  else revalidatePath(path as string, 'page')
 
   return NextResponse.json({ revalidated: true, path, tag, now: Date.now() })
 }
