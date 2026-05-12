@@ -58,3 +58,18 @@ export interface OrganizationRow {
   updated_at?: string
   updated_by?: string | null
 }
+
+export interface OrganizationStatRow {
+  id: string
+  organization_id: string
+  key: string
+  label_ar: string
+  label_en: string | null
+  value: string
+  icon: string | null
+  display_order: number
+  description_ar: string | null
+  description_en: string | null
+  updated_at?: string
+  updated_by?: string | null
+}
