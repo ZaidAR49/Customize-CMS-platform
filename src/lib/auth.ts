@@ -16,9 +16,15 @@ export const authOptions: NextAuthOptions = {
         // Server actions call getServerSession() internally, which
         // would trigger these callbacks again → infinite recursion.
         const existingUser = await usersService.getUserByEmail(user.email!)
-        console.log('existingUser', existingUser)
 
-        if (existingUser) return true
+        if (existingUser) {
+          const nextAvatar = user.image?.trim() || null
+          const current = existingUser.avatarUrl?.trim() || null
+          if (nextAvatar && !current) {
+            await usersService.updateUserAvatar(existingUser.id, nextAvatar)
+          }
+          return true
+        }
 
         // If user doesn't exist, check if they are the first one
         const allUsers = await usersService.getAllUsers()
@@ -26,12 +32,10 @@ export const authOptions: NextAuthOptions = {
 
         if (isFirst) {
           await usersService.createUser({
-            id: '',
             email: user.email!,
             name: user.name!,
-            avatarUrl: user.image ?? '',
+            avatarUrl: user.image?.trim() || undefined,
             role: 'admin',
-            createdAt: new Date().toISOString(),
           })
           return true
         }

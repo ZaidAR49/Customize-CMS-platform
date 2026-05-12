@@ -1,8 +1,8 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import Image from 'next/image'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { UserMenu } from '@/components/dashboard/UserMenu'
+import { Toaster } from 'sonner'
 
 export const metadata = { title: 'لوحة التحكم' }
 
@@ -25,6 +25,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <div className="p-8">
           {children}
         </div>
+        <Toaster richColors position="top-center" dir="rtl" />
       </div>
     </div>
   )

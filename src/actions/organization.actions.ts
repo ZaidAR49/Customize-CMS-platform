@@ -18,7 +18,10 @@ export async function updateOrganizationAction(id: string, data: any) {
       return { success: false, error: parsed.error.issues[0].message };
     }
 
-    const org = await organizationService.updateOrganization(id, parsed.data);
+    const org = await organizationService.updateOrganization(id, {
+      ...parsed.data,
+      updated_by: session.user.id,
+    });
     
     revalidatePath('/dashboard/settings');
     revalidatePath('/');

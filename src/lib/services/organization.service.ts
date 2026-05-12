@@ -1,8 +1,8 @@
 import supabase from '@/lib/supabase';
-import type { Organization } from '@/types/organization';
+import type { OrganizationRow } from '@/types/organization';
 
 export const organizationService = {
-  async getOrganization(): Promise<Organization | null> {
+  async getOrganization(): Promise<OrganizationRow | null> {
     const { data, error } = await supabase
       .from('organization')
       .select('*')
@@ -10,10 +10,10 @@ export const organizationService = {
       .single();
 
     if (error && error.code !== 'PGRST116') throw error;
-    return (data as Organization) ?? null;
+    return (data as OrganizationRow) ?? null;
   },
 
-  async updateOrganization(id: string, orgData: any): Promise<Organization> {
+  async updateOrganization(id: string, orgData: Record<string, unknown>): Promise<OrganizationRow> {
     const { data, error } = await supabase
       .from('organization')
       .update(orgData)
@@ -23,6 +23,6 @@ export const organizationService = {
 
     if (error) throw error;
     if (!data) throw new Error('Organization not found');
-    return data as Organization;
+    return data as OrganizationRow;
   }
 };

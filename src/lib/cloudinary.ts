@@ -1,14 +1,20 @@
 import { v2 as cloudinary } from 'cloudinary'
 
+/** Loads `cloud_name` / `api_key` / `api_secret` from `process.env.CLOUDINARY_URL`. */
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || '',
-  api_key: process.env.CLOUDINARY_API_KEY || '',
-  api_secret: process.env.CLOUDINARY_API_Secret || '',
-})
+  cloudinary_url: process.env.CLOUDINARY_URL
+});
 
 const FOLDER = process.env.CLOUDINARY_FILE || 'CMS'
 
 export async function uploadImage(file: string, subfolder?: string): Promise<string> {
+  const envUrl = process.env.CLOUDINARY_URL?.trim()
+  if (!envUrl?.toLowerCase().startsWith('cloudinary://')) {
+    throw new Error(
+      'Missing or invalid CLOUDINARY_URL. Use cloudinary://API_KEY:API_SECRET@CLOUD_NAME from your Cloudinary dashboard.'
+    )
+  }
+
   const folder = subfolder ? `${FOLDER}/${subfolder}` : FOLDER
   const result = await cloudinary.uploader.upload(file, {
     folder,

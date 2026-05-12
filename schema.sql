@@ -48,6 +48,18 @@ CREATE TABLE organization (
   updated_by UUID REFERENCES users(id) ON DELETE
   SET NULL
 );
+CREATE TABLE post_comments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  author_name TEXT NOT NULL,
+  author_email TEXT,
+  body TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  moderated_at TIMESTAMPTZ,
+  moderated_by UUID REFERENCES users(id) ON DELETE
+  SET NULL
+);
 -- 4. Auto-update trigger
 CREATE OR REPLACE FUNCTION update_updated_at() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now();
 RETURN NEW;
@@ -104,9 +116,9 @@ $$ LANGUAGE sql;
 -- 8. Indexes
 CREATE INDEX idx_posts_latest_published ON posts (published_at DESC)
 WHERE published = true;
-CREATE INDEX idx_org_updated_by ON organization (updated_by);
 CREATE INDEX idx_posts_slug ON posts (slug);
 CREATE INDEX idx_posts_metadata_category ON posts ((metadata->>'category'))
 WHERE (metadata->>'category') IS NOT NULL;
 CREATE INDEX idx_posts_metadata_tags ON posts USING GIN ((metadata->'tags'));
 CREATE INDEX idx_users_email ON users (email);
+CREATE INDEX idx_post_type ON posts (type);
