@@ -8,7 +8,7 @@ export function LoadingSpinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
   return (
     <div className="flex items-center justify-center py-12">
       <div
-        className={`${sizeClasses[size]} animate-spin rounded-full border-[var(--fcps-primary-light)] border-t-[var(--fcps-primary)]`}
+        className={`${sizeClasses[size]} animate-spin rounded-full border-(--fcps-primary-light) border-t-(--fcps-primary)`}
       />
     </div>
   )

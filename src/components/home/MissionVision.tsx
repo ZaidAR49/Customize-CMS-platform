@@ -17,27 +17,27 @@ export function MissionVision({ mission, vision }: MissionVisionProps) {
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           {/* Mission */}
-          <div className="group rounded-2xl border border-[var(--fcps-primary)]/10 bg-gradient-to-br from-white to-[var(--fcps-bg-soft)] p-8 transition-all duration-300 hover:shadow-lg">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--fcps-primary)] text-white transition-transform group-hover:scale-110">
+          <div className="group rounded-2xl border border-(--fcps-primary)/10 bg-gradient-to-br from-white to-(--fcps-bg-soft) p-8 transition-all duration-300 hover:shadow-lg">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-(--fcps-primary) text-white transition-transform group-hover:scale-110">
               <Target className="h-7 w-7" />
             </div>
-            <h3 className="mb-4 text-2xl font-bold text-[var(--fcps-primary-dark)]">
+            <h3 className="mb-4 text-2xl font-bold text-(--fcps-primary-dark)">
               رسالتنا
             </h3>
-            <p className="text-base leading-relaxed text-[var(--fcps-gray-text)]">
+            <p className="text-base leading-relaxed text-(--fcps-gray-text)">
               {mission}
             </p>
           </div>
 
           {/* Vision */}
-          <div className="group rounded-2xl border border-[var(--fcps-primary)]/10 bg-gradient-to-br from-white to-[var(--fcps-bg-soft)] p-8 transition-all duration-300 hover:shadow-lg">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--fcps-primary-light)] text-white transition-transform group-hover:scale-110">
+          <div className="group rounded-2xl border border-(--fcps-primary)/10 bg-gradient-to-br from-white to-(--fcps-bg-soft) p-8 transition-all duration-300 hover:shadow-lg">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-(--fcps-primary-light) text-white transition-transform group-hover:scale-110">
               <Eye className="h-7 w-7" />
             </div>
-            <h3 className="mb-4 text-2xl font-bold text-[var(--fcps-primary-dark)]">
+            <h3 className="mb-4 text-2xl font-bold text-(--fcps-primary-dark)">
               رؤيتنا
             </h3>
-            <p className="text-base leading-relaxed text-[var(--fcps-gray-text)]">
+            <p className="text-base leading-relaxed text-(--fcps-gray-text)">
               {vision}
             </p>
           </div>

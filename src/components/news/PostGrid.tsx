@@ -23,7 +23,7 @@ export function PostGrid({ posts }: PostGridProps) {
       {filteredPosts.length === 0 ? (
         <div className="py-16 text-center">
           <div className="text-5xl mb-4">📭</div>
-          <p className="text-lg text-[var(--fcps-gray-text)]">لا توجد مقالات في هذا التصنيف</p>
+          <p className="text-lg text-(--fcps-gray-text)">لا توجد مقالات في هذا التصنيف</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

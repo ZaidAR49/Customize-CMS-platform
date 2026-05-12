@@ -23,7 +23,7 @@ export function PostContent({ post, related }: PostContentProps) {
         {/* Main Content */}
         <article className="lg:col-span-2">
           {/* Hero Image */}
-          <div className="relative mb-8 h-64 md:h-96 overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--fcps-primary)] to-[var(--fcps-primary-light)]">
+          <div className="relative mb-8 h-64 md:h-96 overflow-hidden rounded-2xl bg-gradient-to-br from-(--fcps-primary) to-(--fcps-primary-light)">
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-8xl opacity-15">📰</div>
             </div>
@@ -31,16 +31,16 @@ export function PostContent({ post, related }: PostContentProps) {
 
           {/* Article Header */}
           <div className="mb-8">
-            <Badge className="mb-4 bg-[var(--fcps-bg-soft)] text-[var(--fcps-primary)] hover:bg-[var(--fcps-bg-soft)]">
+            <Badge className="mb-4 bg-(--fcps-bg-soft) text-(--fcps-primary) hover:bg-(--fcps-bg-soft)">
               {typeLabels[post.type]}
             </Badge>
-            <h1 className="mb-4 text-3xl md:text-4xl font-bold text-[var(--fcps-dark)] leading-tight">
+            <h1 className="mb-4 text-3xl md:text-4xl font-bold text-(--fcps-dark) leading-tight">
               {post.title}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--fcps-gray-text)]">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-(--fcps-gray-text)">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--fcps-primary)] text-white text-xs">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-(--fcps-primary) text-white text-xs">
                   <User className="h-4 w-4" />
                 </div>
                 <span>{post.author.name}</span>
@@ -62,11 +62,11 @@ export function PostContent({ post, related }: PostContentProps) {
 
           {/* Article Body */}
           <div
-            className="prose prose-lg max-w-none text-[var(--fcps-text)] leading-relaxed
-              [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-[var(--fcps-primary-dark)] [&_h2]:mt-8 [&_h2]:mb-4
+            className="prose prose-lg max-w-none text-(--fcps-text) leading-relaxed
+              [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-(--fcps-primary-dark) [&_h2]:mt-8 [&_h2]:mb-4
               [&_p]:mb-4 [&_p]:leading-[1.8]
               [&_ul]:pr-6 [&_ul]:space-y-2
-              [&_li]:text-[var(--fcps-gray-text)]"
+              [&_li]:text-(--fcps-gray-text)"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
         </article>
@@ -74,7 +74,7 @@ export function PostContent({ post, related }: PostContentProps) {
         {/* Sidebar */}
         <aside className="lg:col-span-1">
           <div className="sticky top-24">
-            <h3 className="mb-6 text-xl font-bold text-[var(--fcps-primary-dark)]">
+            <h3 className="mb-6 text-xl font-bold text-(--fcps-primary-dark)">
               مقالات ذات صلة
             </h3>
             <div className="space-y-4">
@@ -84,17 +84,17 @@ export function PostContent({ post, related }: PostContentProps) {
                   className="group overflow-hidden border-none shadow-sm transition-all hover:shadow-md"
                 >
                   <Link href={`/news/${relatedPost.slug}`} className="block p-4">
-                    <p className="mb-1 text-xs text-[var(--fcps-gray-text)]">
+                    <p className="mb-1 text-xs text-(--fcps-gray-text)">
                       {new Date(relatedPost.publishedAt).toLocaleDateString('ar-JO', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
                       })}
                     </p>
-                    <h4 className="text-sm font-bold leading-snug text-[var(--fcps-dark)] transition-colors group-hover:text-[var(--fcps-primary)]">
+                    <h4 className="text-sm font-bold leading-snug text-(--fcps-dark) transition-colors group-hover:text-(--fcps-primary)">
                       {relatedPost.title}
                     </h4>
-                    <p className="mt-2 text-xs text-[var(--fcps-gray-text)] line-clamp-2">
+                    <p className="mt-2 text-xs text-(--fcps-gray-text) line-clamp-2">
                       {relatedPost.excerpt}
                     </p>
                   </Link>

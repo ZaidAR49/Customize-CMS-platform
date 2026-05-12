@@ -10,7 +10,7 @@ interface LatestNewsProps {
 
 export function LatestNews({ posts }: LatestNewsProps) {
   return (
-    <section className="py-20 bg-[var(--fcps-gray-light)]">
+    <section className="py-20 bg-(--fcps-gray-light)">
       <div className="container">
         <SectionTitle
           title="آخر الأخبار والنشاطات"
@@ -26,7 +26,7 @@ export function LatestNews({ posts }: LatestNewsProps) {
         <div className="mt-10 text-center">
           <Link
             href="/news"
-            className="inline-flex items-center gap-2 rounded-lg bg-[var(--fcps-primary)] px-6 py-3 text-sm font-bold text-white transition-all hover:bg-[var(--fcps-primary-dark)] hover:scale-105 shadow-lg"
+            className="inline-flex items-center gap-2 rounded-lg bg-(--fcps-primary) px-6 py-3 text-sm font-bold text-white transition-all hover:bg-(--fcps-primary-dark) hover:scale-105 shadow-lg"
           >
             عرض جميع الأخبار
             <ArrowLeft className="h-4 w-4" />

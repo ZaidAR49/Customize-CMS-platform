@@ -24,9 +24,9 @@ interface PostCardProps {
 
 export function PostCard({ post }: PostCardProps) {
   return (
-    <Card className="group overflow-hidden border-none shadow-[var(--fcps-shadow-card)] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+    <Card className="group overflow-hidden border-none shadow-(--fcps-shadow-card) transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
       {/* Image */}
-      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-[var(--fcps-primary)] to-[var(--fcps-primary-light)]">
+      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-(--fcps-primary) to-(--fcps-primary-light)">
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-6xl opacity-20">📰</div>
         </div>
@@ -42,7 +42,7 @@ export function PostCard({ post }: PostCardProps) {
 
       <CardContent className="p-5">
         {/* Date */}
-        <p className="mb-2 text-xs text-[var(--fcps-gray-text)]">
+        <p className="mb-2 text-xs text-(--fcps-gray-text)">
           {new Date(post.publishedAt).toLocaleDateString('ar-JO', {
             year: 'numeric',
             month: 'long',
@@ -51,14 +51,14 @@ export function PostCard({ post }: PostCardProps) {
         </p>
 
         {/* Title */}
-        <h3 className="mb-2 text-lg font-bold leading-tight text-[var(--fcps-dark)] transition-colors group-hover:text-[var(--fcps-primary)]">
+        <h3 className="mb-2 text-lg font-bold leading-tight text-(--fcps-dark) transition-colors group-hover:text-(--fcps-primary)">
           <Link href={`/news/${post.slug}`} className="block">
             {post.title}
           </Link>
         </h3>
 
         {/* Excerpt */}
-        <p className="mb-4 text-sm leading-relaxed text-[var(--fcps-gray-text)] line-clamp-2">
+        <p className="mb-4 text-sm leading-relaxed text-(--fcps-gray-text) line-clamp-2">
           {post.excerpt}
         </p>
 
@@ -66,12 +66,12 @@ export function PostCard({ post }: PostCardProps) {
         <div className="flex items-center justify-between border-t pt-3">
           <Link
             href={`/news/${post.slug}`}
-            className="flex items-center gap-1 text-sm font-medium text-[var(--fcps-primary)] transition-colors hover:text-[var(--fcps-primary-dark)]"
+            className="flex items-center gap-1 text-sm font-medium text-(--fcps-primary) transition-colors hover:text-(--fcps-primary-dark)"
           >
             اقرأ المزيد
             <ArrowLeft className="h-3 w-3" />
           </Link>
-          <div className="flex items-center gap-1 text-sm text-[var(--fcps-gray-text)]">
+          <div className="flex items-center gap-1 text-sm text-(--fcps-gray-text)">
             <Heart className="h-3.5 w-3.5 text-red-400" />
             {post.likes}
           </div>

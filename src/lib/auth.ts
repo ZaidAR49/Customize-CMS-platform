@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth'
 import type { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getUserByEmailAction, getAllUsersAction, createUserAction } from '@/actions/users.actions'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -13,86 +13,52 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user }) {
       try {
-        const { count: adminCount, error: countError } = await supabaseAdmin
-          .from('users')
-          .select('id', { count: 'exact', head: true })
-          .eq('role', 'admin')
+        const res = await getUserByEmailAction(user.email!);
+        console.log("existingUser", res)
+        if (res) return true;
 
-        if (countError) throw countError
+        // If user doesn't exist, check if they are the first one
+        const { data: allUsers } = await getAllUsersAction();
+        const isFirst = !allUsers || allUsers.length === 0;
 
-        const noAdminsExist = adminCount === 0
-
-        const { data: existingUser } = await supabaseAdmin
-          .from('users')
-          .select('id, role')
-          .eq('email', user.email!)
-          .single()
-
-        if (existingUser) {
-          if (noAdminsExist && existingUser.role !== 'admin') {
-            await supabaseAdmin.from('users').update({ role: 'admin', name: user.name!, avatar_url: user.image }).eq('id', existingUser.id)
-            return true
-          }
-          if (existingUser.role === 'admin' || existingUser.role === 'editor') {
-            return true
-          }
-          return '/unauthorized'
-        } else {
-          if (noAdminsExist) {
-            const { error } = await supabaseAdmin
-              .from('users')
-              .insert({
-                email: user.email!,
-                name: user.name!,
-                avatar_url: user.image,
-                role: 'admin'
-              })
-            if (error) console.error('Supabase insert error:', error.message)
-            return true
-          } else {
-            const { error } = await supabaseAdmin
-              .from('users')
-              .insert({
-                email: user.email!,
-                name: user.name!,
-                avatar_url: user.image,
-                role: 'viewer'
-              })
-            if (error) console.error('Supabase insert error:', error.message)
-            return '/unauthorized'
-          }
+        if (isFirst) {
+          await createUserAction({
+            id: "", // Or generate a nanoid/uuid here
+            email: user.email!,
+            name: user.name!,
+            avatarUrl: user.image ?? "",
+            role: 'admin',
+            createdAt: new Date().toISOString()
+          });
+          return true;
         }
-      } catch (e) {
-        console.error('Auth signIn error:', e)
-        return false
+
+        return '/unauthorized';
+      } catch (error) {
+        console.error("SignIn Error:", error);
+        return '/unauthorized';
       }
     },
+
     async jwt({ token }) {
-      try {
-        const { data } = await supabaseAdmin
-          .from('users')
-          .select('id, role')
-          .eq('email', token.email!)
-          .single()
-        if (data) {
-          token.sub = data.id
-          token.role = data.role
-        }
-      } catch (e) {
-        // Supabase not configured yet — fallback
+      const { data: dbUser } = await getUserByEmailAction(token.email!);
+      if (dbUser) {
+        token.sub = dbUser.id;
+        token.role = dbUser.role;
       }
-      return token
+      return token;
     },
+
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.sub as string
-        session.user.role = (token.role as string) || 'viewer'
+        session.user.id = token.sub!;
+        session.user.role = token.role as string;
       }
-      return session
+      return session;
     },
   },
-  pages: { 
+  pages: {
     signIn: '/auth/signin',
     error: '/unauthorized'
   },
-}
+};

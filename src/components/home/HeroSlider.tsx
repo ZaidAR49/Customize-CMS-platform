@@ -110,7 +110,7 @@ export function HeroSlider() {
             >
               <a
                 href="/about"
-                className="rounded-lg bg-white px-6 py-3 text-sm font-bold text-[var(--fcps-primary-dark)] transition-all hover:bg-white/90 hover:scale-105 shadow-lg"
+                className="rounded-lg bg-white px-6 py-3 text-sm font-bold text-(--fcps-primary-dark) transition-all hover:bg-white/90 hover:scale-105 shadow-lg"
               >
                 تعرف علينا
               </a>

@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { supabaseAdmin } from '@/lib/supabase'
+import supabase from '@/lib/supabase'
 import { NextResponse } from 'next/server'
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -10,15 +10,24 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   const { id } = await params
   const body = await req.json()
-  const { data, error } = await supabaseAdmin
-    .from('posts')
-    .update(body)
-    .eq('id', id)
-    .select()
-    .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
+  try {
+    const keys = Object.keys(body)
+    if (keys.length === 0) return NextResponse.json({ error: 'No data' }, { status: 400 })
+
+    const { data, error } = await supabase
+      .from('posts')
+      .update(body)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw error
+    if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    return NextResponse.json(data)
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
 }
 
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -27,6 +36,12 @@ export async function DELETE(_: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
-  await supabaseAdmin.from('posts').delete().eq('id', id)
+
+  const { error } = await supabase
+    .from('posts')
+    .delete()
+    .eq('id', id)
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ deleted: true })
 }

@@ -1,16 +1,20 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { supabaseAdmin } from '@/lib/supabase'
+import supabase from '@/lib/supabase'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin
-    .from('posts')
-    .select('*')
-    .order('created_at', { ascending: false })
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
+    if (error) throw error
+    return NextResponse.json(data)
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
 }
 
 export async function POST(req: Request) {
@@ -18,13 +22,28 @@ export async function POST(req: Request) {
   if (!session || !['admin', 'editor'].includes(session.user.role))
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await req.json()
-  const { data, error } = await supabaseAdmin
-    .from('posts')
-    .insert(body)
-    .select()
-    .single()
+  try {
+    const body = await req.json()
+    const { title, slug, content, excerpt, cover_image, type, published, author_id } = body
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data, { status: 201 })
+    const { data, error } = await supabase
+      .from('posts')
+      .insert({
+        title,
+        slug,
+        content,
+        excerpt: excerpt ?? null,
+        cover_image: cover_image ?? null,
+        type,
+        published: published ?? false,
+        author_id,
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return NextResponse.json(data, { status: 201 })
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
 }

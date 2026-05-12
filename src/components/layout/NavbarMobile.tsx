@@ -30,10 +30,10 @@ export function NavbarMobile() {
       <div className="container flex h-14 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white overflow-hidden border border-[var(--fcps-bg-soft)] shadow-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white overflow-hidden border border-(--fcps-bg-soft) shadow-sm">
             <Image src={logo} alt="Logo" width={36} height={36} className="object-cover" />
           </div>
-          <span className="text-sm font-bold text-[var(--fcps-primary-dark)]">
+          <span className="text-sm font-bold text-(--fcps-primary-dark)">
             حماية الأسرة والطفولة
           </span>
         </Link>
@@ -42,10 +42,10 @@ export function NavbarMobile() {
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger >
             <button
-              className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-[var(--fcps-bg-soft)]"
+              className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-(--fcps-bg-soft)"
               aria-label="القائمة"
             >
-              <Menu className="h-5 w-5 text-[var(--fcps-text)]" />
+              <Menu className="h-5 w-5 text-(--fcps-text)" />
             </button>
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px] p-0">
@@ -54,10 +54,10 @@ export function NavbarMobile() {
               {/* Header */}
               <div className="flex items-center justify-between border-b px-4 py-4">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white overflow-hidden border border-[var(--fcps-bg-soft)] shadow-sm">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white overflow-hidden border border-(--fcps-bg-soft) shadow-sm">
                     <Image src={logo} alt="Logo" width={36} height={36} className="object-cover" />
                   </div>
-                  <span className="text-sm font-bold text-[var(--fcps-primary-dark)]">القائمة</span>
+                  <span className="text-sm font-bold text-(--fcps-primary-dark)">القائمة</span>
                 </div>
               </div>
 
@@ -66,7 +66,7 @@ export function NavbarMobile() {
                 <Link
                   href="/"
                   onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-3 text-sm font-medium text-[var(--fcps-text)] hover:bg-[var(--fcps-bg-soft)] hover:text-[var(--fcps-primary)]"
+                  className="block rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft) hover:text-(--fcps-primary)"
                 >
                   الرئيسية
                 </Link>
@@ -75,19 +75,19 @@ export function NavbarMobile() {
                 <div>
                   <button
                     onClick={() => toggleSection('centers')}
-                    className="flex w-full items-center justify-between rounded-md px-3 py-3 text-sm font-medium text-[var(--fcps-text)] hover:bg-[var(--fcps-bg-soft)]"
+                    className="flex w-full items-center justify-between rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft)"
                   >
                     مراكز الجمعية
                     <ChevronDown className={cn('h-4 w-4 transition-transform', expandedSection === 'centers' && 'rotate-180')} />
                   </button>
                   {expandedSection === 'centers' && (
-                    <div className="mr-4 space-y-1 border-r-2 border-[var(--fcps-primary-light)] pr-3">
+                    <div className="mr-4 space-y-1 border-r-2 border-(--fcps-primary-light) pr-3">
                       {centers.map(c => (
                         <Link
                           key={c.slug}
                           href={`/centers/${c.slug}`}
                           onClick={() => setOpen(false)}
-                          className="block rounded-md px-3 py-2 text-sm text-[var(--fcps-gray-text)] hover:text-[var(--fcps-primary)]"
+                          className="block rounded-md px-3 py-2 text-sm text-(--fcps-gray-text) hover:text-(--fcps-primary)"
                         >
                           {c.nameAr}
                         </Link>
@@ -100,19 +100,19 @@ export function NavbarMobile() {
                 <div>
                   <button
                     onClick={() => toggleSection('programs')}
-                    className="flex w-full items-center justify-between rounded-md px-3 py-3 text-sm font-medium text-[var(--fcps-text)] hover:bg-[var(--fcps-bg-soft)]"
+                    className="flex w-full items-center justify-between rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft)"
                   >
                     البرامج والمشاريع
                     <ChevronDown className={cn('h-4 w-4 transition-transform', expandedSection === 'programs' && 'rotate-180')} />
                   </button>
                   {expandedSection === 'programs' && (
-                    <div className="mr-4 space-y-1 border-r-2 border-[var(--fcps-primary-light)] pr-3">
+                    <div className="mr-4 space-y-1 border-r-2 border-(--fcps-primary-light) pr-3">
                       {programs.map(p => (
                         <Link
                           key={p.slug}
                           href={`/programs/${p.slug}`}
                           onClick={() => setOpen(false)}
-                          className="block rounded-md px-3 py-2 text-sm text-[var(--fcps-gray-text)] hover:text-[var(--fcps-primary)]"
+                          className="block rounded-md px-3 py-2 text-sm text-(--fcps-gray-text) hover:text-(--fcps-primary)"
                         >
                           {p.nameAr}
                         </Link>
@@ -124,21 +124,21 @@ export function NavbarMobile() {
                 <Link
                   href="/news"
                   onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-3 text-sm font-medium text-[var(--fcps-text)] hover:bg-[var(--fcps-bg-soft)] hover:text-[var(--fcps-primary)]"
+                  className="block rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft) hover:text-(--fcps-primary)"
                 >
                   نشاطات وأخبار
                 </Link>
                 <Link
                   href="/about"
                   onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-3 text-sm font-medium text-[var(--fcps-text)] hover:bg-[var(--fcps-bg-soft)] hover:text-[var(--fcps-primary)]"
+                  className="block rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft) hover:text-(--fcps-primary)"
                 >
                   عن الجمعية
                 </Link>
                 <Link
                   href="/contact"
                   onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-3 text-sm font-medium text-[var(--fcps-text)] hover:bg-[var(--fcps-bg-soft)] hover:text-[var(--fcps-primary)]"
+                  className="block rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft) hover:text-(--fcps-primary)"
                 >
                   اتصل بنا
                 </Link>

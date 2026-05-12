@@ -1,15 +1,19 @@
 import { createClient } from '@supabase/supabase-js'
-// Server-side client (uses service role — full access, bypasses RLS)
-export const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder_key'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// Client-side client (uses anon key — respects RLS)
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder_key'
-)
+// Check database connection on server startup
+;(async () => {
+  try {
+    const { error } = await supabase.from('users').select('id').limit(1)
+    if (error) throw error
+    console.log('✅ Database connected successfully')
+  } catch (error) {
+    console.error('❌ Database connection failed:', error)
+  }
+})()
 
-// ─── Data Fetching Functions ──────────────────────
-// (Moved to src/lib/services)
+export default supabase

@@ -18,15 +18,15 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="sticky top-0 flex h-screen w-64 flex-col border-l bg-[var(--fcps-bg-soft)]">
+    <aside className="sticky top-0 flex h-screen w-64 flex-col border-l bg-(--fcps-bg-soft)">
       {/* Header */}
       <div className="flex items-center gap-3 border-b px-6 py-5">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white overflow-hidden border border-[var(--fcps-bg-soft)] shadow-sm">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white overflow-hidden border border-(--fcps-bg-soft) shadow-sm">
           <Image src={logo} alt="Logo" width={40} height={40} className="object-cover" />
         </div>
         <div>
-          <h2 className="text-sm font-bold text-[var(--fcps-dark)]">لوحة التحكم</h2>
-          <p className="text-xs text-[var(--fcps-gray-text)]">إدارة المحتوى</p>
+          <h2 className="text-sm font-bold text-(--fcps-dark)">لوحة التحكم</h2>
+          <p className="text-xs text-(--fcps-gray-text)">إدارة المحتوى</p>
         </div>
       </div>
 
@@ -41,8 +41,8 @@ export function Sidebar() {
               className={cn(
                 'flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-all',
                 isActive
-                  ? 'bg-[var(--fcps-primary)] text-white shadow-sm'
-                  : 'text-[var(--fcps-gray-text)] hover:bg-white hover:text-[var(--fcps-primary)]'
+                  ? 'bg-(--fcps-primary) text-white shadow-sm'
+                  : 'text-(--fcps-gray-text) hover:bg-white hover:text-(--fcps-primary)'
               )}
             >
               <item.icon className="h-4 w-4" />
@@ -56,7 +56,7 @@ export function Sidebar() {
       <div className="border-t p-4">
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-[var(--fcps-gray-text)] transition-colors hover:bg-white hover:text-red-500"
+          className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-(--fcps-gray-text) transition-colors hover:bg-white hover:text-red-500"
         >
           <LogOut className="h-4 w-4" />
           تسجيل الخروج

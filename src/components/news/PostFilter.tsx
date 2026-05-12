@@ -29,8 +29,8 @@ export function PostFilter({ activeFilter, onFilterChange }: PostFilterProps) {
           className={cn(
             'rounded-full transition-all',
             activeFilter === filter.value
-              ? 'bg-[var(--fcps-primary)] text-white hover:bg-[var(--fcps-primary-dark)]'
-              : 'border-[var(--fcps-primary)]/20 text-[var(--fcps-gray-text)] hover:bg-[var(--fcps-bg-soft)] hover:text-[var(--fcps-primary)]'
+              ? 'bg-(--fcps-primary) text-white hover:bg-(--fcps-primary-dark)'
+              : 'border-(--fcps-primary)/20 text-(--fcps-gray-text) hover:bg-(--fcps-bg-soft) hover:text-(--fcps-primary)'
           )}
         >
           {filter.label}

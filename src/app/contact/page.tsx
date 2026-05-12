@@ -60,19 +60,19 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 max-w-5xl mx-auto">
             {/* Contact Info */}
             <div>
-              <h2 className="text-2xl font-bold text-[var(--fcps-primary-dark)] mb-6">معلومات التواصل</h2>
-              <p className="mb-8 text-[var(--fcps-gray-text)] leading-relaxed">
+              <h2 className="text-2xl font-bold text-(--fcps-primary-dark) mb-6">معلومات التواصل</h2>
+              <p className="mb-8 text-(--fcps-gray-text) leading-relaxed">
                 يمكنكم التواصل معنا عبر أي من الوسائل التالية أو من خلال تعبئة نموذج التواصل.
               </p>
 
               <div className="space-y-4">
                 <Card className="border-none shadow-sm">
                   <CardContent className="flex items-center gap-4 p-5">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--fcps-primary)] text-white">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-(--fcps-primary) text-white">
                       <Phone className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm text-[var(--fcps-gray-text)]">الهاتف</p>
+                      <p className="text-sm text-(--fcps-gray-text)">الهاتف</p>
                       <p className="font-medium" dir="ltr">{organization.phone}</p>
                     </div>
                   </CardContent>
@@ -80,11 +80,11 @@ export default function ContactPage() {
 
                 <Card className="border-none shadow-sm">
                   <CardContent className="flex items-center gap-4 p-5">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--fcps-primary-light)] text-white">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-(--fcps-primary-light) text-white">
                       <Mail className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm text-[var(--fcps-gray-text)]">البريد الإلكتروني</p>
+                      <p className="text-sm text-(--fcps-gray-text)">البريد الإلكتروني</p>
                       <p className="font-medium">{organization.email}</p>
                     </div>
                   </CardContent>
@@ -92,11 +92,11 @@ export default function ContactPage() {
 
                 <Card className="border-none shadow-sm">
                   <CardContent className="flex items-center gap-4 p-5">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--fcps-accent)] text-white">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-(--fcps-accent) text-white">
                       <MapPin className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm text-[var(--fcps-gray-text)]">العنوان</p>
+                      <p className="text-sm text-(--fcps-gray-text)">العنوان</p>
                       <p className="font-medium">{organization.addressAr}</p>
                     </div>
                   </CardContent>
@@ -108,7 +108,7 @@ export default function ContactPage() {
             <div>
               <Card className="border-none shadow-lg">
                 <CardContent className="p-8">
-                  <h2 className="text-2xl font-bold text-[var(--fcps-primary-dark)] mb-6">أرسل رسالة</h2>
+                  <h2 className="text-2xl font-bold text-(--fcps-primary-dark) mb-6">أرسل رسالة</h2>
 
                   {submitted && (
                     <div className="mb-6 flex items-center gap-3 rounded-lg bg-emerald-50 p-4 text-emerald-700">
@@ -124,7 +124,7 @@ export default function ContactPage() {
                         id="name"
                         placeholder="أدخل اسمك الكامل"
                         {...register('name')}
-                        className="bg-[var(--fcps-bg-soft)] border-none"
+                        className="bg-(--fcps-bg-soft) border-none"
                       />
                       {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
                     </div>
@@ -137,7 +137,7 @@ export default function ContactPage() {
                         placeholder="example@email.com"
                         dir="ltr"
                         {...register('email')}
-                        className="bg-[var(--fcps-bg-soft)] border-none text-left"
+                        className="bg-(--fcps-bg-soft) border-none text-left"
                       />
                       {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
                     </div>
@@ -148,7 +148,7 @@ export default function ContactPage() {
                         id="subject"
                         placeholder="موضوع الرسالة"
                         {...register('subject')}
-                        className="bg-[var(--fcps-bg-soft)] border-none"
+                        className="bg-(--fcps-bg-soft) border-none"
                       />
                       {errors.subject && <p className="mt-1 text-xs text-red-500">{errors.subject.message}</p>}
                     </div>
@@ -160,7 +160,7 @@ export default function ContactPage() {
                         placeholder="اكتب رسالتك هنا..."
                         rows={5}
                         {...register('message')}
-                        className="bg-[var(--fcps-bg-soft)] border-none resize-none"
+                        className="bg-(--fcps-bg-soft) border-none resize-none"
                       />
                       {errors.message && <p className="mt-1 text-xs text-red-500">{errors.message.message}</p>}
                     </div>
@@ -168,7 +168,7 @@ export default function ContactPage() {
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-[var(--fcps-primary)] hover:bg-[var(--fcps-primary-dark)] text-white"
+                      className="w-full bg-(--fcps-primary) hover:bg-(--fcps-primary-dark) text-white"
                     >
                       {isSubmitting ? (
                         <span className="flex items-center gap-2">

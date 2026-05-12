@@ -29,11 +29,11 @@ export function UserMenu({ user }: UserMenuProps) {
           onError={() => setImgError(true)}
         />
       ) : (
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--fcps-primary)] text-sm font-bold text-white shadow-sm">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-(--fcps-primary) text-sm font-bold text-white shadow-sm">
           {initial}
         </div>
       )}
-      <span className="text-sm font-medium text-[var(--fcps-text)]">{displayName}</span>
+      <span className="text-sm font-medium text-(--fcps-text)">{displayName}</span>
     </div>
   )
 }

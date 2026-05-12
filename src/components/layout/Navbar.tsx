@@ -59,10 +59,10 @@ export function Navbar() {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo + Name */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white transition-transform group-hover:scale-105 overflow-hidden border border-[var(--fcps-bg-soft)] shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white transition-transform group-hover:scale-105 overflow-hidden border border-(--fcps-bg-soft) shadow-sm">
             <Image src={logo} alt="Logo" width={48} height={48} className="object-cover" />
           </div>
-          <span className="text-lg font-bold text-[var(--fcps-primary-dark)]">
+          <span className="text-lg font-bold text-(--fcps-primary-dark)">
             جمعية حماية الأسرة والطفولة
           </span>
         </Link>
@@ -78,7 +78,7 @@ export function Navbar() {
                 href={item.href}
                 className={cn(
                   'flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  'text-[var(--fcps-text)] hover:text-[var(--fcps-primary)] hover:bg-[var(--fcps-bg-soft)]'
+                  'text-(--fcps-text) hover:text-(--fcps-primary) hover:bg-(--fcps-bg-soft)'
                 )}
                 onClick={(e) => {
                   if (item.children) {
@@ -101,7 +101,7 @@ export function Navbar() {
                       key={child.href}
                       href={child.href}
                       onClick={() => setOpenDropdown(null)}
-                      className="block rounded-md px-3 py-2 text-sm text-[var(--fcps-text)] transition-colors hover:bg-[var(--fcps-bg-soft)] hover:text-[var(--fcps-primary)]"
+                      className="block rounded-md px-3 py-2 text-sm text-(--fcps-text) transition-colors hover:bg-(--fcps-bg-soft) hover:text-(--fcps-primary)"
                     >
                       {child.label}
                     </Link>

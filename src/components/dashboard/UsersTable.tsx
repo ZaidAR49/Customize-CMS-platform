@@ -27,7 +27,7 @@ export function UsersTable() {
     <div className="rounded-lg border bg-white">
       <Table>
         <TableHeader>
-          <TableRow className="bg-[var(--fcps-bg-soft)]">
+          <TableRow className="bg-(--fcps-bg-soft)">
             <TableHead className="text-right font-bold">المستخدم</TableHead>
             <TableHead className="text-right font-bold">البريد الإلكتروني</TableHead>
             <TableHead className="text-right font-bold">الدور</TableHead>
@@ -36,18 +36,18 @@ export function UsersTable() {
         </TableHeader>
         <TableBody>
           {mockUsers.map((user) => (
-            <TableRow key={user.id} className="hover:bg-[var(--fcps-bg-soft)]/50">
+            <TableRow key={user.id} className="hover:bg-(--fcps-bg-soft)/50">
               <TableCell>
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-[var(--fcps-primary)] text-white text-xs">
+                    <AvatarFallback className="bg-(--fcps-primary) text-white text-xs">
                       {user.name.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                   <span className="font-medium">{user.name}</span>
                 </div>
               </TableCell>
-              <TableCell className="text-sm text-[var(--fcps-gray-text)]" dir="ltr">
+              <TableCell className="text-sm text-(--fcps-gray-text)" dir="ltr">
                 {user.email}
               </TableCell>
               <TableCell>
@@ -55,7 +55,7 @@ export function UsersTable() {
                   {roleLabels[user.role]}
                 </Badge>
               </TableCell>
-              <TableCell className="text-sm text-[var(--fcps-gray-text)]">
+              <TableCell className="text-sm text-(--fcps-gray-text)">
                 {new Date(user.createdAt).toLocaleDateString('ar-JO')}
               </TableCell>
             </TableRow>
