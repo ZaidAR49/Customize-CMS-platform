@@ -17,4 +17,8 @@ export function proxy(request: NextRequest) {
   return NextResponse.next()
 }
 
-
+// Only protect dashboard routes — do NOT intercept API routes, static files,
+// auth pages, or the NextAuth callback endpoints.
+export const config = {
+  matcher: ['/dashboard/:path*'],
+}
