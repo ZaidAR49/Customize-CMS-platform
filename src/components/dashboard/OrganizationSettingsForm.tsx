@@ -1,106 +1,332 @@
 'use client'
 
-import { useMemo, useState, useTransition } from 'react'
+import { useMemo, useState, useTransition, type ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import {
+  FaFacebook,
+  FaInstagram,
+  FaLinkedin,
+  FaTiktok,
+  FaWhatsapp,
+  FaXTwitter,
+  FaYoutube,
+} from 'react-icons/fa6'
+import { Plus, Trash2 } from 'lucide-react'
+import { createOrganizationAction, updateOrganizationAction } from '@/actions/organization.actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { updateOrganizationAction } from '@/actions/organization.actions'
-import type { OrganizationRow } from '@/types/organization'
+import {
+  updateOrganizationSchema,
+  validateMetadataRows,
+  zodErrorToFieldErrors,
+  METADATA_KEY_REGEX,
+} from '@/lib/validations/organization.schema'
+import { cn } from '@/lib/utils'
+import type { OrganizationRow, SocialPlatformKey } from '@/types/organization'
+import { SOCIAL_PLATFORM_KEYS } from '@/types/organization'
 
 function empty(v: string | null | undefined) {
   return v ?? ''
 }
 
-function buildInitial(org: OrganizationRow) {
+function valueToMetadataString(v: unknown): string {
+  if (v == null) return ''
+  if (typeof v === 'string') return v
+  try {
+    return JSON.stringify(v)
+  } catch {
+    return String(v)
+  }
+}
+
+function parseSocialFromRow(raw: unknown): Partial<Record<SocialPlatformKey, string>> {
+  if (!raw || typeof raw !== 'object') return {}
+  const o = raw as Record<string, unknown>
+  const out: Partial<Record<SocialPlatformKey, string>> = {}
+  for (const key of SOCIAL_PLATFORM_KEYS) {
+    const v = o[key]
+    if (typeof v === 'string') out[key] = v
+  }
+  return out
+}
+
+type MetadataRow = { clientId: string; key: string; value: string }
+
+function metadataToRows(metadata: unknown): MetadataRow[] {
+  if (!metadata || typeof metadata !== 'object') return []
+  return Object.entries(metadata as Record<string, unknown>).map(([key, val]) => ({
+    clientId: crypto.randomUUID(),
+    key,
+    value: valueToMetadataString(val),
+  }))
+}
+
+const SOCIAL_ICONS: Record<SocialPlatformKey, ReactNode> = {
+  facebook: <FaFacebook className="size-6" />,
+  twitter: <FaXTwitter className="size-6" />,
+  instagram: <FaInstagram className="size-6" />,
+  youtube: <FaYoutube className="size-6" />,
+  linkedin: <FaLinkedin className="size-6" />,
+  tiktok: <FaTiktok className="size-6" />,
+  whatsapp: <FaWhatsapp className="size-6" />,
+}
+
+const SOCIAL_LABELS: Record<SocialPlatformKey, string> = {
+  facebook: 'Facebook',
+  twitter: 'X (Twitter)',
+  instagram: 'Instagram',
+  youtube: 'YouTube',
+  linkedin: 'LinkedIn',
+  tiktok: 'TikTok',
+  whatsapp: 'WhatsApp',
+}
+
+function emptySocialFlags(): Record<SocialPlatformKey, boolean> {
+  return Object.fromEntries(SOCIAL_PLATFORM_KEYS.map((k) => [k, false])) as Record<
+    SocialPlatformKey,
+    boolean
+  >
+}
+
+function emptySocialUrls(): Record<SocialPlatformKey, string> {
+  return Object.fromEntries(SOCIAL_PLATFORM_KEYS.map((k) => [k, ''])) as Record<
+    SocialPlatformKey,
+    string
+  >
+}
+
+function buildInitial(org: OrganizationRow | null) {
+  const social = org ? parseSocialFromRow(org.social) : {}
+  const socialEnabled = emptySocialFlags()
+  const socialUrls = emptySocialUrls()
+  for (const key of SOCIAL_PLATFORM_KEYS) {
+    const u = social[key]?.trim()
+    if (u) {
+      socialEnabled[key] = true
+      socialUrls[key] = u
+    }
+  }
+
   return {
-    name_ar: org.name_ar,
-    name_en: empty(org.name_en),
-    tagline_ar: empty(org.tagline_ar),
-    founded_year: org.founded_year != null ? String(org.founded_year) : '',
-    logo_url: empty(org.logo_url),
-    about_ar: empty(org.about_ar),
-    mission_ar: empty(org.mission_ar),
-    vision_ar: empty(org.vision_ar),
-    phone: empty(org.phone),
-    email: empty(org.email),
-    address_ar: empty(org.address_ar),
-    google_maps_url: empty(org.google_maps_url),
-    facebook_url: empty(org.facebook_url),
-    twitter_url: empty(org.twitter_url),
-    youtube_url: empty(org.youtube_url),
-    stat_families: org.stat_families != null ? String(org.stat_families) : '',
-    stat_children: org.stat_children != null ? String(org.stat_children) : '',
-    stat_women: org.stat_women != null ? String(org.stat_women) : '',
-    stat_activities: org.stat_activities != null ? String(org.stat_activities) : '',
+    name_ar: org?.name_ar ?? '',
+    name_en: empty(org?.name_en),
+    tagline_ar: empty(org?.tagline_ar),
+    tagline_en: empty(org?.tagline_en),
+    founded_year: org?.founded_year != null ? String(org.founded_year) : '',
+    about_ar: empty(org?.about_ar),
+    about_en: empty(org?.about_en),
+    mission_ar: empty(org?.mission_ar),
+    mission_en: empty(org?.mission_en),
+    vision_ar: empty(org?.vision_ar),
+    vision_en: empty(org?.vision_en),
+    phone: empty(org?.phone),
+    email: empty(org?.email),
+    socialEnabled,
+    socialUrls,
+    metadataRows: org ? metadataToRows(org.metadata) : [],
   }
 }
 
 type FormState = ReturnType<typeof buildInitial>
 
-export function OrganizationSettingsForm({ organization }: { organization: OrganizationRow }) {
+function serializeForm(form: FormState) {
+  return JSON.stringify(form)
+}
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null
+  return (
+    <p className="text-right text-sm text-destructive" role="alert">
+      {message}
+    </p>
+  )
+}
+
+function OptionalEnHint() {
+  return <span className="mr-1 text-xs font-normal text-muted-foreground">(اختياري)</span>
+}
+
+export function OrganizationSettingsForm({
+  organization,
+}: {
+  organization: OrganizationRow | null
+}) {
+  const router = useRouter()
+  const isCreate = organization == null
   const [form, setForm] = useState<FormState>(() => buildInitial(organization))
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const [pending, startTransition] = useTransition()
 
-  const changed = useMemo(() => {
-    const initial = buildInitial(organization)
-    return JSON.stringify(form) !== JSON.stringify(initial)
-  }, [form, organization])
+  const baseline = useMemo(() => serializeForm(buildInitial(organization)), [organization])
+  const changed = useMemo(() => serializeForm(form) !== baseline, [form, baseline])
+
+  function removeErrorKeys(keys: string[]) {
+    if (keys.length === 0) return
+    setErrors((prev) => {
+      const next = { ...prev }
+      for (const k of keys) delete next[k]
+      return next
+    })
+  }
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
+    removeErrorKeys([String(key)])
   }
 
   function parseOptionalInt(raw: string): number | undefined {
     const t = raw.trim()
     if (t === '') return undefined
+    if (!/^\d+$/.test(t)) return undefined
     const n = Number.parseInt(t, 10)
     return Number.isFinite(n) ? n : undefined
   }
 
+  function toggleSocial(key: SocialPlatformKey) {
+    setForm((prev) => {
+      const next = !prev.socialEnabled[key]
+      return {
+        ...prev,
+        socialEnabled: { ...prev.socialEnabled, [key]: next },
+        socialUrls: next ? prev.socialUrls : { ...prev.socialUrls, [key]: '' },
+      }
+    })
+    removeErrorKeys([`social.${key}`])
+  }
+
+  function addMetadataRow() {
+    setForm((prev) => ({
+      ...prev,
+      metadataRows: [...prev.metadataRows, { clientId: crypto.randomUUID(), key: '', value: '' }],
+    }))
+  }
+
+  function updateMetadataRow(clientId: string, patch: Partial<Pick<MetadataRow, 'key' | 'value'>>) {
+    setForm((prev) => ({
+      ...prev,
+      metadataRows: prev.metadataRows.map((r) => (r.clientId === clientId ? { ...r, ...patch } : r)),
+    }))
+    removeErrorKeys([`metadata.${clientId}.key`, `metadata.${clientId}.value`])
+  }
+
+  function removeMetadataRow(clientId: string) {
+    setForm((prev) => ({
+      ...prev,
+      metadataRows: prev.metadataRows.filter((r) => r.clientId !== clientId),
+    }))
+    removeErrorKeys([`metadata.${clientId}.key`, `metadata.${clientId}.value`])
+  }
+
+  function setSocialUrl(key: SocialPlatformKey, value: string) {
+    setForm((prev) => ({
+      ...prev,
+      socialUrls: { ...prev.socialUrls, [key]: value },
+    }))
+    removeErrorKeys([`social.${key}`])
+  }
+
+  function scrollFirstInvalidIntoView() {
+    requestAnimationFrame(() => {
+      document.querySelector('[aria-invalid="true"]')?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    })
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    setErrors({})
+
+    const social: Partial<Record<SocialPlatformKey, string>> = {}
+    for (const key of SOCIAL_PLATFORM_KEYS) {
+      if (!form.socialEnabled[key]) continue
+      social[key] = form.socialUrls[key].trim()
+    }
+
+    const metadata: Record<string, string> = {}
+    for (const row of form.metadataRows) {
+      const k = row.key.trim()
+      if (!k || !METADATA_KEY_REGEX.test(k)) continue
+      metadata[k] = row.value
+    }
+
+    const foundedRaw = form.founded_year.trim()
+    let founded_year = parseOptionalInt(form.founded_year)
+    const foundedFieldErrors: Record<string, string> = {}
+    if (foundedRaw !== '' && founded_year === undefined) {
+      foundedFieldErrors.founded_year = 'أدخل سنة تأسيس صحيحة (أرقام فقط)'
+    }
+
+    const payload = {
+      name_ar: form.name_ar.trim(),
+      name_en: form.name_en.trim(),
+      tagline_ar: form.tagline_ar.trim(),
+      tagline_en: form.tagline_en.trim(),
+      founded_year,
+      about_ar: form.about_ar.trim(),
+      about_en: form.about_en.trim(),
+      mission_ar: form.mission_ar.trim(),
+      mission_en: form.mission_en.trim(),
+      vision_ar: form.vision_ar.trim(),
+      vision_en: form.vision_en.trim(),
+      phone: form.phone.trim(),
+      email: form.email.trim(),
+      social,
+      metadata,
+    }
+
+    const merged: Record<string, string> = {
+      ...validateMetadataRows(form.metadataRows),
+      ...foundedFieldErrors,
+    }
+
+    const parsed = updateOrganizationSchema.safeParse(payload)
+    if (!parsed.success) {
+      Object.assign(merged, zodErrorToFieldErrors(parsed.error))
+    }
+
+    if (Object.keys(merged).length > 0) {
+      setErrors(merged)
+      scrollFirstInvalidIntoView()
+      return
+    }
+
     startTransition(async () => {
-      const payload = {
-        name_ar: form.name_ar.trim(),
-        name_en: form.name_en.trim(),
-        tagline_ar: form.tagline_ar.trim(),
-        founded_year: parseOptionalInt(form.founded_year),
-        logo_url: form.logo_url.trim(),
-        about_ar: form.about_ar.trim(),
-        mission_ar: form.mission_ar.trim(),
-        vision_ar: form.vision_ar.trim(),
-        phone: form.phone.trim(),
-        email: form.email.trim(),
-        address_ar: form.address_ar.trim(),
-        google_maps_url: form.google_maps_url.trim(),
-        facebook_url: form.facebook_url.trim(),
-        twitter_url: form.twitter_url.trim(),
-        youtube_url: form.youtube_url.trim(),
-        stat_families: parseOptionalInt(form.stat_families),
-        stat_children: parseOptionalInt(form.stat_children),
-        stat_women: parseOptionalInt(form.stat_women),
-        stat_activities: parseOptionalInt(form.stat_activities),
+      if (isCreate) {
+        const result = await createOrganizationAction(payload)
+        if (result.success && result.data) {
+          setErrors({})
+          toast.success('تم إنشاء سجل المنظمة')
+          router.refresh()
+        } else {
+          toast.error(result.error ?? 'تعذر الإنشاء')
+          if ('fieldErrors' in result && result.fieldErrors) setErrors(result.fieldErrors)
+        }
+        return
       }
 
       const result = await updateOrganizationAction(organization.id, payload)
       if (result.success && result.data) {
+        setErrors({})
         toast.success('تم حفظ معلومات المنظمة')
         setForm(buildInitial(result.data as OrganizationRow))
       } else {
         toast.error(result.error ?? 'تعذر الحفظ')
+        if ('fieldErrors' in result && result.fieldErrors) setErrors(result.fieldErrors)
       }
     })
   }
 
+  const e = errors
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       <Card className="border-none shadow-sm">
         <CardHeader className="text-right">
           <CardTitle>الهوية والظهور</CardTitle>
-          <CardDescription>الاسم، الشعار، والسنة التأسيسية</CardDescription>
+          <CardDescription>الاسم، الشعارات، وسنة التأسيس</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
@@ -108,53 +334,73 @@ export function OrganizationSettingsForm({ organization }: { organization: Organ
             <Input
               id="name_ar"
               value={form.name_ar}
-              onChange={(e) => update('name_ar', e.target.value)}
-              required
+              onChange={(ev) => update('name_ar', ev.target.value)}
+              placeholder="مثال: جمعية حماية الأسرة والطفولة"
               dir="rtl"
+              aria-invalid={!!e.name_ar}
+              className={cn(e.name_ar && 'border-destructive')}
             />
+            <FieldError message={e.name_ar} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="name_en">الاسم بالإنجليزية</Label>
+            <Label htmlFor="name_en" className="flex flex-wrap items-center  gap-1">
+              الاسم بالإنجليزية
+              <OptionalEnHint />
+            </Label>
             <Input
               id="name_en"
               value={form.name_en}
-              onChange={(e) => update('name_en', e.target.value)}
+              onChange={(ev) => update('name_en', ev.target.value)}
+              placeholder="Example: Family and Child Protection Society"
               dir="ltr"
-              className="text-left"
+              className={cn('text-left', e.name_en && 'border-destructive')}
+              aria-invalid={!!e.name_en}
             />
+            <FieldError message={e.name_en} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="founded_year">سنة التأسيس</Label>
             <Input
               id="founded_year"
-              type="number"
+              type="text"
               inputMode="numeric"
               value={form.founded_year}
-              onChange={(e) => update('founded_year', e.target.value)}
+              onChange={(ev) => update('founded_year', ev.target.value)}
+              placeholder="مثال: 1990"
               dir="ltr"
-              className="text-left"
+              className={cn('text-left', e.founded_year && 'border-destructive')}
+              aria-invalid={!!e.founded_year}
             />
+            <FieldError message={e.founded_year} />
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="tagline_ar">الشعار</Label>
+            <Label htmlFor="tagline_ar">الشعار بالعربية</Label>
             <Input
               id="tagline_ar"
               value={form.tagline_ar}
-              onChange={(e) => update('tagline_ar', e.target.value)}
+              onChange={(ev) => update('tagline_ar', ev.target.value)}
+              placeholder="عبارة ترويجية أو شعار قصير..."
               dir="rtl"
+              aria-invalid={!!e.tagline_ar}
+              className={cn(e.tagline_ar && 'border-destructive')}
             />
+            <FieldError message={e.tagline_ar} />
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="logo_url">رابط شعار المنظمة (URL)</Label>
+            <Label htmlFor="tagline_en" className="flex flex-wrap items-center  gap-1">
+              الشعار بالإنجليزية
+              <OptionalEnHint />
+            </Label>
             <Input
-              id="logo_url"
-              type="url"
-              value={form.logo_url}
-              onChange={(e) => update('logo_url', e.target.value)}
-              placeholder="https://"
+              id="tagline_en"
+              value={form.tagline_en}
+              onChange={(ev) => update('tagline_en', ev.target.value)}
+              placeholder="Short promotional slogan or tagline..."
               dir="ltr"
-              className="text-left"
+              className={cn('text-left', e.tagline_en && 'border-destructive')}
+              aria-invalid={!!e.tagline_en}
             />
+            <FieldError message={e.tagline_en} />
           </div>
         </CardContent>
       </Card>
@@ -162,45 +408,114 @@ export function OrganizationSettingsForm({ organization }: { organization: Organ
       <Card className="border-none shadow-sm">
         <CardHeader className="text-right">
           <CardTitle>المحتوى</CardTitle>
-          <CardDescription>نبذة، الرسالة، والرؤية</CardDescription>
+          <CardDescription>نبذة، الرسالة، والرؤية (عربي / إنجليزي)</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="about_ar">عن الجمعية</Label>
-            <Textarea
-              id="about_ar"
-              value={form.about_ar}
-              onChange={(e) => update('about_ar', e.target.value)}
-              rows={5}
-              dir="rtl"
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="about_ar">عن المنظمة (عربي)</Label>
+              <Textarea
+                id="about_ar"
+                value={form.about_ar}
+                onChange={(ev) => update('about_ar', ev.target.value)}
+                placeholder="نبذة تعريفية شاملة عن المنظمة، أهدافها، وتاريخها..."
+                rows={5}
+                dir="rtl"
+                aria-invalid={!!e.about_ar}
+                className={cn(e.about_ar && 'border-destructive')}
+              />
+              <FieldError message={e.about_ar} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="about_en" className="flex flex-wrap items-center  gap-1">
+                عن المنظمة (إنجليزي)
+                <OptionalEnHint />
+              </Label>
+              <Textarea
+                id="about_en"
+                value={form.about_en}
+                onChange={(ev) => update('about_en', ev.target.value)}
+                placeholder="Comprehensive overview of the organization, its goals, and history..."
+                rows={5}
+                dir="ltr"
+                className={cn('text-left', e.about_en && 'border-destructive')}
+                aria-invalid={!!e.about_en}
+              />
+              <FieldError message={e.about_en} />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="mission_ar">الرسالة</Label>
-            <Textarea
-              id="mission_ar"
-              value={form.mission_ar}
-              onChange={(e) => update('mission_ar', e.target.value)}
-              rows={4}
-              dir="rtl"
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="mission_ar">الرسالة (عربي)</Label>
+              <Textarea
+                id="mission_ar"
+                value={form.mission_ar}
+                onChange={(ev) => update('mission_ar', ev.target.value)}
+                placeholder="رسالة المنظمة التي تسعى لتحقيقها في المجتمع..."
+                rows={4}
+                dir="rtl"
+                aria-invalid={!!e.mission_ar}
+                className={cn(e.mission_ar && 'border-destructive')}
+              />
+              <FieldError message={e.mission_ar} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="mission_en" className="flex flex-wrap items-center  gap-1">
+                الرسالة (إنجليزي)
+                <OptionalEnHint />
+              </Label>
+              <Textarea
+                id="mission_en"
+                value={form.mission_en}
+                onChange={(ev) => update('mission_en', ev.target.value)}
+                placeholder="The organization's mission statement..."
+                rows={4}
+                dir="ltr"
+                className={cn('text-left', e.mission_en && 'border-destructive')}
+                aria-invalid={!!e.mission_en}
+              />
+              <FieldError message={e.mission_en} />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="vision_ar">الرؤية</Label>
-            <Textarea
-              id="vision_ar"
-              value={form.vision_ar}
-              onChange={(e) => update('vision_ar', e.target.value)}
-              rows={3}
-              dir="rtl"
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="vision_ar">الرؤية (عربي)</Label>
+              <Textarea
+                id="vision_ar"
+                value={form.vision_ar}
+                onChange={(ev) => update('vision_ar', ev.target.value)}
+                placeholder="الرؤية المستقبلية والغاية الكبرى للمنظمة..."
+                rows={3}
+                dir="rtl"
+                aria-invalid={!!e.vision_ar}
+                className={cn(e.vision_ar && 'border-destructive')}
+              />
+              <FieldError message={e.vision_ar} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="vision_en" className="flex flex-wrap items-center  gap-1">
+                الرؤية (إنجليزي)
+                <OptionalEnHint />
+              </Label>
+              <Textarea
+                id="vision_en"
+                value={form.vision_en}
+                onChange={(ev) => update('vision_en', ev.target.value)}
+                placeholder="The future vision and ultimate goal of the organization..."
+                rows={3}
+                dir="ltr"
+                className={cn('text-left', e.vision_en && 'border-destructive')}
+                aria-invalid={!!e.vision_en}
+              />
+              <FieldError message={e.vision_en} />
+            </div>
           </div>
         </CardContent>
       </Card>
 
       <Card className="border-none shadow-sm">
         <CardHeader className="text-right">
-          <CardTitle>التواصل والموقع</CardTitle>
+          <CardTitle>التواصل</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
@@ -208,10 +523,13 @@ export function OrganizationSettingsForm({ organization }: { organization: Organ
             <Input
               id="phone"
               value={form.phone}
-              onChange={(e) => update('phone', e.target.value)}
-              dir="ltr"
-              className="text-left"
+              onChange={(ev) => update('phone', ev.target.value)}
+              placeholder="مثال: +962790000000"
+              dir="rtl"
+              className={cn('text-left', e.phone && 'border-destructive')}
+              aria-invalid={!!e.phone}
             />
+            <FieldError message={e.phone} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">البريد الإلكتروني</Label>
@@ -219,103 +537,141 @@ export function OrganizationSettingsForm({ organization }: { organization: Organ
               id="email"
               type="email"
               value={form.email}
-              onChange={(e) => update('email', e.target.value)}
+              onChange={(ev) => update('email', ev.target.value)}
+              placeholder="مثال: info@example.com"
               dir="ltr"
-              className="text-left"
+              className={cn('text-left', e.email && 'border-destructive')}
+              aria-invalid={!!e.email}
             />
-          </div>
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="address_ar">العنوان</Label>
-            <Textarea
-              id="address_ar"
-              value={form.address_ar}
-              onChange={(e) => update('address_ar', e.target.value)}
-              rows={2}
-              dir="rtl"
-            />
-          </div>
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="google_maps_url">رابط خرائط Google</Label>
-            <Input
-              id="google_maps_url"
-              type="url"
-              value={form.google_maps_url}
-              onChange={(e) => update('google_maps_url', e.target.value)}
-              dir="ltr"
-              className="text-left"
-            />
+            <FieldError message={e.email} />
           </div>
         </CardContent>
       </Card>
 
       <Card className="border-none shadow-sm">
         <CardHeader className="text-right">
-          <CardTitle>وسائل التواصل</CardTitle>
+          <CardTitle>وسائل التواصل الاجتماعي</CardTitle>
+          <CardDescription>اختر المنصات التي تريد عرضها ثم أدخل الرابط لكل منها</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="facebook_url">Facebook</Label>
-            <Input
-              id="facebook_url"
-              type="url"
-              value={form.facebook_url}
-              onChange={(e) => update('facebook_url', e.target.value)}
-              dir="ltr"
-              className="text-left"
-            />
+        <CardContent className="space-y-6">
+          <div className="flex flex-wrap justify-end gap-2">
+            {SOCIAL_PLATFORM_KEYS.map((key) => {
+              const active = form.socialEnabled[key]
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => toggleSocial(key)}
+                  title={SOCIAL_LABELS[key]}
+                  className={
+                    'flex flex-col items-center gap-1 rounded-xl border px-3 py-2 transition-colors ' +
+                    (active
+                      ? 'border-(--fcps-primary) bg-(--fcps-primary)/10 text-(--fcps-dark)'
+                      : 'border-border bg-muted/40 text-muted-foreground hover:bg-muted')
+                  }
+                >
+                  {SOCIAL_ICONS[key]}
+                  <span className="max-w-22 truncate text-center text-[10px] font-medium leading-tight">
+                    {SOCIAL_LABELS[key]}
+                  </span>
+                </button>
+              )
+            })}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="twitter_url">Twitter / X</Label>
-            <Input
-              id="twitter_url"
-              type="url"
-              value={form.twitter_url}
-              onChange={(e) => update('twitter_url', e.target.value)}
-              dir="ltr"
-              className="text-left"
-            />
-          </div>
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="youtube_url">YouTube</Label>
-            <Input
-              id="youtube_url"
-              type="url"
-              value={form.youtube_url}
-              onChange={(e) => update('youtube_url', e.target.value)}
-              dir="ltr"
-              className="text-left"
-            />
+          <div className="grid gap-4">
+            {SOCIAL_PLATFORM_KEYS.filter((k) => form.socialEnabled[k]).map((key) => {
+              const path = `social.${key}`
+              const msg = e[path]
+              return (
+                <div key={key} className="space-y-2">
+                  <Label htmlFor={`social_${key}`} className="flex items-center gap-2">
+                    <span className="text-muted-foreground">{SOCIAL_ICONS[key]}</span>
+                    {SOCIAL_LABELS[key]}
+                  </Label>
+                  <Input
+                    id={`social_${key}`}
+                    type="url"
+                    value={form.socialUrls[key]}
+                    onChange={(ev) => setSocialUrl(key, ev.target.value)}
+                    placeholder={`https://${key}.com/your-page`}
+                    dir="ltr"
+                    className={cn('text-left', msg && 'border-destructive')}
+                    aria-invalid={!!msg}
+                  />
+                  <FieldError message={msg} />
+                </div>
+              )
+            })}
+            {SOCIAL_PLATFORM_KEYS.every((k) => !form.socialEnabled[k]) && (
+              <p className="text-right text-sm text-muted-foreground">
+                لم يتم اختيار أي منصة. اضغط على أيقونة أعلاه لإظهار حقل الرابط.
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
 
       <Card className="border-none shadow-sm">
-        <CardHeader className="text-right">
-          <CardTitle>الإحصائيات المعروضة</CardTitle>
-          <CardDescription>أرقام الواجهة العامة (الأسر، الأطفال، ...)</CardDescription>
+        <CardHeader className="flex flex-col gap-2 text-right sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle>البيانات الوصفية (Metadata)</CardTitle>
+            <CardDescription>أزواج مفتاح وقيمة تُخزَّن في حقل JSONB</CardDescription>
+          </div>
+          <Button type="button" variant="outline" size="sm" className="gap-1 self-end sm:self-auto" onClick={addMetadataRow}>
+            <Plus className="size-4" />
+            إضافة حقل
+          </Button>
         </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-2">
-          {(
-            [
-              ['stat_families', 'أسر مستفيدة'],
-              ['stat_children', 'أطفال'],
-              ['stat_women', 'نساء'],
-              ['stat_activities', 'أنشطة'],
-            ] as const
-          ).map(([key, label]) => (
-            <div key={key} className="space-y-2">
-              <Label htmlFor={key}>{label}</Label>
-              <Input
-                id={key}
-                type="number"
-                inputMode="numeric"
-                value={form[key]}
-                onChange={(e) => update(key, e.target.value)}
-                dir="ltr"
-                className="text-left"
-              />
-            </div>
-          ))}
+        <CardContent className="space-y-3">
+          {form.metadataRows.length === 0 ? (
+            <p className="text-right text-sm text-muted-foreground">لا توجد حقول. استخدم «إضافة حقل».</p>
+          ) : (
+            form.metadataRows.map((row) => {
+              const errKey = e[`metadata.${row.clientId}.key`]
+              const errVal = e[`metadata.${row.clientId}.value`]
+              return (
+                <div
+                  key={row.clientId}
+                  className="grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
+                >
+                  <div className="space-y-2 sm:col-span-1">
+                    <Label className="text-right">المفتاح</Label>
+                    <Input
+                      value={row.key}
+                      onChange={(ev) => updateMetadataRow(row.clientId, { key: ev.target.value })}
+                      placeholder="مثال: tax_number (لغة إنجليزية فقط)"
+                      dir="ltr"
+                      className={cn('text-left font-mono text-sm', errKey && 'border-destructive')}
+                      aria-invalid={!!errKey}
+                    />
+                    <FieldError message={errKey} />
+                  </div>
+                  <div className="space-y-2 sm:col-span-1">
+                    <Label className="text-right">القيمة</Label>
+                    <Input
+                      value={row.value}
+                      onChange={(ev) => updateMetadataRow(row.clientId, { value: ev.target.value })}
+                      placeholder='نص عادي أو كود JSON مثل: ["أ", "ب"]'
+                      dir="ltr"
+                      className={cn('text-left', errVal && 'border-destructive')}
+                      aria-invalid={!!errVal}
+                    />
+                    <FieldError message={errVal} />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive hover:text-destructive"
+                    onClick={() => removeMetadataRow(row.clientId)}
+                    aria-label="حذف الحقل"
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              )
+            })
+          )}
         </CardContent>
       </Card>
 
@@ -324,12 +680,15 @@ export function OrganizationSettingsForm({ organization }: { organization: Organ
           type="button"
           variant="outline"
           disabled={pending || !changed}
-          onClick={() => setForm(buildInitial(organization))}
+          onClick={() => {
+            setForm(buildInitial(organization))
+            setErrors({})
+          }}
         >
           إلغاء التعديلات
         </Button>
-        <Button type="submit" disabled={pending || !changed} className="min-w-[120px]">
-          {pending ? 'جاري الحفظ...' : 'حفظ'}
+        <Button type="submit" disabled={pending || (!isCreate && !changed)} className="min-w-[120px]">
+          {pending ? 'جاري الحفظ...' : isCreate ? 'إنشاء السجل' : 'حفظ'}
         </Button>
       </div>
     </form>

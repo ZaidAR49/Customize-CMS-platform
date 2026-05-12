@@ -3,10 +3,46 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { organizationService } from '@/lib/services/organization.service';
-import { updateOrganizationSchema } from '@/lib/validations/organization.schema';
+import {
+  updateOrganizationSchema,
+  zodErrorToFieldErrors,
+  type UpdateOrganizationInput,
+} from '@/lib/validations/organization.schema';
+import { SOCIAL_PLATFORM_KEYS } from '@/types/organization';
 import { revalidatePath } from 'next/cache';
 
-export async function updateOrganizationAction(id: string, data: any) {
+function normalizeSocial(s: UpdateOrganizationInput['social']) {
+  const out: Record<string, string> = {};
+  if (!s) return out;
+  for (const key of SOCIAL_PLATFORM_KEYS) {
+    const v = s[key];
+    if (typeof v === 'string' && v.trim() !== '') out[key] = v.trim();
+  }
+  return out;
+}
+
+function normalizeMetadata(m: UpdateOrganizationInput['metadata']) {
+  const out: Record<string, string> = {};
+  if (!m) return out;
+  for (const [k, v] of Object.entries(m)) {
+    const key = k.trim();
+    if (!key || v.trim() === '') continue;
+    out[key] = v.trim();
+  }
+  return out;
+}
+
+function toDbPayload(parsed: UpdateOrganizationInput, userId: string) {
+  const { social, metadata, ...rest } = parsed;
+  return {
+    ...rest,
+    social: normalizeSocial(social),
+    metadata: normalizeMetadata(metadata),
+    updated_by: userId,
+  };
+}
+
+export async function updateOrganizationAction(id: string, data: unknown) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== 'admin') {
@@ -15,19 +51,49 @@ export async function updateOrganizationAction(id: string, data: any) {
 
     const parsed = updateOrganizationSchema.safeParse(data);
     if (!parsed.success) {
-      return { success: false, error: parsed.error.issues[0].message };
+      return {
+        success: false,
+        error: parsed.error.issues[0]?.message ?? 'Invalid data',
+        fieldErrors: zodErrorToFieldErrors(parsed.error),
+      };
     }
 
-    const org = await organizationService.updateOrganization(id, {
-      ...parsed.data,
-      updated_by: session.user.id,
-    });
-    
+    const org = await organizationService.updateOrganization(id, toDbPayload(parsed.data, session.user.id));
+
     revalidatePath('/dashboard/settings');
     revalidatePath('/');
-    
+
     return { success: true, data: org };
-  } catch (error: any) {
-    return { success: false, error: error.message || 'Failed to update organization details' };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Failed to update organization details';
+    return { success: false, error: message };
+  }
+}
+
+export async function createOrganizationAction(data: unknown) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== 'admin') {
+      return { success: false, error: 'Unauthorized access. Admins only.' };
+    }
+
+    const parsed = updateOrganizationSchema.safeParse(data);
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: parsed.error.issues[0]?.message ?? 'Invalid data',
+        fieldErrors: zodErrorToFieldErrors(parsed.error),
+      };
+    }
+
+    const org = await organizationService.createOrganization(toDbPayload(parsed.data, session.user.id));
+
+    revalidatePath('/dashboard/settings');
+    revalidatePath('/');
+
+    return { success: true, data: org };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Failed to create organization';
+    return { success: false, error: message };
   }
 }

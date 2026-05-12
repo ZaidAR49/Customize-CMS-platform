@@ -24,5 +24,17 @@ export const organizationService = {
     if (error) throw error;
     if (!data) throw new Error('Organization not found');
     return data as OrganizationRow;
-  }
+  },
+
+  async createOrganization(orgData: Record<string, unknown>): Promise<OrganizationRow> {
+    const { data, error } = await supabase
+      .from('organization')
+      .insert(orgData)
+      .select()
+      .single();
+
+    if (error) throw error;
+    if (!data) throw new Error('Organization insert failed');
+    return data as OrganizationRow;
+  },
 };

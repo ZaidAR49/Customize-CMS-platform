@@ -97,8 +97,6 @@ CREATE TABLE public.organization (
   mission_en TEXT,
   vision_ar TEXT,
   vision_en TEXT,
-  logo_url VARCHAR(500),
-  website_url VARCHAR(500),
   phone VARCHAR(20),
   email VARCHAR(150),
   founded_year INTEGER DEFAULT 1992,
@@ -108,6 +106,9 @@ CREATE TABLE public.organization (
   updated_by UUID REFERENCES public.users(id) ON DELETE
   SET NULL
 );
+-- Upgrade path (existing databases only): drop removed columns
+-- ALTER TABLE public.organization DROP COLUMN IF EXISTS logo_url;
+-- ALTER TABLE public.organization DROP COLUMN IF EXISTS website_url;
 -- -------------------------------------------------------------
 -- 2.5 organization_stats
 -- Dynamic key-value stats (families served, activities, etc.)
