@@ -37,12 +37,29 @@ CREATE TABLE public.users (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 -- -------------------------------------------------------------
--- 2.2 posts
+-- 2.2 categories
+-- Standalone categories. Posts reference via category_id FK.
+-- Allows empty categories, ordering, and bilingual labels.
+-- -------------------------------------------------------------
+CREATE TABLE public.categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key VARCHAR(50) NOT NULL UNIQUE,
+  label_ar VARCHAR(100) NOT NULL,
+  label_en VARCHAR(100),
+  description_ar TEXT,
+  description_en TEXT,
+  icon VARCHAR(100),
+  display_order INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_categories_key ON public.categories(key);
+-- -------------------------------------------------------------
+-- 2.3 posts
 -- Core content table. Every content type is a post.
 --
 -- metadata jsonb shape by type:
 --   news / posts / activities:
---     { "category": "", "excerpt": "", "body": "" }
+--     { "excerpt": "", "body": "" }
 --   top_employees:
 --     { "job_title": "", "department": "", "bio": "", "phone": "" }
 -- -------------------------------------------------------------
@@ -53,13 +70,15 @@ CREATE TABLE public.posts (
   slug VARCHAR(255) NOT NULL UNIQUE,
   cover_image VARCHAR(500),
   tags TEXT [] DEFAULT '{}',
-  metadata JSONB DEFAULT '{}',
-  published BOOLEAN DEFAULT false,
-  published_at TIMESTAMPTZ DEFAULT now(),
-  author_id UUID NOT NULL REFERENCES public.users(id) ON DELETE RESTRICT
+  category_id UUID REFERENCES public.categories(id) ON DELETE
+  SET NULL,
+    metadata JSONB DEFAULT '{}',
+    published BOOLEAN DEFAULT false,
+    published_at TIMESTAMPTZ DEFAULT now(),
+    author_id UUID NOT NULL REFERENCES public.users(id) ON DELETE RESTRICT
 );
 -- -------------------------------------------------------------
--- 2.3 post_comments
+-- 2.4 post_comments
 -- Public-submittable comments with moderation workflow.
 -- -------------------------------------------------------------
 CREATE TABLE public.post_comments (
@@ -75,7 +94,7 @@ CREATE TABLE public.post_comments (
   SET NULL
 );
 -- -------------------------------------------------------------
--- 2.4 organization
+-- 2.5 organization
 -- Single-row table for org branding and identity.
 --
 -- social jsonb shape:
@@ -97,6 +116,8 @@ CREATE TABLE public.organization (
   mission_en TEXT,
   vision_ar TEXT,
   vision_en TEXT,
+  logo_url VARCHAR(500),
+  website_url VARCHAR(500),
   phone VARCHAR(20),
   email VARCHAR(150),
   founded_year INTEGER DEFAULT 1992,
@@ -106,11 +127,8 @@ CREATE TABLE public.organization (
   updated_by UUID REFERENCES public.users(id) ON DELETE
   SET NULL
 );
--- Upgrade path (existing databases only): drop removed columns
--- ALTER TABLE public.organization DROP COLUMN IF EXISTS logo_url;
--- ALTER TABLE public.organization DROP COLUMN IF EXISTS website_url;
 -- -------------------------------------------------------------
--- 2.5 organization_stats
+-- 2.6 organization_stats
 -- Dynamic key-value stats (families served, activities, etc.)
 -- Each stat is a row — add/remove/reorder without schema changes.
 -- -------------------------------------------------------------
@@ -135,8 +153,11 @@ CREATE TABLE public.organization_stats (
 -- =============================================================
 -- users
 -- (users_email_key unique index is created automatically by UNIQUE constraint)
+-- categories
+-- (categories_key_key unique index is created automatically by UNIQUE constraint)
 -- posts
 CREATE INDEX idx_posts_tags ON public.posts USING GIN (tags);
+CREATE INDEX idx_posts_category_id ON public.posts USING BTREE (category_id);
 CREATE INDEX idx_post_type ON public.posts USING BTREE (type);
 CREATE INDEX idx_posts_author_id ON public.posts USING BTREE (author_id);
 CREATE INDEX idx_posts_latest_published ON public.posts USING BTREE (published_at DESC)
@@ -154,13 +175,34 @@ CREATE INDEX idx_org_stats_org_id ON public.organization_stats USING BTREE (orga
 -- =============================================================
 -- 4. ROW LEVEL SECURITY
 -- =============================================================
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.post_comments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.organization ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.organization_stats ENABLE ROW LEVEL SECURITY;
 -- -------------------------------------------------------------
--- 4.1 users policies
+-- 4.1 categories policies
+-- -------------------------------------------------------------
+CREATE POLICY "Public read categories" ON public.categories FOR
+SELECT USING (true);
+CREATE POLICY "Admins manage categories" ON public.categories FOR ALL USING (
+  EXISTS (
+    SELECT 1
+    FROM public.users
+    WHERE id = auth.uid()
+      AND role = 'admin'
+  )
+) WITH CHECK (
+  EXISTS (
+    SELECT 1
+    FROM public.users
+    WHERE id = auth.uid()
+      AND role = 'admin'
+  )
+);
+-- -------------------------------------------------------------
+-- 4.2 users policies
 -- -------------------------------------------------------------
 CREATE POLICY "Users read own row" ON public.users FOR
 SELECT USING (id = auth.uid());
@@ -174,7 +216,7 @@ SELECT USING (
     )
   );
 -- -------------------------------------------------------------
--- 4.2 posts policies
+-- 4.3 posts policies
 -- -------------------------------------------------------------
 CREATE POLICY "Public read published posts" ON public.posts FOR
 SELECT USING (published = true);
@@ -214,7 +256,7 @@ CREATE POLICY "Admins delete posts" ON public.posts FOR DELETE USING (
   )
 );
 -- -------------------------------------------------------------
--- 4.3 post_comments policies
+-- 4.4 post_comments policies
 -- -------------------------------------------------------------
 CREATE POLICY "Public read approved comments" ON public.post_comments FOR
 SELECT USING (status = 'approved');
@@ -247,7 +289,7 @@ CREATE POLICY "Admins delete comments" ON public.post_comments FOR DELETE USING 
   )
 );
 -- -------------------------------------------------------------
--- 4.4 organization policies
+-- 4.5 organization policies
 -- -------------------------------------------------------------
 CREATE POLICY "Public read org" ON public.organization FOR
 SELECT USING (true);
@@ -261,7 +303,7 @@ UPDATE USING (
     )
   );
 -- -------------------------------------------------------------
--- 4.5 organization_stats policies
+-- 4.6 organization_stats policies
 -- -------------------------------------------------------------
 CREATE POLICY "Public read org stats" ON public.organization_stats FOR
 SELECT USING (true);
@@ -306,3 +348,34 @@ $$;
 CREATE TRIGGER on_auth_user_created
 AFTER
 INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+-- =============================================================
+-- 6. EXTENSIONS FOR SCHEDULING
+-- =============================================================
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+-- =============================================================
+-- 7. SCHEDULED JOBS
+-- =============================================================
+-- -------------------------------------------------------------
+-- 7.1 Delete rejected comments older than 1 month
+-- Runs at 00:00 on the 1st of every month (cron: '0 0 1 * *')
+-- -------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.delete_old_rejected_comments() RETURNS void LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public AS $$
+DECLARE deleted_count INTEGER;
+BEGIN
+DELETE FROM public.post_comments
+WHERE status = 'rejected'
+  AND moderated_at < now() - INTERVAL '1 month';
+GET DIAGNOSTICS deleted_count = ROW_COUNT;
+RAISE LOG 'delete_old_rejected_comments: deleted % rows at %',
+deleted_count,
+now();
+END;
+$$;
+SELECT cron.schedule(
+    'delete-rejected-comments-monthly',
+    '0 0 1 * *',
+    $$
+    SELECT public.delete_old_rejected_comments();
+$$
+);

@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const createPostSchema = z.object({
   slug: z.string().min(1, 'Slug is required'),
   title: z.string().min(1, 'Title is required'),
+  category_id: z.string().uuid('Invalid category ID').optional().or(z.literal('')),
   excerpt: z.string().optional(),
   content: z.string().optional(),
   cover_image: z.string().url('Invalid URL').optional().or(z.literal('')),

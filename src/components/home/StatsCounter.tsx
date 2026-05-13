@@ -3,6 +3,7 @@
 import { useCountUp } from '@/hooks/useCountUp'
 import type { OrgStats } from '@/types/organization'
 import { Users, Baby, Heart, Sparkles } from 'lucide-react'
+import { formatSiteNumber } from '@/lib/date-format'
 
 interface StatsCounterProps {
   stats: OrgStats
@@ -17,7 +18,7 @@ function StatItem({ target, label, icon: Icon }: { target: number; label: string
         <Icon className="h-7 w-7 text-white/90" />
       </div>
       <div className="text-5xl font-black text-white mb-2 tabular-nums">
-        {count.toLocaleString('ar-SA')}
+        {formatSiteNumber(count)}
       </div>
       <div className="text-lg text-white/80 mt-2">
         {label}

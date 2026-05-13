@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Heart, ArrowLeft } from 'lucide-react'
 import type { Post } from '@/types/post'
+import { formatSiteDate, formatSiteNumber } from '@/lib/date-format'
 
 const typeLabels: Record<string, string> = {
   news: 'أخبار',
@@ -43,11 +44,7 @@ export function PostCard({ post }: PostCardProps) {
       <CardContent className="p-5">
         {/* Date */}
         <p className="mb-2 text-xs text-(--fcps-gray-text)">
-          {new Date(post.publishedAt).toLocaleDateString('ar-JO', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
+          {formatSiteDate(post.publishedAt)}
         </p>
 
         {/* Title */}
@@ -73,7 +70,7 @@ export function PostCard({ post }: PostCardProps) {
           </Link>
           <div className="flex items-center gap-1 text-sm text-(--fcps-gray-text)">
             <Heart className="h-3.5 w-3.5 text-red-400" />
-            {post.likes}
+            {formatSiteNumber(post.likes)}
           </div>
         </div>
       </CardContent>

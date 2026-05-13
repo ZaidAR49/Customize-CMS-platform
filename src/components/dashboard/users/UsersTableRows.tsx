@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { AppUser } from '@/types/user'
 import { roleColors, roleLabels } from './users-table.constants'
+import { formatSiteDate } from '@/lib/date-format'
 
 interface UsersTableRowsProps {
   users: AppUser[]
@@ -96,7 +97,7 @@ export function UsersTableRows({
                     </Badge>
                   </TableCell>
                   <TableCell className="text-sm text-(--fcps-gray-text)">
-                    {new Date(user.createdAt).toLocaleDateString('ar-JO')}
+                    {formatSiteDate(user.createdAt)}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">

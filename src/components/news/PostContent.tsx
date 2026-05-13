@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card'
 import { Heart, Calendar, User } from 'lucide-react'
 import Link from 'next/link'
 import type { Post } from '@/types/post'
+import { formatSiteDate, formatSiteNumber } from '@/lib/date-format'
 
 const typeLabels: Record<string, string> = {
   news: 'أخبار',
@@ -47,15 +48,11 @@ export function PostContent({ post, related }: PostContentProps) {
               </div>
               <div className="flex items-center gap-1.5">
                 <Calendar className="h-4 w-4" />
-                {new Date(post.publishedAt).toLocaleDateString('ar-JO', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
+                {formatSiteDate(post.publishedAt)}
               </div>
               <div className="flex items-center gap-1.5">
                 <Heart className="h-4 w-4 text-red-400" />
-                {post.likes} إعجاب
+                {formatSiteNumber(post.likes)} إعجاب
               </div>
             </div>
           </div>
@@ -85,11 +82,7 @@ export function PostContent({ post, related }: PostContentProps) {
                 >
                   <Link href={`/news/${relatedPost.slug}`} className="block p-4">
                     <p className="mb-1 text-xs text-(--fcps-gray-text)">
-                      {new Date(relatedPost.publishedAt).toLocaleDateString('ar-JO', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
+                      {formatSiteDate(relatedPost.publishedAt)}
                     </p>
                     <h4 className="text-sm font-bold leading-snug text-(--fcps-dark) transition-colors group-hover:text-(--fcps-primary)">
                       {relatedPost.title}

@@ -8,7 +8,12 @@ export interface Post {
   content: string
   coverImage: string
   type: PostType
+  categoryId?: string
+  category?: string
+  categoryLabel?: string
+  tags?: string[]
   likes: number
+  published: boolean
   publishedAt: string
   author: {
     name: string

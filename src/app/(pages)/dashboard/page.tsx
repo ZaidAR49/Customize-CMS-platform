@@ -1,16 +1,17 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { PostsTable } from '@/components/dashboard/PostsTable'
-import { posts } from '@/data/posts'
+import { postsService } from '@/lib/services/posts.service'
 import { FileText, Heart, Users, Clock } from 'lucide-react'
 
-const stats = [
-  { label: 'إجمالي المقالات', value: posts.length, icon: FileText, color: 'bg-blue-500' },
-  { label: 'إجمالي الإعجابات', value: posts.reduce((sum, p) => sum + p.likes, 0), icon: Heart, color: 'bg-red-500' },
-  { label: 'المستخدمون', value: 3, icon: Users, color: 'bg-(--fcps-primary)' },
-  { label: 'مسودات معلقة', value: 0, icon: Clock, color: 'bg-amber-500' },
-]
+export default async function DashboardPage() {
+  const posts = await postsService.getPosts()
+  const stats = [
+    { label: 'إجمالي المقالات', value: posts.length, icon: FileText, color: 'bg-blue-500' },
+    { label: 'إجمالي الإعجابات', value: posts.reduce((sum, p) => sum + p.likes, 0), icon: Heart, color: 'bg-red-500' },
+    { label: 'المستخدمون', value: 3, icon: Users, color: 'bg-(--fcps-primary)' },
+    { label: 'مسودات معلقة', value: 0, icon: Clock, color: 'bg-amber-500' },
+  ]
 
-export default function DashboardPage() {
   return (
     <div>
       <h2 className="mb-6 text-2xl font-bold text-(--fcps-dark)">نظرة عامة</h2>

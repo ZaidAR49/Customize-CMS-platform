@@ -1,4 +1,5 @@
 import { organization } from '@/data/organization'
+import { formatSiteNumber } from '@/lib/date-format'
 import { Card, CardContent } from '@/components/ui/card'
 import { SectionTitle } from '@/components/shared/SectionTitle'
 import { Target, Eye, Calendar, MapPin, Phone, Mail } from 'lucide-react'
@@ -71,19 +72,19 @@ export default function AboutPage() {
         <div className="container">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4 text-center text-white">
             <div>
-              <div className="text-4xl md:text-5xl font-black">{organization.stats.families}</div>
+              <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(organization.stats.families)}</div>
               <div className="mt-2 text-white/80">أسرة</div>
             </div>
             <div>
-              <div className="text-4xl md:text-5xl font-black">{organization.stats.children.toLocaleString()}</div>
+              <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(organization.stats.children)}</div>
               <div className="mt-2 text-white/80">طفل</div>
             </div>
             <div>
-              <div className="text-4xl md:text-5xl font-black">{organization.stats.women.toLocaleString()}</div>
+              <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(organization.stats.women)}</div>
               <div className="mt-2 text-white/80">من النساء</div>
             </div>
             <div>
-              <div className="text-4xl md:text-5xl font-black">{organization.stats.activities}</div>
+              <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(organization.stats.activities)}</div>
               <div className="mt-2 text-white/80">نشاط</div>
             </div>
           </div>

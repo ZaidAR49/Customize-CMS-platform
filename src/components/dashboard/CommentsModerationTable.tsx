@@ -16,6 +16,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { moderateCommentAction } from '@/actions/comments.actions'
 import type { CommentStatus, PostCommentWithPost } from '@/types/comment'
+import { formatSiteDateTime } from '@/lib/date-format'
+import { TruncateFullTextPopup } from '@/components/ui/truncate-full-text'
 
 function postEmbed(posts: PostCommentWithPost['posts']) {
   if (!posts) return null
@@ -93,7 +95,7 @@ export function CommentsModerationTable({ comments }: Props) {
       </div>
 
       <div className="rounded-lg border bg-white">
-        <Table>
+        <Table className="table-fixed">
           <TableHeader>
             <TableRow className="bg-(--fcps-bg-soft)">
               <TableHead className="text-right font-bold">المقال</TableHead>
@@ -118,36 +120,57 @@ export function CommentsModerationTable({ comments }: Props) {
 
                 return (
                   <TableRow key={c.id} className="align-top hover:bg-(--fcps-bg-soft)/50">
-                    <TableCell className="max-w-[180px]">
+                    <TableCell className="max-w-[180px] whitespace-normal wrap-break-word">
                       {post ? (
-                        <Link
-                          href={href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-medium text-(--fcps-primary) hover:underline"
-                        >
-                          {post.title}
-                        </Link>
+                        <TruncateFullTextPopup
+                          text={post.title}
+                          dialogTitle="عنوان المقال"
+                          className="font-medium text-(--fcps-primary)"
+                          renderDialogFooter={(close) => (
+                            <>
+                              <Button type="button" variant="outline" onClick={close}>
+                                إغلاق
+                              </Button>
+                              <Link
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={close}
+                                className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                              >
+                                فتح المقال
+                              </Link>
+                            </>
+                          )}
+                        />
                       ) : (
                         <span className="text-sm text-(--fcps-gray-text)">—</span>
                       )}
                     </TableCell>
-                    <TableCell className="max-w-[140px]">
-                      <div className="font-medium">{c.author_name}</div>
+                    <TableCell className="max-w-[140px] whitespace-normal wrap-break-word">
+                      <div className="font-medium">
+                        <TruncateFullTextPopup text={c.author_name} dialogTitle="اسم المشارك" />
+                      </div>
                       {c.author_email ? (
-                        <div className="text-xs text-(--fcps-gray-text)" dir="ltr">
-                          {c.author_email}
+                        <div className="text-xs text-(--fcps-gray-text) break-all" dir="ltr">
+                          <TruncateFullTextPopup text={c.author_email} dialogTitle="البريد الإلكتروني" />
                         </div>
                       ) : null}
                     </TableCell>
-                    <TableCell className="max-w-md whitespace-pre-wrap text-sm">{c.body}</TableCell>
+                    <TableCell className="max-w-md text-sm">
+                      <TruncateFullTextPopup
+                        text={c.body}
+                        dialogTitle="نص التعليق"
+                        className="whitespace-pre-line"
+                      />
+                    </TableCell>
                     <TableCell>
                       <Badge variant={statusVariant[c.status]} className="text-xs">
                         {statusLabels[c.status]}
                       </Badge>
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-sm text-(--fcps-gray-text)">
-                      {new Date(c.created_at).toLocaleString('ar-JO')}
+                      {formatSiteDateTime(c.created_at)}
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1 sm:flex-row">

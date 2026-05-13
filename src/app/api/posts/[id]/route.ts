@@ -3,6 +3,13 @@ import { authOptions } from '@/lib/auth'
 import supabase from '@/lib/supabase'
 import { NextResponse } from 'next/server'
 
+function toDatabasePostType(type: string | null | undefined): string {
+  if (type === 'activity') return 'activities'
+  if (type === 'program') return 'posts'
+  if (type === 'center') return 'top_employees'
+  return type ?? 'news'
+}
+
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions)
   if (!session || !['admin', 'editor'].includes(session.user.role))
@@ -15,9 +22,31 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const keys = Object.keys(body)
     if (keys.length === 0) return NextResponse.json({ error: 'No data' }, { status: 400 })
 
+    const { content, excerpt, type, category_id, ...rest } = body
+    const payload: Record<string, unknown> = { ...rest }
+
+    if (type !== undefined) payload.type = toDatabasePostType(type)
+    if (category_id !== undefined) payload.category_id = category_id || null
+
+    if (content !== undefined || excerpt !== undefined) {
+      const { data: existingPost, error: existingError } = await supabase
+        .from('posts')
+        .select('metadata')
+        .eq('id', id)
+        .single()
+
+      if (existingError) throw existingError
+
+      payload.metadata = {
+        ...(existingPost?.metadata ?? {}),
+        ...(excerpt !== undefined ? { excerpt } : {}),
+        ...(content !== undefined ? { body: content } : {}),
+      }
+    }
+
     const { data, error } = await supabase
       .from('posts')
-      .update(body)
+      .update(payload)
       .eq('id', id)
       .select()
       .single()
