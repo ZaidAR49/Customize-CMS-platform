@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'lh5.googleusercontent.com', pathname: '/**' },
       { protocol: 'https', hostname: 'lh6.googleusercontent.com', pathname: '/**' },
       { protocol: 'https', hostname: 'fcpsjo.org', pathname: '/**' },
+      { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
     ],
   },
 }

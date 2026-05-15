@@ -22,6 +22,7 @@ export async function createPostAction(data: any) {
     const post = await postsService.createPost(postData);
     
     revalidatePath('/dashboard/posts');
+    revalidatePath('/dashboard/posts/new');
     revalidatePath('/news');
     
     return { success: true, data: post };
@@ -46,6 +47,7 @@ export async function updatePostAction(id: string, data: any) {
     const post = await postsService.updatePost(postId, updateData);
     
     revalidatePath('/dashboard/posts');
+    revalidatePath(`/dashboard/posts/${postId}/edit`);
     revalidatePath('/news');
     
     return { success: true, data: post };

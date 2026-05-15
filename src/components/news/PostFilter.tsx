@@ -1,7 +1,8 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { ClearFiltersButton } from '@/components/shared/ClearFiltersButton'
+import { SearchBar } from '@/components/shared/SearchBar'
 import type { PostType } from '@/types/post'
 import { cn } from '@/lib/utils'
 
@@ -20,6 +21,8 @@ interface PostFilterProps {
   onSearchChange: (value: string) => void
   activeCategory: string
   onCategoryChange: (value: string) => void
+  onClearFilters: () => void
+  hasActiveFilters: boolean
   categories: Array<{ key: string; label: string }>
 }
 
@@ -30,17 +33,25 @@ export function PostFilter({
   onSearchChange,
   activeCategory,
   onCategoryChange,
+  onClearFilters,
+  hasActiveFilters,
   categories,
 }: PostFilterProps) {
   return (
     <div className="mb-8 space-y-4">
-      <Input
-        value={searchQuery}
-        onChange={(e) => onSearchChange(e.target.value)}
-        placeholder="ابحث بالـ slug (مثل: news-2026)"
-        dir="ltr"
-        className="text-left"
-      />
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-[200px] flex-1">
+          <SearchBar
+            value={searchQuery}
+            onChange={onSearchChange}
+            placeholder="ابحث بالـ slug (مثل: news-2026)"
+            aria-label="بحث بالـ slug"
+            dir="ltr"
+            inputClassName="text-left"
+          />
+        </div>
+        <ClearFiltersButton onClear={onClearFilters} disabled={!hasActiveFilters} />
+      </div>
 
       <div className="flex flex-wrap gap-2">
         {filters.map((filter) => (

@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { ClearFiltersButton } from '@/components/shared/ClearFiltersButton'
 import { moderateCommentAction } from '@/actions/comments.actions'
 import type { CommentStatus, PostCommentWithPost } from '@/types/comment'
 import { formatSiteDateTime } from '@/lib/date-format'
@@ -77,21 +78,24 @@ export function CommentsModerationTable({ comments }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-(--fcps-gray-text)">عرض:</span>
-        {(['all', 'pending', 'approved', 'rejected'] as const).map((key) => (
-          <Button
-            key={key}
-            type="button"
-            size="sm"
-            variant={filter === key ? 'default' : 'outline'}
-            onClick={() => setFilter(key)}
-          >
-            {key === 'all'
-              ? 'الكل'
-              : statusLabels[key as CommentStatus]}
-          </Button>
-        ))}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-(--fcps-gray-text)">عرض:</span>
+          {(['all', 'pending', 'approved', 'rejected'] as const).map((key) => (
+            <Button
+              key={key}
+              type="button"
+              size="sm"
+              variant={filter === key ? 'default' : 'outline'}
+              onClick={() => setFilter(key)}
+            >
+              {key === 'all'
+                ? 'الكل'
+                : statusLabels[key as CommentStatus]}
+            </Button>
+          ))}
+        </div>
+        <ClearFiltersButton onClear={() => setFilter('all')} disabled={filter === 'all'} />
       </div>
 
       <div className="rounded-lg border bg-white">

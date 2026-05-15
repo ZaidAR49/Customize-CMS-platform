@@ -103,6 +103,16 @@ export function PostGrid({
     setCurrentPage(1)
   }
 
+  const hasActiveFilters =
+    activeFilter !== 'all' || activeCategory !== 'all' || searchQuery.trim() !== ''
+
+  function clearFilters() {
+    setActiveFilter('all')
+    setActiveCategory('all')
+    setSearchQuery('')
+    setCurrentPage(1)
+  }
+
   function goToPage(next: number) {
     if (next < 1 || next > totalPages) return
     setCurrentPage(next)
@@ -117,6 +127,8 @@ export function PostGrid({
         onSearchChange={changeSearch}
         activeCategory={activeCategory}
         onCategoryChange={changeCategory}
+        onClearFilters={clearFilters}
+        hasActiveFilters={hasActiveFilters}
         categories={categories}
       />
 

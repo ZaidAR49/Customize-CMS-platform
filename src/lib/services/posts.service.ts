@@ -27,6 +27,16 @@ function parseGallery(metadata: Record<string, unknown>): string[] {
   return raw.filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
 }
 
+function parseLikes(metadata: Record<string, unknown>): number {
+  const raw = metadata.likes;
+  if (typeof raw === 'number' && Number.isFinite(raw)) return Math.max(0, Math.floor(raw));
+  if (typeof raw === 'string') {
+    const n = Number.parseInt(raw, 10);
+    if (!Number.isNaN(n)) return Math.max(0, n);
+  }
+  return 0;
+}
+
 function mapPost(row: RawPost): Post {
   const metadata = row.metadata ?? {};
   const excerpt = row.excerpt ?? metadata.excerpt ?? '';
@@ -46,7 +56,7 @@ function mapPost(row: RawPost): Post {
     categoryLabel: category?.label_ar ?? category?.label_en ?? category?.key ?? metadata.category ?? undefined,
     tags: Array.isArray(row.tags) ? row.tags : [],
     gallery: parseGallery(metadata),
-    likes: row.likes ?? 0,
+    likes: parseLikes(metadata),
     published: row.published ?? false,
     publishedAt: row.published_at ?? row.publishedAt ?? new Date().toISOString(),
     author: {
@@ -69,6 +79,17 @@ export const postsService = {
     const { data, error } = await query;
     if (error) throw error;
     return (data ?? []).map(mapPost);
+  },
+
+  async getPostById(id: string): Promise<Post | null> {
+    const { data, error } = await supabase
+      .from('posts')
+      .select(POST_SELECT)
+      .eq('id', id)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data ? mapPost(data) : null;
   },
 
   async getPostBySlug(slug: string, publishedOnly = true): Promise<Post | null> {
@@ -95,7 +116,7 @@ export const postsService = {
 
   async createPost(postData: any): Promise<Post> {
     const { title, slug, content, excerpt, cover_image, type, published, author_id, category_id } = postData;
-    const metadata: Record<string, string> = {};
+    const metadata: Record<string, unknown> = { likes: 0 };
     if (excerpt !== undefined) metadata.excerpt = excerpt;
     if (content !== undefined) metadata.body = content;
 
@@ -162,23 +183,30 @@ export const postsService = {
     if (error) throw error;
   },
 
-  async incrementLikes(id: string): Promise<void> {
-    // Fetch current likes, then increment
+  async incrementLikes(id: string): Promise<number> {
     const { data: post, error: fetchError } = await supabase
       .from('posts')
-      .select('likes')
+      .select('metadata')
       .eq('id', id)
       .single();
 
     if (fetchError) throw fetchError;
+    if (!post) throw new Error('Post not found');
 
-    const currentLikes = post?.likes ?? 0;
+    const metadata = (post.metadata ?? {}) as Record<string, unknown>;
+    const nextLikes = parseLikes(metadata) + 1;
 
     const { error: updateError } = await supabase
       .from('posts')
-      .update({ likes: currentLikes + 1 })
+      .update({
+        metadata: {
+          ...metadata,
+          likes: nextLikes,
+        },
+      })
       .eq('id', id);
 
     if (updateError) throw updateError;
-  }
+    return nextLikes;
+  },
 };

@@ -1,12 +1,12 @@
 'use client'
 
 import { useMemo, useState, useTransition } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
 import { PostsTable } from '@/components/dashboard/PostsTable'
 import { Button, buttonVariants } from '@/components/ui/button'
-import { PostFormDialog, type PostFormValue } from '@/components/dashboard/PostFormDialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,9 +14,10 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { createPostAction, deletePostAction, updatePostAction } from '@/actions/posts.actions'
+import { deletePostAction } from '@/actions/posts.actions'
 import type { Post } from '@/types/post'
 import { FileText, Layers3, Tags, ChevronDown, Plus } from 'lucide-react'
+import { ClearFiltersButton } from '@/components/shared/ClearFiltersButton'
 import { cn } from '@/lib/utils'
 
 interface PostsOverviewProps {
@@ -33,23 +34,11 @@ const typeLabels: Record<string, string> = {
 
 export function PostsOverview({ posts }: PostsOverviewProps) {
   const router = useRouter()
-  const [pending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [activeType, setActiveType] = useState<Post['type'] | 'all'>('all')
   const [activeTag, setActiveTag] = useState<string>('all')
-  const [editingPost, setEditingPost] = useState<Post | null>(null)
-  const [formOpen, setFormOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
-  const [formValue, setFormValue] = useState<PostFormValue>({
-    slug: '',
-    title: '',
-    category_id: '',
-    excerpt: '',
-    content: '',
-    cover_image: '',
-    type: 'news',
-    published: false,
-  })
 
   const availableCategories = useMemo(() => {
     const categories = new Map<string, string>()
@@ -59,14 +48,6 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
     }
     return Array.from(categories.entries())
       .map(([key, label]) => ({ key, label }))
-      .sort((a, b) => a.label.localeCompare(b.label, 'ar'))
-  }, [posts])
-
-  const formCategories = useMemo(() => {
-    return posts
-      .filter((post) => post.categoryId && post.categoryLabel)
-      .map((post) => ({ id: post.categoryId as string, label: post.categoryLabel as string }))
-      .filter((v, i, arr) => arr.findIndex((x) => x.id === v.id) === i)
       .sort((a, b) => a.label.localeCompare(b.label, 'ar'))
   }, [posts])
 
@@ -87,68 +68,20 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
     })
   }, [activeCategory, activeType, activeTag, posts])
 
+  const hasActiveFilters =
+    activeCategory !== 'all' || activeType !== 'all' || activeTag !== 'all'
+
+  function clearFilters() {
+    setActiveCategory('all')
+    setActiveType('all')
+    setActiveTag('all')
+  }
+
   const stats = [
     { label: 'إجمالي المقالات', value: posts.length, icon: FileText, color: 'bg-blue-500' },
     { label: 'التصنيفات', value: availableCategories.length, icon: Layers3, color: 'bg-(--fcps-primary)' },
     { label: 'الوسوم', value: availableTags.length, icon: Tags, color: 'bg-amber-500' },
   ]
-
-  function updateForm<K extends keyof PostFormValue>(key: K, next: PostFormValue[K]) {
-    setFormValue((prev) => ({ ...prev, [key]: next }))
-  }
-
-  function openCreate() {
-    setEditingPost(null)
-    setFormValue({
-      slug: '',
-      title: '',
-      category_id: '',
-      excerpt: '',
-      content: '',
-      cover_image: '',
-      type: 'news',
-      published: false,
-    })
-    setFormOpen(true)
-  }
-
-  function openEdit(post: Post) {
-    setEditingPost(post)
-    setFormValue({
-      slug: post.slug,
-      title: post.title,
-      category_id: post.categoryId ?? '',
-      excerpt: post.excerpt ?? '',
-      content: post.content ?? '',
-      cover_image: post.coverImage ?? '',
-      type: post.type,
-      published: post.published,
-    })
-    setFormOpen(true)
-  }
-
-  function submitForm() {
-    startTransition(async () => {
-      const payload = {
-        ...formValue,
-        published_at: formValue.published ? new Date().toISOString() : '',
-      }
-
-      const result = editingPost?.id
-        ? await updatePostAction(editingPost.id, payload)
-        : await createPostAction(payload)
-
-      if (!result.success) {
-        toast.error(result.error ?? 'تعذر حفظ المقال')
-        return
-      }
-
-      toast.success(editingPost ? 'تم تحديث المقال' : 'تم إنشاء المقال')
-      setFormOpen(false)
-      setEditingPost(null)
-      router.refresh()
-    })
-  }
 
   function deletePost(post: Post) {
     if (!post.id) return
@@ -172,10 +105,16 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-end">
-        <Button className="bg-(--fcps-primary) hover:bg-(--fcps-primary-dark) text-white" onClick={openCreate}>
+        <Link
+          href="/dashboard/posts/new"
+          className={cn(
+            buttonVariants(),
+            'bg-(--fcps-primary) hover:bg-(--fcps-primary-dark) text-white'
+          )}
+        >
           <Plus className="h-4 w-4 ml-2" />
           مقال جديد
-        </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -196,6 +135,10 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
 
       <Card className="border-none shadow-sm">
         <CardContent className="p-5">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h3 className="text-sm font-medium text-(--fcps-dark)">تصفية المقالات</h3>
+            <ClearFiltersButton onClear={clearFilters} disabled={!hasActiveFilters} />
+          </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
               <label className="mb-2 block text-sm font-medium text-(--fcps-dark)">
@@ -288,18 +231,7 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
         </CardContent>
       </Card>
 
-      <PostsTable posts={filteredPosts} onEdit={openEdit} onDelete={deletePost} pendingDeleteId={pendingDeleteId} />
-
-      <PostFormDialog
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        mode={editingPost ? 'edit' : 'create'}
-        value={formValue}
-        categories={formCategories}
-        pending={pending}
-        onChange={updateForm}
-        onSubmit={submitForm}
-      />
+      <PostsTable posts={filteredPosts} onDelete={deletePost} pendingDeleteId={pendingDeleteId} />
     </div>
   )
 }

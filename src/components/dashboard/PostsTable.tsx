@@ -1,10 +1,12 @@
 'use client'
 
+import Link from 'next/link'
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Pencil, Trash2 } from 'lucide-react'
 import type { Post } from '@/types/post'
 import { formatSiteDate, formatSiteNumber } from '@/lib/date-format'
@@ -20,11 +22,10 @@ const typeLabels: Record<string, string> = {
 interface PostsTableProps {
   posts: Post[]
   pendingDeleteId?: string | null
-  onEdit?: (post: Post) => void
   onDelete?: (post: Post) => void
 }
 
-export function PostsTable({ posts, pendingDeleteId, onEdit, onDelete }: PostsTableProps) {
+export function PostsTable({ posts, pendingDeleteId, onDelete }: PostsTableProps) {
   return (
     <div className="rounded-lg border bg-white">
       <Table className="table-fixed">
@@ -66,15 +67,16 @@ export function PostsTable({ posts, pendingDeleteId, onEdit, onDelete }: PostsTa
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">
-                  {onEdit ? (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 text-(--fcps-gray-text) hover:text-(--fcps-primary)"
-                      onClick={() => onEdit(post)}
+                  {post.id ? (
+                    <Link
+                      href={`/dashboard/posts/${post.id}/edit`}
+                      className={cn(
+                        buttonVariants({ variant: 'ghost', size: 'sm' }),
+                        'h-8 w-8 p-0 text-(--fcps-gray-text) hover:text-(--fcps-primary)'
+                      )}
                     >
                       <Pencil className="h-4 w-4" />
-                    </Button>
+                    </Link>
                   ) : null}
                   {onDelete ? (
                     <Button

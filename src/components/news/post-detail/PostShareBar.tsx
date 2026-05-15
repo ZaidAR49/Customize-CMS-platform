@@ -48,8 +48,9 @@ export function PostShareBar({ postId, postUrl, postTitle, initialLikes }: PostS
     setPending(true)
     try {
       const res = await fetch(`/api/posts/${postId}/like`, { method: 'POST' })
+      const data = (await res.json()) as { likes?: number }
       if (res.ok) {
-        setLikes((n) => n + 1)
+        setLikes((n) => (typeof data.likes === 'number' ? data.likes : n + 1))
         setLiked(true)
       }
     } finally {

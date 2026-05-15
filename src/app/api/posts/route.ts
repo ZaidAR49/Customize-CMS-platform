@@ -32,7 +32,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
     const { title, slug, content, excerpt, cover_image, type, category_id, published, author_id } = body
-    const metadata: Record<string, string> = {}
+    const metadata: Record<string, unknown> = { likes: 0 }
     if (typeof excerpt === 'string') metadata.excerpt = excerpt
     if (typeof content === 'string') metadata.body = content
 

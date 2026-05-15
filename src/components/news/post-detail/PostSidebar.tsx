@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { X } from 'lucide-react'
 import type { Post } from '@/types/post'
+import { SearchBar } from '@/components/shared/SearchBar'
 import { formatSiteDate } from '@/lib/date-format'
 
 interface SidebarCategory {
@@ -21,36 +21,20 @@ export function PostSidebar({ latestPosts, categories }: PostSidebarProps) {
   const router = useRouter()
   const [search, setSearch] = useState('')
 
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
-    const q = search.trim()
-    if (q) router.push(`/news?q=${encodeURIComponent(q)}`)
-    else router.push('/news')
-  }
-
   return (
     <aside className="space-y-8 lg:col-span-1">
       <div className="rounded-lg bg-[#f9f9f9] p-5">
-        <form onSubmit={handleSearch} className="relative">
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="بحث..."
-            className="w-full rounded-md border border-[#e0e0e0] bg-white py-2.5 pr-10 pl-10 text-sm outline-none focus:border-[#0073aa] focus:ring-1 focus:ring-[#0073aa]"
-            aria-label="بحث في الأخبار"
-          />
-          {search && (
-            <button
-              type="button"
-              onClick={() => setSearch('')}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#777777] hover:text-[#333333]"
-              aria-label="مسح البحث"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </form>
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          onSubmit={(q) => {
+            const trimmed = q.trim()
+            if (trimmed) router.push(`/news?q=${encodeURIComponent(trimmed)}`)
+            else router.push('/news')
+          }}
+          placeholder="بحث..."
+          aria-label="بحث في الأخبار"
+        />
       </div>
 
       <div className="rounded-lg bg-[#f9f9f9] p-5">
