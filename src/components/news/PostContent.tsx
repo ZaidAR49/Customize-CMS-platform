@@ -10,6 +10,7 @@ import { PostSidebar } from '@/components/news/post-detail/PostSidebar'
 import { getPublicPostUrl } from '@/lib/post-url'
 import type { Post } from '@/types/post'
 import { formatSiteDate } from '@/lib/date-format'
+import { preparePostHtml } from '@/lib/post-html'
 
 const typeBreadcrumbLabels: Record<string, string> = {
   news: 'أخبار الجمعية',
@@ -69,6 +70,8 @@ export function PostContent({
   const postUrl = getPublicPostUrl(post.slug)
   const categoryLabel =
     post.categoryLabel ?? typeBreadcrumbLabels[post.type] ?? 'أخبار الجمعية'
+  const postBodyHtml =
+    preparePostHtml(post.descripcion) || (post.excerpt ? `<p>${post.excerpt}</p>` : '')
 
   return (
     <div className="bg-white">
@@ -76,7 +79,7 @@ export function PostContent({
         className="border-b border-[#e0e0e0] bg-[#fafafa] py-3 text-sm text-[#777777]"
         aria-label="مسار التنقل"
       >
-        <div className="container flex flex-wrap items-center gap-2">
+        <div className="page-layout-shell flex flex-wrap items-center gap-2">
           <Link href="/" className="hover:text-[#0073aa]">
             الرئيسية
           </Link>
@@ -92,7 +95,7 @@ export function PostContent({
       </nav>
 
       <div className="py-10">
-        <div className="page-layout">
+        <div className="page-layout-shell page-layout">
           <article className="min-w-0">
             <h1 className="mb-4 text-3xl font-bold leading-tight text-[#1a1a1a] md:text-4xl">
               {post.title}
@@ -118,12 +121,8 @@ export function PostContent({
             />
 
             <div
-              className="prose prose-lg max-w-none text-[#333333] leading-[1.8]
-                [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-[#1a1a1a] [&_h2]:mt-8 [&_h2]:mb-4
-                [&_p]:mb-4 [&_p]:text-right
-                [&_ul]:pr-6 [&_ul]:space-y-2
-                [&_li]:text-[#333333]"
-              dangerouslySetInnerHTML={{ __html: post.content || `<p>${post.excerpt}</p>` }}
+              className="post-html-content"
+              dangerouslySetInnerHTML={{ __html: postBodyHtml }}
             />
 
             <PostShareBar

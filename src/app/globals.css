@@ -234,21 +234,104 @@
   overflow: hidden;
 }
 
-/* ─── Page Layout ─────────────────────────────── */
+/* ─── Page Layout (post detail) ───────────────── */
+.page-layout-shell {
+  width: 100%;
+  max-width: 1536px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 2.5vw, 40px);
+}
+
 .page-layout {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 40px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 32px;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 48px;
   direction: rtl;
 }
 
 @media (max-width: 768px) {
+  .page-layout-shell {
+    padding: 0 16px;
+  }
+
   .page-layout {
     grid-template-columns: 1fr;
     gap: 24px;
-    padding: 0 16px;
   }
+}
+
+/* ─── Post HTML content (descripcion) ─────────── */
+.post-html-content {
+  color: #333333;
+  line-height: 1.8;
+  text-align: right;
+  font-size: 1.125rem;
+}
+
+.post-html-content h1 {
+  margin: 2rem 0 1rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: #1a1a1a;
+}
+
+.post-html-content h2 {
+  margin: 2rem 0 1rem;
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #1a1a1a;
+}
+
+.post-html-content h3 {
+  margin: 1.5rem 0 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #1a1a1a;
+}
+
+.post-html-content h4,
+.post-html-content h5,
+.post-html-content h6 {
+  margin: 1.25rem 0 0.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.post-html-content p {
+  margin-bottom: 1rem;
+}
+
+.post-html-content ul,
+.post-html-content ol {
+  margin: 0 0 1rem;
+  padding-right: 1.5rem;
+}
+
+.post-html-content li {
+  margin-bottom: 0.5rem;
+}
+
+.post-html-content a {
+  color: #0073aa;
+  text-decoration: underline;
+}
+
+.post-html-content a:hover {
+  color: #005580;
+}
+
+.post-html-content strong,
+.post-html-content b {
+  font-weight: 700;
+}
+
+.post-html-content blockquote {
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem;
+  border-right: 4px solid #0073aa;
+  background: #f9f9f9;
+  color: #555555;
 }

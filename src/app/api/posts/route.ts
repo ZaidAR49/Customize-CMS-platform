@@ -31,10 +31,9 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json()
-    const { title, slug, content, excerpt, cover_image, type, category_id, published, author_id } = body
+    const { title, slug, descripcion, excerpt, cover_image, type, category_id, published, author_id } = body
     const metadata: Record<string, unknown> = { likes: 0 }
     if (typeof excerpt === 'string') metadata.excerpt = excerpt
-    if (typeof content === 'string') metadata.body = content
 
     const { data, error } = await supabase
       .from('posts')
@@ -45,6 +44,7 @@ export async function POST(req: Request) {
         type: toDatabasePostType(type),
         category_id: category_id || null,
         metadata,
+        descripcion: typeof descripcion === 'string' ? descripcion : null,
         published: published ?? false,
         author_id,
       })

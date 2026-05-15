@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import type { PostFormValue } from '@/lib/posts-form'
 import type { Post } from '@/types/post'
+import CodeEditor from '@uiw/react-textarea-code-editor'
+import { Switch } from "@/components/ui/switch";
 
 const typeOptions: Array<{ value: Post['type']; label: string }> = [
   { value: 'news', label: 'أخبار' },
@@ -35,7 +37,7 @@ export function PostForm({
   onCancel,
 }: PostFormProps) {
   const [slugTouched, setSlugTouched] = useState(mode === 'edit')
-
+  const [isHtml, setIsHtml] = useState(false)
   useEffect(() => {
     setSlugTouched(mode === 'edit')
   }, [mode])
@@ -151,15 +153,43 @@ export function PostForm({
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="post-content">المحتوى</Label>
-          <Textarea
-            id="post-content"
-            value={value.content}
-            onChange={(e) => onChange('content', e.target.value)}
+          <Label htmlFor="post-descripcion">المحتوى</Label>
+          <p className="text-xs text-[#777777]">
+            يدعم HTML مثل <code className="rounded bg-[#f0f0f0] px-1">&lt;h2&gt;عنوان&lt;/h2&gt;</code>{' '}
+            أو Markdown مثل <code className="rounded bg-[#f0f0f0] px-1">## عنوان</code>
+          </p>
+          {/* toggel */}
+          <div className="flex items-center space-x-3 pb-2">
+            <Switch
+              id="theme-mode"
+              checked={isHtml}
+              onCheckedChange={setIsHtml}
+              // This matches the blue color from your image
+              className="data-[state=checked]:bg-blue-500"
+            />
+            <Label htmlFor="theme-mode" className="font-medium text-gray-700">
+              {isHtml ? "HTML" : "نص"}
+            </Label>
+          </div>
+
+          <CodeEditor
+            id="post-descripcion"
+            value={value.descripcion}
+            onChange={(e) => onChange('descripcion', e.target.value)}
             disabled={pending}
-            rows={16}
-            className="min-h-[320px]"
+            rows={20}
+            language={isHtml ? "html" : "text"}
+            className="min-h-[320px] font-mono text-sm leading-relaxed"
+            placeholder="Please enter HTML code."
+            dir="auto"
+            style={{
+              color: "#333333",
+              fontSize: 14,
+              backgroundColor: "#f5f5f5",
+              fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
+            }}
           />
+
         </div>
 
         <label className="flex items-center gap-2 text-sm">

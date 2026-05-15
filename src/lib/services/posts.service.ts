@@ -39,8 +39,12 @@ function parseLikes(metadata: Record<string, unknown>): number {
 
 function mapPost(row: RawPost): Post {
   const metadata = row.metadata ?? {};
-  const excerpt = row.excerpt ?? metadata.excerpt ?? '';
-  const content = row.content ?? metadata.body ?? '';
+  const excerpt = metadata.excerpt ?? '';
+  const descripcion =
+    row.descripcion ??
+    row.description ??
+    (typeof metadata.body === 'string' ? metadata.body : '') ??
+    '';
   const category = Array.isArray(row.category) ? row.category[0] : row.category;
 
   return {
@@ -48,7 +52,7 @@ function mapPost(row: RawPost): Post {
     slug: row.slug ?? '',
     title: row.title ?? '',
     excerpt,
-    content,
+    descripcion,
     coverImage: row.cover_image ?? row.coverImage ?? '',
     type: normalizePostType(row.type),
     categoryId: row.category_id ?? category?.id ?? undefined,
@@ -115,10 +119,9 @@ export const postsService = {
   },
 
   async createPost(postData: any): Promise<Post> {
-    const { title, slug, content, excerpt, cover_image, type, published, author_id, category_id } = postData;
+    const { title, slug, descripcion, excerpt, cover_image, type, published, author_id, category_id } = postData;
     const metadata: Record<string, unknown> = { likes: 0 };
     if (excerpt !== undefined) metadata.excerpt = excerpt;
-    if (content !== undefined) metadata.body = content;
 
     const { data, error } = await supabase
       .from('posts')
@@ -128,6 +131,7 @@ export const postsService = {
         cover_image: cover_image ?? null,
         type: toDatabasePostType(type),
         metadata,
+        descripcion: descripcion ?? null,
         category_id: category_id || null,
         published: published ?? false,
         author_id,
@@ -140,13 +144,17 @@ export const postsService = {
   },
 
   async updatePost(id: string, postData: any): Promise<Post> {
-    const { content, excerpt, type, category_id, ...rest } = postData;
+    const { descripcion, excerpt, type, category_id, ...rest } = postData;
     const payload: Record<string, any> = { ...rest };
 
     if (type !== undefined) payload.type = toDatabasePostType(type);
     if (category_id !== undefined) payload.category_id = category_id || null;
 
-    if (content !== undefined || excerpt !== undefined) {
+    if (descripcion !== undefined) {
+      payload.descripcion = descripcion;
+    }
+
+    if (excerpt !== undefined) {
       const { data: existingPost, error: existingError } = await supabase
         .from('posts')
         .select('metadata')
@@ -157,8 +165,7 @@ export const postsService = {
 
       payload.metadata = {
         ...(existingPost?.metadata ?? {}),
-        ...(excerpt !== undefined ? { excerpt } : {}),
-        ...(content !== undefined ? { body: content } : {}),
+        excerpt,
       };
     }
 

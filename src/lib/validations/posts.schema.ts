@@ -5,7 +5,7 @@ export const createPostSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   category_id: z.string().uuid('Invalid category ID').optional().or(z.literal('')),
   excerpt: z.string().optional(),
-  content: z.string().optional(),
+  descripcion: z.string().optional(),
   cover_image: z.string().url('Invalid URL').optional().or(z.literal('')),
   type: z.enum(['news', 'activity', 'program', 'center'], {
     message: 'Invalid post type',

@@ -5,7 +5,7 @@ export interface Post {
   slug: string
   title: string
   excerpt: string
-  content: string
+  descripcion: string
   coverImage: string
   type: PostType
   categoryId?: string

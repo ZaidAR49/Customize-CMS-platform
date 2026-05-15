@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import { useScrollTop } from '@/hooks/useScrollTop'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { centers } from '@/data/centers'
@@ -13,6 +14,7 @@ import logo from '@/app/icon.png'
 
 export function NavbarMobile() {
   const scrolled = useScrollTop(80)
+  const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const [expandedSection, setExpandedSection] = useState<string | null>(null)
 
@@ -142,6 +144,15 @@ export function NavbarMobile() {
                 >
                   اتصل بنا
                 </Link>
+                {session?.user && (
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setOpen(false)}
+                    className="mt-2 block rounded-md border border-(--fcps-primary-light) bg-(--fcps-bg-soft) px-3 py-3 text-sm font-semibold text-(--fcps-primary) hover:bg-(--fcps-primary) hover:text-white"
+                  >
+                    لوحة التحكم
+                  </Link>
+                )}
               </nav>
             </div>
           </SheetContent>

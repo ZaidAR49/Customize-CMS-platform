@@ -1,39 +1,28 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import { useScrollTop } from '@/hooks/useScrollTop'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { NavbarMobile } from './NavbarMobile'
-import { centers } from '@/data/centers'
-import { programs } from '@/data/programs'
+import { dashboardNavItem, siteNavItems } from '@/lib/site-nav'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import logo from '@/app/icon.png'
 
-const navItems = [
-  { label: 'الرئيسية', href: '/' },
-  {
-    label: 'مراكز الجمعية',
-    href: '#',
-    children: centers.map(c => ({ label: c.nameAr, href: `/centers/${c.slug}` }))
-  },
-  {
-    label: 'البرامج والمشاريع',
-    href: '#',
-    children: programs.map(p => ({ label: p.nameAr, href: `/programs/${p.slug}` }))
-  },
-  { label: 'نشاطات وأخبار', href: '/news' },
-  { label: 'عن الجمعية', href: '/about' },
-  { label: 'اتصل بنا', href: '/contact' },
-]
-
 export function Navbar() {
   const scrolled = useScrollTop(80)
   const isMobile = useMediaQuery('(max-width: 768px)')
+  const { data: session } = useSession()
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const navRef = useRef<HTMLElement>(null)
+
+  const navItems = useMemo(
+    () => (session?.user ? [...siteNavItems, dashboardNavItem] : siteNavItems),
+    [session?.user]
+  )
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

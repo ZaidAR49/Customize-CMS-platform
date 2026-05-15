@@ -59,7 +59,7 @@ CREATE INDEX idx_categories_key ON public.categories(key);
 --
 -- metadata jsonb shape by type:
 --   news / posts / activities:
---     { "excerpt": "", "body": "" }
+--     { "excerpt": "", "likes": 0, "gallery": [] }
 --   top_employees:
 --     { "job_title": "", "department": "", "bio": "", "phone": "" }
 -- -------------------------------------------------------------
@@ -75,7 +75,9 @@ CREATE TABLE public.posts (
     metadata JSONB DEFAULT '{}',
     published BOOLEAN DEFAULT false,
     published_at TIMESTAMPTZ DEFAULT now(),
-    author_id UUID NOT NULL REFERENCES public.users(id) ON DELETE RESTRICT
+    author_id UUID NOT NULL REFERENCES public.users(id) ON DELETE RESTRICT,
+    description TEXT,
+    descripcion TEXT
 );
 -- -------------------------------------------------------------
 -- 2.4 post_comments

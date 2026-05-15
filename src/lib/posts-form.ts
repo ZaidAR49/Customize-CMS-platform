@@ -5,7 +5,7 @@ export interface PostFormValue {
   title: string
   category_id: string
   excerpt: string
-  content: string
+  descripcion: string
   cover_image: string
   type: Post['type']
   published: boolean
@@ -25,7 +25,7 @@ export function postToFormValue(post: Post): PostFormValue {
     title: post.title,
     category_id: post.categoryId ?? '',
     excerpt: post.excerpt ?? '',
-    content: post.content ?? '',
+    descripcion: post.descripcion ?? '',
     cover_image: post.coverImage ?? '',
     type: post.type,
     published: post.published,
@@ -37,7 +37,7 @@ export const emptyPostFormValue: PostFormValue = {
   title: '',
   category_id: '',
   excerpt: '',
-  content: '',
+  descripcion: '',
   cover_image: '',
   type: 'news',
   published: false,

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Cairo } from 'next/font/google'
 import './globals.css'
 import { ConditionalHeader, ConditionalFooter } from '@/components/layout/ConditionalLayout'
+import { SessionProvider } from '@/components/providers/SessionProvider'
 import { ScrollToTop } from '@/components/shared/ScrollToTop'
 import { Toaster } from 'sonner'
 
@@ -23,11 +24,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ar" dir="rtl" className={cairo.variable} suppressHydrationWarning>
       <body className="bg-white text-[#333] antialiased" style={{ fontFamily: 'var(--font-cairo), sans-serif' }}>
-        <ConditionalHeader />
-        <main className="min-h-screen">{children}</main>
-        <ConditionalFooter />
-        <ScrollToTop />
-        <Toaster richColors position="top-center" dir="rtl" />
+        <SessionProvider>
+          <ConditionalHeader />
+          <main className="min-h-screen">{children}</main>
+          <ConditionalFooter />
+          <ScrollToTop />
+          <Toaster richColors position="top-center" dir="rtl" />
+        </SessionProvider>
       </body>
     </html>
   )
