@@ -1,4 +1,5 @@
 import supabase from '@/lib/supabase';
+import { normalizeSlug } from '@/lib/slug';
 import type { Post } from '@/types/post';
 
 const POST_SELECT =
@@ -20,6 +21,12 @@ function toDatabasePostType(type: string | null | undefined): string {
   return type ?? 'news';
 }
 
+function parseGallery(metadata: Record<string, unknown>): string[] {
+  const raw = metadata.gallery;
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
+}
+
 function mapPost(row: RawPost): Post {
   const metadata = row.metadata ?? {};
   const excerpt = row.excerpt ?? metadata.excerpt ?? '';
@@ -38,6 +45,7 @@ function mapPost(row: RawPost): Post {
     category: category?.key ?? metadata.category ?? undefined,
     categoryLabel: category?.label_ar ?? category?.label_en ?? category?.key ?? metadata.category ?? undefined,
     tags: Array.isArray(row.tags) ? row.tags : [],
+    gallery: parseGallery(metadata),
     likes: row.likes ?? 0,
     published: row.published ?? false,
     publishedAt: row.published_at ?? row.publishedAt ?? new Date().toISOString(),
@@ -63,15 +71,26 @@ export const postsService = {
     return (data ?? []).map(mapPost);
   },
 
-  async getPostBySlug(slug: string): Promise<Post | null> {
-    const { data, error } = await supabase
-      .from('posts')
-      .select(POST_SELECT)
-      .eq('slug', slug)
-      .single();
+  async getPostBySlug(slug: string, publishedOnly = true): Promise<Post | null> {
+    const normalized = normalizeSlug(slug)
 
-    if (error && error.code !== 'PGRST116') throw error;
-    return data ? mapPost(data) : null;
+    let query = supabase.from('posts').select(POST_SELECT).eq('slug', normalized)
+    if (publishedOnly) query = query.eq('published', true)
+
+    const { data, error } = await query.single()
+
+    if (error && error.code !== 'PGRST116') throw error
+    if (data) return mapPost(data)
+
+    // Fallback: match after NFC normalization (encoding / copy-paste differences)
+    let listQuery = supabase.from('posts').select(POST_SELECT)
+    if (publishedOnly) listQuery = listQuery.eq('published', true)
+
+    const { data: rows, error: listError } = await listQuery
+    if (listError) throw listError
+
+    const match = (rows ?? []).find((row) => normalizeSlug(row.slug ?? '') === normalized)
+    return match ? mapPost(match) : null
   },
 
   async createPost(postData: any): Promise<Post> {

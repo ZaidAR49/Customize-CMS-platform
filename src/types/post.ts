@@ -12,6 +12,7 @@ export interface Post {
   category?: string
   categoryLabel?: string
   tags?: string[]
+  gallery?: string[]
   likes: number
   published: boolean
   publishedAt: string

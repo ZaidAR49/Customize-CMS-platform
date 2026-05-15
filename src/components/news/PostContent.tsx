@@ -1,101 +1,147 @@
-import { Badge } from '@/components/ui/badge'
-import { Card } from '@/components/ui/card'
-import { Heart, Calendar, User } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
+import { ChevronRight } from 'lucide-react'
+import { PostMediaGallery } from '@/components/news/post-detail/PostMediaGallery'
+import { PostShareBar } from '@/components/news/post-detail/PostShareBar'
+import { PostCommentsSection } from '@/components/news/post-detail/PostCommentsSection'
+import type { PostApprovedComment } from '@/components/news/post-detail/PostCommentsSection'
+import { RelatedPosts } from '@/components/news/post-detail/RelatedPosts'
+import { PostSidebar } from '@/components/news/post-detail/PostSidebar'
+import { getPublicPostUrl } from '@/lib/post-url'
 import type { Post } from '@/types/post'
-import { formatSiteDate, formatSiteNumber } from '@/lib/date-format'
+import { formatSiteDate } from '@/lib/date-format'
 
-const typeLabels: Record<string, string> = {
-  news: 'أخبار',
-  activity: 'نشاطات',
-  program: 'برامج',
-  center: 'مراكز',
+const typeBreadcrumbLabels: Record<string, string> = {
+  news: 'أخبار الجمعية',
+  activity: 'نشاطات الجمعية',
 }
 
-interface PostContentProps {
+interface SidebarCategory {
+  key: string
+  label: string
+}
+
+export interface PostContentProps {
   post: Post
   related: Post[]
+  previousPost: Post | null
+  latestPosts: Array<Post & { commentCount?: number }>
+  categories: SidebarCategory[]
+  approvedComments: PostApprovedComment[]
 }
 
-export function PostContent({ post, related }: PostContentProps) {
-  return (
-    <div className="container py-12">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        {/* Main Content */}
-        <article className="lg:col-span-2">
-          {/* Hero Image */}
-          <div className="relative mb-8 h-64 md:h-96 overflow-hidden rounded-2xl bg-gradient-to-br from-(--fcps-primary) to-(--fcps-primary-light)">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-8xl opacity-15">📰</div>
-            </div>
-          </div>
+function authorAvatarUrl(avatarUrl: string, name: string): string | null {
+  if (avatarUrl?.trim()) return avatarUrl.trim()
+  return null
+}
 
-          {/* Article Header */}
-          <div className="mb-8">
-            <Badge className="mb-4 bg-(--fcps-bg-soft) text-(--fcps-primary) hover:bg-(--fcps-bg-soft)">
-              {typeLabels[post.type]}
-            </Badge>
-            <h1 className="mb-4 text-3xl md:text-4xl font-bold text-(--fcps-dark) leading-tight">
+function AuthorBlock({ post }: { post: Post }) {
+  const avatar = authorAvatarUrl(post.author.avatarUrl, post.author.name)
+
+  return (
+    <div className="mb-10 flex items-center gap-3">
+      {avatar ? (
+        <Image
+          src={avatar}
+          alt=""
+          width={64}
+          height={64}
+          className="h-16 w-16 rounded-full object-cover"
+        />
+      ) : (
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#0073aa] text-lg font-bold text-white">
+          {post.author.name.charAt(0)}
+        </div>
+      )}
+      <span className="text-base font-medium text-[#333333]">{post.author.name}</span>
+    </div>
+  )
+}
+
+export function PostContent({
+  post,
+  related,
+  previousPost,
+  latestPosts,
+  categories,
+  approvedComments,
+}: PostContentProps) {
+  const postUrl = getPublicPostUrl(post.slug)
+  const categoryLabel =
+    post.categoryLabel ?? typeBreadcrumbLabels[post.type] ?? 'أخبار الجمعية'
+
+  return (
+    <div className="bg-white">
+      <nav
+        className="border-b border-[#e0e0e0] bg-[#fafafa] py-3 text-sm text-[#777777]"
+        aria-label="مسار التنقل"
+      >
+        <div className="container flex flex-wrap items-center gap-2">
+          <Link href="/" className="hover:text-[#0073aa]">
+            الرئيسية
+          </Link>
+          <span aria-hidden="true">/</span>
+          <Link href="/news" className="hover:text-[#0073aa]">
+            نشاطات وأخبار الجمعية
+          </Link>
+          <span aria-hidden="true">/</span>
+          <span className="text-[#777777]">{categoryLabel}</span>
+          <span aria-hidden="true">/</span>
+          <span className="text-[#333333]">{post.title}</span>
+        </div>
+      </nav>
+
+      <div className="py-10">
+        <div className="page-layout">
+          <article className="min-w-0">
+            <h1 className="mb-4 text-3xl font-bold leading-tight text-[#1a1a1a] md:text-4xl">
               {post.title}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-4 text-sm text-(--fcps-gray-text)">
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-(--fcps-primary) text-white text-xs">
-                  <User className="h-4 w-4" />
-                </div>
-                <span>{post.author.name}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Calendar className="h-4 w-4" />
-                {formatSiteDate(post.publishedAt)}
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Heart className="h-4 w-4 text-red-400" />
-                {formatSiteNumber(post.likes)} إعجاب
-              </div>
-            </div>
-          </div>
+            {previousPost && (
+              <Link
+                href={`/news/${previousPost.slug}`}
+                className="mb-6 flex items-start gap-2 text-sm text-[#0073aa] hover:text-[#005580]"
+              >
+                <ChevronRight className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                <span>
+                  <span className="block text-[#777777]">{formatSiteDate(previousPost.publishedAt)}</span>
+                  <span className="font-medium">{previousPost.title}</span>
+                </span>
+              </Link>
+            )}
 
-          {/* Article Body */}
-          <div
-            className="prose prose-lg max-w-none text-(--fcps-text) leading-relaxed
-              [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-(--fcps-primary-dark) [&_h2]:mt-8 [&_h2]:mb-4
-              [&_p]:mb-4 [&_p]:leading-[1.8]
-              [&_ul]:pr-6 [&_ul]:space-y-2
-              [&_li]:text-(--fcps-gray-text)"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
-        </article>
+            <PostMediaGallery
+              coverImage={post.coverImage}
+              gallery={post.gallery}
+              title={post.title}
+            />
 
-        {/* Sidebar */}
-        <aside className="lg:col-span-1">
-          <div className="sticky top-24">
-            <h3 className="mb-6 text-xl font-bold text-(--fcps-primary-dark)">
-              مقالات ذات صلة
-            </h3>
-            <div className="space-y-4">
-              {related.map((relatedPost) => (
-                <Card
-                  key={relatedPost.id}
-                  className="group overflow-hidden border-none shadow-sm transition-all hover:shadow-md"
-                >
-                  <Link href={`/news/${relatedPost.slug}`} className="block p-4">
-                    <p className="mb-1 text-xs text-(--fcps-gray-text)">
-                      {formatSiteDate(relatedPost.publishedAt)}
-                    </p>
-                    <h4 className="text-sm font-bold leading-snug text-(--fcps-dark) transition-colors group-hover:text-(--fcps-primary)">
-                      {relatedPost.title}
-                    </h4>
-                    <p className="mt-2 text-xs text-(--fcps-gray-text) line-clamp-2">
-                      {relatedPost.excerpt}
-                    </p>
-                  </Link>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </aside>
+            <div
+              className="prose prose-lg max-w-none text-[#333333] leading-[1.8]
+                [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-[#1a1a1a] [&_h2]:mt-8 [&_h2]:mb-4
+                [&_p]:mb-4 [&_p]:text-right
+                [&_ul]:pr-6 [&_ul]:space-y-2
+                [&_li]:text-[#333333]"
+              dangerouslySetInnerHTML={{ __html: post.content || `<p>${post.excerpt}</p>` }}
+            />
+
+            <PostShareBar
+              postId={post.id ?? ''}
+              postUrl={postUrl}
+              postTitle={post.title}
+              initialLikes={post.likes}
+            />
+
+            {post.id && (
+              <PostCommentsSection postId={post.id} comments={approvedComments} />
+            )}
+
+            <RelatedPosts posts={related} />
+          </article>
+
+          <PostSidebar latestPosts={latestPosts} categories={categories} />
+        </div>
       </div>
     </div>
   )

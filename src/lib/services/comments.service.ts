@@ -2,6 +2,41 @@ import supabase from '@/lib/supabase'
 import type { PostCommentRow, PostCommentWithPost } from '@/types/comment'
 
 export const commentsService = {
+  async listRecentApproved(limit = 5) {
+    const { data, error } = await supabase
+      .from('post_comments')
+      .select('id, author_name, body, created_at, posts(title, slug)')
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false })
+      .limit(limit)
+
+    if (error) throw error
+    return data ?? []
+  },
+
+  async listApprovedForPost(postId: string) {
+    const { data, error } = await supabase
+      .from('post_comments')
+      .select('id, author_name, body, created_at')
+      .eq('post_id', postId)
+      .eq('status', 'approved')
+      .order('created_at', { ascending: true })
+
+    if (error) throw error
+    return data ?? []
+  },
+
+  async countApprovedForPost(postId: string): Promise<number> {
+    const { count, error } = await supabase
+      .from('post_comments')
+      .select('id', { count: 'exact', head: true })
+      .eq('post_id', postId)
+      .eq('status', 'approved')
+
+    if (error) throw error
+    return count ?? 0
+  },
+
   async listForModeration(): Promise<PostCommentWithPost[]> {
     const { data, error } = await supabase
       .from('post_comments')

@@ -1,12 +1,14 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { Post, PostType } from '@/types/post'
 import { PostCard } from './PostCard'
 import { PostFilter } from './PostFilter'
 
 interface PostGridProps {
   posts: Post[]
+  initialSearchQuery?: string
+  initialCategory?: string
 }
 
 const POSTS_PER_PAGE = 8
@@ -42,11 +44,25 @@ function isSmartSlugMatch(slug: string, query: string): boolean {
   return false
 }
 
-export function PostGrid({ posts }: PostGridProps) {
+export function PostGrid({
+  posts,
+  initialSearchQuery = '',
+  initialCategory = 'all',
+}: PostGridProps) {
   const [activeFilter, setActiveFilter] = useState<PostType | 'all'>('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [activeCategory, setActiveCategory] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
+  const [activeCategory, setActiveCategory] = useState(
+    initialCategory === 'all' || !initialCategory ? 'all' : initialCategory
+  )
   const [currentPage, setCurrentPage] = useState(1)
+
+  useEffect(() => {
+    setSearchQuery(initialSearchQuery)
+  }, [initialSearchQuery])
+
+  useEffect(() => {
+    setActiveCategory(initialCategory === 'all' || !initialCategory ? 'all' : initialCategory)
+  }, [initialCategory])
 
   const categories = useMemo(() => {
     const values = new Map<string, string>()

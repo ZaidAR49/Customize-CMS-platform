@@ -3,6 +3,7 @@ import { Cairo } from 'next/font/google'
 import './globals.css'
 import { ConditionalHeader, ConditionalFooter } from '@/components/layout/ConditionalLayout'
 import { ScrollToTop } from '@/components/shared/ScrollToTop'
+import { Toaster } from 'sonner'
 
 const cairo = Cairo({
   subsets: ['arabic'],
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="min-h-screen">{children}</main>
         <ConditionalFooter />
         <ScrollToTop />
+        <Toaster richColors position="top-center" dir="rtl" />
       </body>
     </html>
   )
