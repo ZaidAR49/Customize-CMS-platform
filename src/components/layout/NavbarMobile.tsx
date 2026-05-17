@@ -2,19 +2,16 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
 import { useScrollTop } from '@/hooks/useScrollTop'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
-import { centers } from '@/data/centers'
-import { programs } from '@/data/programs'
-import { Menu, ChevronDown, X } from 'lucide-react'
+import { Menu, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import logo from '@/app/icon.png'
+import type { SiteNavItem } from '@/lib/site-nav'
 
-export function NavbarMobile() {
+export function NavbarMobile({ navItems = [] }: { navItems?: SiteNavItem[] }) {
   const scrolled = useScrollTop(80)
-  const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const [expandedSection, setExpandedSection] = useState<string | null>(null)
 
@@ -42,7 +39,7 @@ export function NavbarMobile() {
 
         {/* Mobile Menu */}
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger >
+          <SheetTrigger asChild>
             <button
               className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-(--fcps-bg-soft)"
               aria-label="القائمة"
@@ -65,94 +62,49 @@ export function NavbarMobile() {
 
               {/* Nav Items */}
               <nav className="flex-1 overflow-y-auto p-4">
-                <Link
-                  href="/"
-                  onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft) hover:text-(--fcps-primary)"
-                >
-                  الرئيسية
-                </Link>
-
-                {/* Centers Dropdown */}
-                <div>
-                  <button
-                    onClick={() => toggleSection('centers')}
-                    className="flex w-full items-center justify-between rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft)"
-                  >
-                    مراكز الجمعية
-                    <ChevronDown className={cn('h-4 w-4 transition-transform', expandedSection === 'centers' && 'rotate-180')} />
-                  </button>
-                  {expandedSection === 'centers' && (
-                    <div className="mr-4 space-y-1 border-r-2 border-(--fcps-primary-light) pr-3">
-                      {centers.map(c => (
-                        <Link
-                          key={c.slug}
-                          href={`/centers/${c.slug}`}
-                          onClick={() => setOpen(false)}
-                          className="block rounded-md px-3 py-2 text-sm text-(--fcps-gray-text) hover:text-(--fcps-primary)"
+                {navItems.map((item) => {
+                  if (item.children) {
+                    return (
+                      <div key={item.label}>
+                        <button
+                          onClick={() => toggleSection(item.label)}
+                          className="flex w-full items-center justify-between rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft)"
                         >
-                          {c.nameAr}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                          {item.label}
+                          <ChevronDown className={cn('h-4 w-4 transition-transform', expandedSection === item.label && 'rotate-180')} />
+                        </button>
+                        {expandedSection === item.label && (
+                          <div className="mr-4 space-y-1 border-r-2 border-(--fcps-primary-light) pr-3">
+                            {item.children.map(child => (
+                              <Link
+                                key={child.href}
+                                href={child.href}
+                                onClick={() => setOpen(false)}
+                                className="block rounded-md px-3 py-2 text-sm text-(--fcps-gray-text) hover:text-(--fcps-primary)"
+                              >
+                                {child.label}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  }
 
-                {/* Programs Dropdown */}
-                <div>
-                  <button
-                    onClick={() => toggleSection('programs')}
-                    className="flex w-full items-center justify-between rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft)"
-                  >
-                    البرامج والمشاريع
-                    <ChevronDown className={cn('h-4 w-4 transition-transform', expandedSection === 'programs' && 'rotate-180')} />
-                  </button>
-                  {expandedSection === 'programs' && (
-                    <div className="mr-4 space-y-1 border-r-2 border-(--fcps-primary-light) pr-3">
-                      {programs.map(p => (
-                        <Link
-                          key={p.slug}
-                          href={`/programs/${p.slug}`}
-                          onClick={() => setOpen(false)}
-                          className="block rounded-md px-3 py-2 text-sm text-(--fcps-gray-text) hover:text-(--fcps-primary)"
-                        >
-                          {p.nameAr}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <Link
-                  href="/news"
-                  onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft) hover:text-(--fcps-primary)"
-                >
-                  نشاطات وأخبار
-                </Link>
-                <Link
-                  href="/about"
-                  onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft) hover:text-(--fcps-primary)"
-                >
-                  عن الجمعية
-                </Link>
-                <Link
-                  href="/contact"
-                  onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft) hover:text-(--fcps-primary)"
-                >
-                  اتصل بنا
-                </Link>
-                {session?.user && (
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setOpen(false)}
-                    className="mt-2 block rounded-md border border-(--fcps-primary-light) bg-(--fcps-bg-soft) px-3 py-3 text-sm font-semibold text-(--fcps-primary) hover:bg-(--fcps-primary) hover:text-white"
-                  >
-                    لوحة التحكم
-                  </Link>
-                )}
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        "block rounded-md px-3 py-3 text-sm font-medium text-(--fcps-text) hover:bg-(--fcps-bg-soft) hover:text-(--fcps-primary)",
+                        item.href === '/dashboard' && "mt-2 border border-(--fcps-primary-light) bg-(--fcps-bg-soft) text-(--fcps-primary) font-semibold hover:bg-(--fcps-primary) hover:text-white"
+                      )}
+                    >
+                      {item.label}
+                    </Link>
+                  )
+                })}
               </nav>
             </div>
           </SheetContent>

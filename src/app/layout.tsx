@@ -20,12 +20,19 @@ export const metadata: Metadata = {
   description: 'الطفولة والبراءة والامل بالبقاء — إربد، الأردن',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+import { postsService } from '@/lib/services/posts.service'
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const [programs, centers] = await Promise.all([
+    postsService.getPosts('program', true),
+    postsService.getPosts('center', true)
+  ])
+
   return (
     <html lang="ar" dir="rtl" className={cairo.variable} suppressHydrationWarning>
       <body className="bg-white text-[#333] antialiased" style={{ fontFamily: 'var(--font-cairo), sans-serif' }}>
         <SessionProvider>
-          <ConditionalHeader />
+          <ConditionalHeader programs={programs} centers={centers} />
           <main className="min-h-screen">{children}</main>
           <ConditionalFooter />
           <ScrollToTop />

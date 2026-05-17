@@ -179,24 +179,39 @@ export function PostForm({
             </Label>
           </div>
 
-          <CodeEditor
-            id="post-descripcion"
-            value={value.descripcion}
-            onChange={(e) => onChange('descripcion', e.target.value)}
-            disabled={pending}
-            rows={20}
-            language={isHtml ? "html" : "text"}
-            className="min-h-[320px] font-mono text-sm leading-relaxed"
-            placeholder="Please enter HTML code."
-            dir="auto"
-            style={{
-              color: "#333333",
-              fontSize: 14,
-              backgroundColor: "#f5f5f5",
-              fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
-            }}
-          />
-
+          {isHtml ? (
+            <CodeEditor
+              id="post-descripcion"
+              value={value.descripcion}
+              onChange={(e) => onChange('descripcion', e.target.value)}
+              disabled={pending}
+              rows={20}
+              language="html"
+              className="min-h-[320px] font-mono text-sm leading-relaxed"
+              placeholder="Please enter HTML code."
+              dir="ltr"
+              style={{
+                direction: 'ltr',
+                unicodeBidi: 'isolate',
+                textAlign: 'left',
+                color: "#333333",
+                fontSize: 14,
+                backgroundColor: "#f5f5f5",
+                fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
+              }}
+            />
+          ) : (
+            <Textarea
+              id="post-descripcion"
+              value={value.descripcion}
+              onChange={(e) => onChange('descripcion', e.target.value)}
+              disabled={pending}
+              rows={16}
+              className="min-h-[320px] text-base leading-relaxed p-4"
+              placeholder="أدخل المحتوى..."
+              dir="rtl"
+            />
+          )}
         </div>
 
         <label className="flex items-center gap-2 text-sm">

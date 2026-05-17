@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import CodeEditor from '@uiw/react-textarea-code-editor'
+import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 
 export interface SimplePostFormValue {
@@ -36,6 +38,7 @@ export function SimplePostForm({
   onCancel,
 }: SimplePostFormProps) {
   const [slugTouched, setSlugTouched] = useState(mode === 'edit')
+  const [isHtml, setIsHtml] = useState(false)
 
   useEffect(() => {
     setSlugTouched(mode === 'edit')
@@ -92,15 +95,58 @@ export function SimplePostForm({
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="post-descripcion">الوصف</Label>
-          <Textarea
-            id="post-descripcion"
-            value={value.descripcion}
-            onChange={(e) => onChange('descripcion', e.target.value)}
-            disabled={pending}
-            rows={6}
-            required
-          />
+          <div className="flex items-center justify-between pb-2">
+            <div>
+              <Label htmlFor="post-descripcion">الوصف</Label>
+              <p className="text-xs text-[#777777] mt-1">
+                يدعم HTML مثل <code className="rounded bg-[#f0f0f0] px-1">&lt;h2&gt;عنوان&lt;/h2&gt;</code>
+              </p>
+            </div>
+            <div className="flex items-center space-x-3 flex-row-reverse">
+              <Switch
+                id="theme-mode"
+                checked={isHtml}
+                onCheckedChange={setIsHtml}
+                className="data-[state=checked]:bg-blue-500 mr-3"
+              />
+              <Label htmlFor="theme-mode" className="font-medium text-gray-700">
+                {isHtml ? "HTML" : "نص"}
+              </Label>
+            </div>
+          </div>
+
+          {isHtml ? (
+            <CodeEditor
+              id="post-descripcion"
+              value={value.descripcion}
+              onChange={(e) => onChange('descripcion', e.target.value)}
+              disabled={pending}
+              language="html"
+              className="min-h-[320px] font-mono text-sm leading-relaxed rounded-md border"
+              placeholder="أدخل كود HTML..."
+              dir="ltr"
+              style={{
+                direction: 'ltr',
+                unicodeBidi: 'isolate',
+                textAlign: 'left',
+                color: "#333333",
+                fontSize: 14,
+                backgroundColor: "#f5f5f5",
+                fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
+              }}
+            />
+          ) : (
+            <Textarea
+              id="post-descripcion"
+              value={value.descripcion}
+              onChange={(e) => onChange('descripcion', e.target.value)}
+              disabled={pending}
+              rows={12}
+              className="min-h-[320px] text-base leading-relaxed p-4"
+              placeholder="أدخل الوصف..."
+              dir="rtl"
+            />
+          )}
         </div>
       </div>
 

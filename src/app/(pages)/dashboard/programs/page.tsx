@@ -12,8 +12,11 @@ export default async function DashboardProgramsPage() {
 
   return (
     <div>
-      <div className="mb-6">
+      <div className="mb-6 flex items-center gap-3">
         <h2 className="text-2xl font-bold text-(--fcps-dark)">إدارة البرامج والمشاريع</h2>
+        <span className="inline-flex items-center justify-center rounded-full bg-(--fcps-primary)/10 px-3 py-1 text-sm font-medium text-(--fcps-primary)">
+          {posts.length} {posts.length === 1 ? 'برنامج' : 'برامج'}
+        </span>
       </div>
       <SimplePostsOverview 
         posts={posts} 
