@@ -5,8 +5,6 @@ import { NextResponse } from 'next/server'
 
 function toDatabasePostType(type: string | null | undefined): string {
   if (type === 'activity') return 'activities'
-  if (type === 'program') return 'posts'
-  if (type === 'center') return 'top_employees'
   return type ?? 'news'
 }
 

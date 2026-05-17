@@ -72,6 +72,7 @@ export function SimplePostsOverview({ posts, newUrl, newLabel, editUrlPrefix, is
         pendingDeleteId={pendingDeleteId} 
         editUrlPrefix={editUrlPrefix} 
         isEditor={isEditor}
+        hideStats={true}
       />
 
       <Dialog open={!!postToDelete} onOpenChange={(open) => !open && setPostToDelete(null)}>

@@ -16,8 +16,6 @@ function normalizePostType(type: string | null | undefined): Post['type'] {
 
 function toDatabasePostType(type: string | null | undefined): string {
   if (type === 'activity') return 'activities';
-  if (type === 'program') return 'posts';
-  if (type === 'center') return 'top_employees';
   return type ?? 'news';
 }
 

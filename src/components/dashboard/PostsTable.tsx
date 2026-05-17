@@ -25,9 +25,10 @@ interface PostsTableProps {
   onDelete?: (post: Post) => void
   editUrlPrefix?: string
   isEditor?: boolean
+  hideStats?: boolean
 }
 
-export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '/dashboard/posts', isEditor = true }: PostsTableProps) {
+export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '/dashboard/posts', isEditor = true, hideStats = false }: PostsTableProps) {
   return (
     <div className="rounded-lg border bg-white">
       <Table className="table-fixed">
@@ -36,8 +37,12 @@ export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '
             <TableHead className="text-right font-bold">العنوان</TableHead>
             <TableHead className="text-right font-bold">النوع</TableHead>
             <TableHead className="text-right font-bold">التاريخ</TableHead>
-            <TableHead className="text-right font-bold">الإعجابات</TableHead>
-            <TableHead className="text-right font-bold">الحالة</TableHead>
+            {!hideStats && (
+              <>
+                <TableHead className="text-right font-bold">الإعجابات</TableHead>
+                <TableHead className="text-right font-bold">الحالة</TableHead>
+              </>
+            )}
             <TableHead className="text-right font-bold">الإجراءات</TableHead>
           </TableRow>
         </TableHeader>
@@ -55,18 +60,22 @@ export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '
               <TableCell className="text-sm text-(--fcps-gray-text)">
                 {formatSiteDate(post.publishedAt)}
               </TableCell>
-              <TableCell className="text-sm">{formatSiteNumber(post.likes)}</TableCell>
-              <TableCell>
-                {post.published ? (
-                  <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-none text-xs">
-                     منشور
-                  </Badge>
-                ) : (
-                  <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-none text-xs">
-                    مسودة
-                  </Badge>
-                )}
-              </TableCell>
+              {!hideStats && (
+                <>
+                  <TableCell className="text-sm">{formatSiteNumber(post.likes)}</TableCell>
+                  <TableCell>
+                    {post.published ? (
+                      <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-none text-xs">
+                         منشور
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-none text-xs">
+                        مسودة
+                      </Badge>
+                    )}
+                  </TableCell>
+                </>
+              )}
               <TableCell>
                 <div className="flex gap-2">
                   {post.id && isEditor ? (

@@ -16,7 +16,9 @@ CREATE TYPE public.post_type AS ENUM (
   'news',
   'posts',
   'activities',
-  'top_employees'
+  'top_employees',
+  'program',
+  'center'
 );
 -- =============================================================
 -- 2. TABLES
