@@ -23,9 +23,11 @@ interface PostsTableProps {
   posts: Post[]
   pendingDeleteId?: string | null
   onDelete?: (post: Post) => void
+  editUrlPrefix?: string
+  isEditor?: boolean
 }
 
-export function PostsTable({ posts, pendingDeleteId, onDelete }: PostsTableProps) {
+export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '/dashboard/posts', isEditor = true }: PostsTableProps) {
   return (
     <div className="rounded-lg border bg-white">
       <Table className="table-fixed">
@@ -57,7 +59,7 @@ export function PostsTable({ posts, pendingDeleteId, onDelete }: PostsTableProps
               <TableCell>
                 {post.published ? (
                   <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-none text-xs">
-                    منشور
+                     منشور
                   </Badge>
                 ) : (
                   <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-none text-xs">
@@ -67,9 +69,9 @@ export function PostsTable({ posts, pendingDeleteId, onDelete }: PostsTableProps
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">
-                  {post.id ? (
+                  {post.id && isEditor ? (
                     <Link
-                      href={`/dashboard/posts/${post.id}/edit`}
+                      href={`${editUrlPrefix}/${post.id}/edit`}
                       className={cn(
                         buttonVariants({ variant: 'ghost', size: 'sm' }),
                         'h-8 w-8 p-0 text-(--fcps-gray-text) hover:text-(--fcps-primary)'

@@ -44,7 +44,7 @@ export async function POST(req: Request) {
         type: toDatabasePostType(type),
         category_id: category_id || null,
         metadata,
-        descripcion: typeof descripcion === 'string' ? descripcion : null,
+        description: typeof descripcion === 'string' ? descripcion : null,
         published: published ?? false,
         author_id,
       })

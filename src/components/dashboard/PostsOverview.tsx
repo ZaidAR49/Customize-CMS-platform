@@ -14,6 +14,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { deletePostAction } from '@/actions/posts.actions'
 import type { Post } from '@/types/post'
 import { FileText, Layers3, Tags, ChevronDown, Plus } from 'lucide-react'
@@ -39,6 +40,7 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
   const [activeType, setActiveType] = useState<Post['type'] | 'all'>('all')
   const [activeTag, setActiveTag] = useState<string>('all')
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  const [postToDelete, setPostToDelete] = useState<Post | null>(null)
 
   const availableCategories = useMemo(() => {
     const categories = new Map<string, string>()
@@ -84,20 +86,24 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
   ]
 
   function deletePost(post: Post) {
-    if (!post.id) return
-    const confirmed = window.confirm(`هل أنت متأكد من حذف "${post.title}"؟`)
-    if (!confirmed) return
+    setPostToDelete(post)
+  }
 
-    setPendingDeleteId(post.id)
+  function confirmDelete() {
+    if (!postToDelete?.id) return
+
+    setPendingDeleteId(postToDelete.id)
     startTransition(async () => {
-      const result = await deletePostAction(post.id as string)
+      const result = await deletePostAction(postToDelete.id as string)
       if (!result.success) {
         toast.error(result.error ?? 'تعذر حذف المقال')
         setPendingDeleteId(null)
+        setPostToDelete(null)
         return
       }
       toast.success('تم حذف المقال')
       setPendingDeleteId(null)
+      setPostToDelete(null)
       router.refresh()
     })
   }
@@ -232,6 +238,25 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
       </Card>
 
       <PostsTable posts={filteredPosts} onDelete={deletePost} pendingDeleteId={pendingDeleteId} />
+
+      <Dialog open={!!postToDelete} onOpenChange={(open) => !open && setPostToDelete(null)}>
+        <DialogContent className="sm:max-w-md" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>تأكيد الحذف</DialogTitle>
+            <DialogDescription>
+              هل أنت متأكد من حذف <strong>{postToDelete?.title}</strong>؟ لا يمكن التراجع عن هذا الإجراء.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:justify-start">
+            <Button type="button" variant="outline" onClick={() => setPostToDelete(null)} disabled={pendingDeleteId !== null}>
+              إلغاء
+            </Button>
+            <Button type="button" variant="destructive" onClick={confirmDelete} disabled={pendingDeleteId !== null}>
+              {pendingDeleteId !== null ? 'جاري الحذف...' : 'حذف نهائي'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

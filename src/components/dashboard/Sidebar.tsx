@@ -12,6 +12,8 @@ import {
   ExternalLink,
   BarChart3,
   Images,
+  Target,
+  MapPin,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { signOut } from 'next-auth/react'
@@ -51,7 +53,7 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 space-y-1 p-4">
         {sidebarItems.map((item) => {
-          const isActive = pathname === item.href
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
           return (
             <Link
               key={item.href}
@@ -68,6 +70,34 @@ export function Sidebar() {
             </Link>
           )
         })}
+
+        <hr className="my-4 border-(--fcps-bg-soft)" />
+
+        <Link
+          href="/dashboard/programs"
+          className={cn(
+            'flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-all',
+            pathname.startsWith('/dashboard/programs')
+              ? 'bg-(--fcps-primary) text-white shadow-sm'
+              : 'text-(--fcps-gray-text) hover:bg-white hover:text-(--fcps-primary)'
+          )}
+        >
+          <Target className="h-4 w-4" />
+          البرامج والمشاريع
+        </Link>
+        
+        <Link
+          href="/dashboard/centers"
+          className={cn(
+            'flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium transition-all',
+            pathname.startsWith('/dashboard/centers')
+              ? 'bg-(--fcps-primary) text-white shadow-sm'
+              : 'text-(--fcps-gray-text) hover:bg-white hover:text-(--fcps-primary)'
+          )}
+        >
+          <MapPin className="h-4 w-4" />
+          مراكز الجمعية
+        </Link>
         <Link
           href="/"
           target="_blank"

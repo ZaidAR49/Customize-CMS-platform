@@ -29,7 +29,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (category_id !== undefined) payload.category_id = category_id || null
 
     if (descripcion !== undefined) {
-      payload.descripcion = descripcion
+      payload.description = descripcion
     }
 
     if (excerpt !== undefined) {

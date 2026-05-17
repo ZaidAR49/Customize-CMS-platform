@@ -131,7 +131,7 @@ export const postsService = {
         cover_image: cover_image ?? null,
         type: toDatabasePostType(type),
         metadata,
-        descripcion: descripcion ?? null,
+        description: descripcion ?? null,
         category_id: category_id || null,
         published: published ?? false,
         author_id,
@@ -151,7 +151,7 @@ export const postsService = {
     if (category_id !== undefined) payload.category_id = category_id || null;
 
     if (descripcion !== undefined) {
-      payload.descripcion = descripcion;
+      payload.description = descripcion;
     }
 
     if (excerpt !== undefined) {
