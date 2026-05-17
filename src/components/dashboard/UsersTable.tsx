@@ -4,6 +4,7 @@ import { useState, useTransition, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { deleteUserAction, updateUserProfileAction, createUserAction } from '@/actions/users.actions'
+import { sendRoleAssignmentEmailAction } from '@/actions/malis.actions'
 import { signOut } from 'next-auth/react'
 import type { AppUser, UserRole } from '@/types/user'
 import { NOT_ALLOWED_AR } from './users/users-table.constants'
@@ -12,6 +13,10 @@ import { UsersTableRows } from './users/UsersTableRows'
 import { EditUserDialog } from './users/EditUserDialog'
 import { AddUserDialog } from './users/AddUserDialog'
 import { DeleteUserDialog } from './users/DeleteUserDialog'
+import {
+  SendRoleEmailDialog,
+  type RoleEmailPrompt,
+} from './users/SendRoleEmailDialog'
 
 interface UsersTableProps {
   users: AppUser[]
@@ -22,6 +27,8 @@ interface UsersTableProps {
 export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
+  const [emailPending, startEmailTransition] = useTransition()
+  const [roleEmailPrompt, setRoleEmailPrompt] = useState<RoleEmailPrompt | null>(null)
 
   const hasOtherAdmin = users.some((u) => u.role === 'admin' && u.id !== currentUserId)
 
@@ -105,6 +112,11 @@ export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
         toast.success('تم إضافة المستخدم')
         setAddOpen(false)
         setNewAvatarFile(null)
+        setRoleEmailPrompt({
+          name: res.data.name,
+          email: res.data.email,
+          role: res.data.role,
+        })
         router.refresh()
       } else {
         toast.error(res.error ?? 'تعذّر إضافة المستخدم')
@@ -137,11 +149,19 @@ export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
       if (editAvatarFile) {
         fd.append('avatar', editAvatarFile)
       }
+      const roleChanged = editRole !== editUser.role
       const res = await updateUserProfileAction(fd)
       if (res.success) {
         toast.success('تم تحديث بيانات المستخدم')
         setEditUser(null)
         setEditAvatarFile(null)
+        if (roleChanged) {
+          setRoleEmailPrompt({
+            name: editName.trim(),
+            email: editEmail.trim().toLowerCase(),
+            role: editRole,
+          })
+        }
         router.refresh()
       } else {
         toast.error(res.error ?? 'تعذّر تحديث المستخدم')
@@ -170,6 +190,23 @@ export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
   function closeEditDialog() {
     setEditUser(null)
     setEditAvatarFile(null)
+  }
+
+  function dismissRoleEmailPrompt() {
+    setRoleEmailPrompt(null)
+  }
+
+  function confirmRoleEmail() {
+    if (!roleEmailPrompt) return
+    startEmailTransition(async () => {
+      const res = await sendRoleAssignmentEmailAction(roleEmailPrompt)
+      if (res.success) {
+        toast.success('تم إرسال البريد الإلكتروني إلى المستخدم')
+        dismissRoleEmailPrompt()
+      } else {
+        toast.error(res.error ?? 'تعذّر إرسال البريد الإلكتروني')
+      }
+    })
   }
 
   return (
@@ -239,6 +276,15 @@ export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
         onAvatarFile={setNewAvatarFile}
         pending={pending}
         onSubmit={submitAdd}
+      />
+
+      <SendRoleEmailDialog
+        prompt={roleEmailPrompt}
+        pending={emailPending}
+        onOpenChange={(open) => {
+          if (!open) dismissRoleEmailPrompt()
+        }}
+        onConfirm={confirmRoleEmail}
       />
     </>
   )

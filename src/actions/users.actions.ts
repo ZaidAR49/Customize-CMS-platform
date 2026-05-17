@@ -189,6 +189,7 @@ export async function createUserAction(formData: FormData) {
       role: parsed.data.role,
       avatarUrl: avatarRes.url ?? null,
     });
+
     revalidatePath('/dashboard/users');
 
     return { success: true, data: createdUser };

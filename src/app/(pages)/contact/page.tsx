@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { organization } from '@/data/organization'
 import { Phone, Mail, MapPin, Send, CheckCircle } from 'lucide-react'
 import { useState } from 'react'
+import { submitContactFormAction } from '@/actions/malis.actions'
 
 const contactSchema = z.object({
   name: z.string().min(2, 'الاسم مطلوب'),
@@ -23,6 +24,7 @@ type ContactForm = z.infer<typeof contactSchema>
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const {
     register,
     handleSubmit,
@@ -33,9 +35,12 @@ export default function ContactPage() {
   })
 
   const onSubmit = async (data: ContactForm) => {
-    console.log('Contact form data:', data)
-    // Phase 3: send to API
-    await new Promise(r => setTimeout(r, 1000))
+    setSubmitError(null)
+    const result = await submitContactFormAction(data)
+    if (!result.success) {
+      setSubmitError(result.error ?? 'تعذّر إرسال الرسالة. يُرجى المحاولة لاحقاً.')
+      return
+    }
     setSubmitted(true)
     reset()
     setTimeout(() => setSubmitted(false), 4000)
@@ -110,12 +115,18 @@ export default function ContactPage() {
                 <CardContent className="p-8">
                   <h2 className="text-2xl font-bold text-(--fcps-primary-dark) mb-6">أرسل رسالة</h2>
 
-                  {submitted && (
+                  {submitError ? (
+                    <div className="mb-6 rounded-lg bg-red-50 p-4 text-sm text-red-700">
+                      {submitError}
+                    </div>
+                  ) : null}
+
+                  {submitted ? (
                     <div className="mb-6 flex items-center gap-3 rounded-lg bg-emerald-50 p-4 text-emerald-700">
                       <CheckCircle className="h-5 w-5" />
                       <p className="text-sm font-medium">تم إرسال رسالتك بنجاح. سنتواصل معك قريباً.</p>
                     </div>
-                  )}
+                  ) : null}
 
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                     <div>
