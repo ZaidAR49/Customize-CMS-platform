@@ -57,6 +57,8 @@ export interface OrganizationRow {
   metadata: Record<string, unknown> | null
   updated_at?: string
   updated_by?: string | null
+  /** Populated via `users` join on fetch (not stored in DB). */
+  updatedByName?: string | null
 }
 
 export interface OrganizationStatRow {
@@ -72,4 +74,6 @@ export interface OrganizationStatRow {
   description_en: string | null
   updated_at?: string
   updated_by?: string | null
+  /** Populated via `users` join on fetch (not stored in DB). */
+  updatedByName?: string | null
 }

@@ -9,6 +9,7 @@ import type { PostFormValue } from '@/lib/posts-form'
 import type { Post } from '@/types/post'
 import CodeEditor from '@uiw/react-textarea-code-editor'
 import { Switch } from "@/components/ui/switch";
+import { ReadOnlyField } from '@/components/dashboard/ReadOnlyField';
 
 const typeOptions: Array<{ value: Post['type']; label: string }> = [
   { value: 'news', label: 'أخبار' },
@@ -21,6 +22,7 @@ interface PostFormProps {
   mode: 'create' | 'edit'
   value: PostFormValue
   categories: Array<{ id: string; label: string }>
+  authorName?: string
   pending: boolean
   onChange: <K extends keyof PostFormValue>(key: K, next: PostFormValue[K]) => void
   onSubmit: () => void
@@ -31,6 +33,7 @@ export function PostForm({
   mode,
   value,
   categories,
+  authorName,
   pending,
   onChange,
   onSubmit,
@@ -65,6 +68,10 @@ export function PostForm({
       }}
     >
       <div className="grid gap-4">
+        {mode === 'edit' && authorName ? (
+          <ReadOnlyField id="post-author" label="الكاتب" value={authorName} />
+        ) : null}
+
         <div className="grid gap-2">
           <Label htmlFor="post-title">العنوان</Label>
           <Input

@@ -81,6 +81,7 @@ export function PostFormEditor({ mode, post, categories }: PostFormEditorProps) 
             mode={mode}
             value={formValue}
             categories={categories}
+            authorName={mode === 'edit' ? post?.author.name : undefined}
             pending={pending}
             onChange={updateForm}
             onSubmit={submitForm}

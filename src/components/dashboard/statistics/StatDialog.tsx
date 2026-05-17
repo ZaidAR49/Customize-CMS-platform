@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { OrganizationStatRow } from '@/types/organization';
+import { ReadOnlyField } from '@/components/dashboard/ReadOnlyField';
 import { Activity, Users, Heart, Star, Award, BookOpen, UserPlus, FileText, Briefcase, HandHeart, Globe } from 'lucide-react';
 
 interface StatDialogProps {
@@ -71,6 +72,17 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
           <DialogTitle>{stat ? 'تعديل إحصائية' : 'إضافة إحصائية'}</DialogTitle>
         </DialogHeader>
         <form id="stat-form" onSubmit={handleSubmit} className="grid gap-4 py-4">
+          {stat ? (
+            <ReadOnlyField
+              id="stat-updated-by"
+              label="آخر تحديث بواسطة"
+              value={
+                stat.updatedByName?.trim() ||
+                (stat.updated_by ? 'مستخدم محذوف' : 'غير محدد')
+              }
+            />
+          ) : null}
+
           <div className="grid gap-2">
             <Label htmlFor="stat-key">المفتاح (باللغة الإنجليزية، فريد)</Label>
             <Input

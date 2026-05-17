@@ -28,6 +28,7 @@ import {
 import { cn } from '@/lib/utils'
 import type { OrganizationRow, SocialPlatformKey } from '@/types/organization'
 import { SOCIAL_PLATFORM_KEYS } from '@/types/organization'
+import { ReadOnlyField } from '@/components/dashboard/ReadOnlyField'
 
 function empty(v: string | null | undefined) {
   return v ?? ''
@@ -321,8 +322,15 @@ export function OrganizationSettingsForm({
 
   const e = errors
 
+  const lastUpdatedBy =
+    organization?.updatedByName?.trim() || (organization?.updated_by ? 'مستخدم محذوف' : '')
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+      {!isCreate && lastUpdatedBy ? (
+        <ReadOnlyField id="org-updated-by" label="آخر تحديث بواسطة" value={lastUpdatedBy} />
+      ) : null}
+
       <Card className="border-none shadow-sm">
         <CardHeader className="text-right">
           <CardTitle>الهوية والظهور</CardTitle>
