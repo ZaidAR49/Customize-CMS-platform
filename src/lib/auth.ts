@@ -1,4 +1,6 @@
 import type { NextAuthOptions } from 'next-auth'
+import type { Session } from 'next-auth'
+import { getServerSession } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import { usersService } from '@/lib/services/users.service'
 
@@ -74,4 +76,54 @@ export const authOptions: NextAuthOptions = {
     signIn: '/auth/signin',
     error: '/unauthorized',
   },
+}
+
+// ---------------------------------------------------------------------------
+// Action Guards
+// ---------------------------------------------------------------------------
+// These are thin helpers meant to be called at the top of every sensitive
+// Server Action. They throw on failure so the caller's existing try/catch
+// handles the error response — no extra ceremony needed.
+//
+// Usage (admin-only action):
+//   const session = await requireAdmin();
+//
+// Usage (any authenticated user):
+//   const session = await requireAuth();
+// ---------------------------------------------------------------------------
+
+/**
+ * Asserts that the current request has a valid session.
+ * Throws an `Error` with message "Unauthorized" when not authenticated.
+ */
+export async function requireAuth(): Promise<Session> {
+  const session = await getServerSession(authOptions)
+  if (!session) {
+    throw new Error('Unauthorized')
+  }
+  return session
+}
+
+/**
+ * Asserts that the current request belongs to an admin.
+ * Throws an `Error` with message "Forbidden" when the user is not an admin.
+ */
+export async function requireAdmin(): Promise<Session> {
+  const session = await requireAuth()
+  if (session.user.role !== 'admin') {
+    throw new Error('Forbidden')
+  }
+  return session
+}
+
+/**
+ * Asserts that the current request belongs to an admin or editor.
+ * Throws an `Error` with message "Forbidden" for all other roles.
+ */
+export async function requireEditor(): Promise<Session> {
+  const session = await requireAuth()
+  if (session.user.role !== 'admin' && session.user.role !== 'editor') {
+    throw new Error('Forbidden')
+  }
+  return session
 }

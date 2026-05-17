@@ -1,6 +1,7 @@
 'use server'
 
 import { v2 as cloudinary } from 'cloudinary';
+import { requireAuth } from '@/lib/auth';
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -12,6 +13,7 @@ interface fetchImageParams {
 }
 
 export async function signin() {
+    await requireAuth();
     const timestamp = Math.round(new Date().getTime() / 1000);
     const allowed_formats = 'jpg,png,jpeg';
     const params_to_sign = {
@@ -29,6 +31,7 @@ export async function signin() {
 
 export async function fetchCloudinaryImages({ next_cursor, max_results = 10 }: fetchImageParams) {
     try {
+        await requireAuth();
         const response = await cloudinary.search.expression(`folder:"${process.env.CLOUDINARY_FILE}"`).sort_by("created_at", "desc").max_results(max_results).next_cursor(next_cursor || undefined).execute();
         return { success: true, data: response };
     } catch (err: any) {
@@ -50,6 +53,7 @@ export async function uploadImage(file: string, subfolder?: string): Promise<str
 }
 
 export async function DeleteImages(imageIds: string[]) {
+    await requireAuth();
     if (!imageIds.length) {
         return { success: true, deleted: [] as string[], failed: [] as string[] };
     }

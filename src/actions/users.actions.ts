@@ -1,7 +1,6 @@
 'use server';
 
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 import { usersService } from '@/lib/services/users.service';
 import { createUserSchema, updateUserProfileSchema } from '@/lib/validations/users.schema';
 import { revalidatePath } from 'next/cache';
@@ -40,14 +39,7 @@ async function uploadAvatarFromFormField(raw: FormDataEntryValue | null): Promis
 
 export async function updateUserProfileAction(formData: FormData) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session || session.user.role !== 'admin') {
-      return {
-        success: false,
-        error: 'You are not authorized to perform this action.',
-      };
-    }
+    const session = await requireAdmin();
 
     const userId = String(formData.get('userId') ?? '').trim();
     const name = String(formData.get('name') ?? '').trim();
@@ -120,14 +112,7 @@ export async function updateUserProfileAction(formData: FormData) {
 
 export async function deleteUserAction(userId: string) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session || session.user.role !== 'admin') {
-      return {
-        success: false,
-        error: 'You are not authorized to perform this action.',
-      };
-    }
+    const session = await requireAdmin();
 
     const isSelf = userId === session.user.id;
 
@@ -153,13 +138,8 @@ export async function deleteUserAction(userId: string) {
 }
 
 export async function getUserByEmailAction(email: string) {
-  const session = await getServerSession(authOptions);
-
-  if (!session || session.user.role !== 'admin') {
-    return { success: false, error: 'Unauthorized access. Admins only.' };
-  }
-
   try {
+    await requireAdmin();
     const user = await usersService.getUserByEmail(email);
     if (!user) {
       return { success: false, error: 'User not found' };
@@ -171,11 +151,7 @@ export async function getUserByEmailAction(email: string) {
 }
 export async function getAllUsersAction() {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session || session.user.role !== 'admin') {
-      return { success: false, error: 'Unauthorized access. Admins only.' };
-    }
+    await requireAdmin();
 
     const users = await usersService.getAllUsers();
     return { success: true, data: users };
@@ -185,14 +161,7 @@ export async function getAllUsersAction() {
 }
 export async function createUserAction(formData: FormData) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session || session.user.role !== 'admin') {
-      return {
-        success: false,
-        error: 'You are not authorized to perform this action.',
-      };
-    }
+    const session = await requireAdmin();
 
     const name = String(formData.get('name') ?? '').trim();
     const emailRaw = String(formData.get('email') ?? '').trim();

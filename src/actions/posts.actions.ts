@@ -1,17 +1,13 @@
 'use server';
 
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireEditor } from '@/lib/auth';
 import { postsService } from '@/lib/services/posts.service';
 import { createPostSchema, updatePostSchema } from '@/lib/validations/posts.schema';
 import { revalidatePath } from 'next/cache';
 
 export async function createPostAction(data: any) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || (session.user.role !== 'admin' && session.user.role !== 'editor')) {
-      return { success: false, error: 'Unauthorized access.' };
-    }
+    const session = await requireEditor();
 
     const parsed = createPostSchema.safeParse(data);
     if (!parsed.success) {
@@ -33,10 +29,7 @@ export async function createPostAction(data: any) {
 
 export async function updatePostAction(id: string, data: any) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || (session.user.role !== 'admin' && session.user.role !== 'editor')) {
-      return { success: false, error: 'Unauthorized access.' };
-    }
+    const session = await requireEditor();
 
     const parsed = updatePostSchema.safeParse({ id, ...data });
     if (!parsed.success) {
@@ -58,10 +51,7 @@ export async function updatePostAction(id: string, data: any) {
 
 export async function deletePostAction(id: string) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || (session.user.role !== 'admin' && session.user.role !== 'editor')) {
-      return { success: false, error: 'Unauthorized access.' };
-    }
+    await requireEditor();
 
     await postsService.deletePost(id);
     revalidatePath('/dashboard/posts');
@@ -75,10 +65,7 @@ export async function deletePostAction(id: string) {
 
 export async function togglePostPublishAction(id: string, published: boolean) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || (session.user.role !== 'admin' && session.user.role !== 'editor')) {
-      return { success: false, error: 'Unauthorized access.' };
-    }
+    await requireEditor();
 
     const post = await postsService.updatePost(id, { 
       published, 

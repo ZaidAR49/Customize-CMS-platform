@@ -1,7 +1,6 @@
 'use server';
 
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 import { organizationService } from '@/lib/services/organization.service';
 import {
   updateOrganizationSchema,
@@ -44,10 +43,7 @@ function toDbPayload(parsed: UpdateOrganizationInput, userId: string) {
 
 export async function updateOrganizationAction(id: string, data: unknown) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== 'admin') {
-      return { success: false, error: 'Unauthorized access. Admins only.' };
-    }
+    const session = await requireAdmin();
 
     const parsed = updateOrganizationSchema.safeParse(data);
     if (!parsed.success) {
@@ -72,10 +68,7 @@ export async function updateOrganizationAction(id: string, data: unknown) {
 
 export async function createOrganizationAction(data: unknown) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== 'admin') {
-      return { success: false, error: 'Unauthorized access. Admins only.' };
-    }
+    const session = await requireAdmin();
 
     const parsed = updateOrganizationSchema.safeParse(data);
     if (!parsed.success) {

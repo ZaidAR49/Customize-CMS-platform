@@ -1,7 +1,6 @@
 'use server';
 
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 import { organizationStatsService } from '@/lib/services/organization-stats.service';
 import { organizationService } from '@/lib/services/organization.service';
 import { organizationStatSchema, zodErrorToFieldErrors } from '@/lib/validations/organization-stats.schema';
@@ -9,10 +8,7 @@ import { revalidatePath } from 'next/cache';
 
 export async function createOrganizationStatAction(data: unknown) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== 'admin') {
-      return { success: false, error: 'Unauthorized access. Admins only.' };
-    }
+    const session = await requireAdmin();
 
     const parsed = organizationStatSchema.safeParse(data);
     if (!parsed.success) {
@@ -48,10 +44,7 @@ export async function createOrganizationStatAction(data: unknown) {
 
 export async function updateOrganizationStatAction(id: string, data: unknown) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== 'admin') {
-      return { success: false, error: 'Unauthorized access. Admins only.' };
-    }
+    const session = await requireAdmin();
 
     const parsed = organizationStatSchema.safeParse(data);
     if (!parsed.success) {
@@ -81,10 +74,7 @@ export async function updateOrganizationStatAction(id: string, data: unknown) {
 
 export async function deleteOrganizationStatAction(id: string) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== 'admin') {
-      return { success: false, error: 'Unauthorized access. Admins only.' };
-    }
+    await requireAdmin();
 
     await organizationStatsService.deleteStat(id);
 
