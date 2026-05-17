@@ -11,6 +11,7 @@ import {
   MessageSquare,
   ExternalLink,
   BarChart3,
+  Images,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { signOut } from 'next-auth/react'
@@ -20,6 +21,7 @@ import logo from '@/app/icon.png'
 const sidebarItems = [
   { label: 'لوحة التحكم', href: '/dashboard', icon: LayoutDashboard },
   { label: 'المقالات', href: '/dashboard/posts', icon: FileText },
+  { label: 'المعرض', href: '/dashboard/gallery', icon: Images },
   { label: 'المستخدمون', href: '/dashboard/users', icon: Users },
   { label: 'الاحصائيات', href: '/dashboard/statistics', icon: BarChart3 },
   { label: 'معلومات المنظمة', href: '/dashboard/settings', icon: Building2 },

@@ -5,7 +5,7 @@ import { authOptions } from '@/lib/auth';
 import { usersService } from '@/lib/services/users.service';
 import { createUserSchema, updateUserProfileSchema } from '@/lib/validations/users.schema';
 import { revalidatePath } from 'next/cache';
-import { uploadImage } from '@/lib/cloudinary';
+import { uploadImage } from '@/actions/cloudinary.actions';
 
 const AVATAR_MAX_BYTES = 4 * 1024 * 1024;
 
