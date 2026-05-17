@@ -23,6 +23,7 @@ import {
   type ImageResource,
 } from '@/lib/cloudinary-client'
 import { DeleteGalleryImagesDialog } from './DeleteGalleryImagesDialog'
+import { cloudinaryLoader } from '@/lib/image-loader'
 
 const MAX_BATCH = 10
 const MAX_FILE_BYTES = 5 * 1024 * 1024
@@ -49,6 +50,7 @@ function GalleryImageCard({ image, selected, onToggle }: GalleryImageCardProps) 
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-(--fcps-gray-light)">
         <Image
+          loader={cloudinaryLoader}
           src={image.secure_url}
           alt={image.public_id}
           fill
@@ -56,7 +58,7 @@ function GalleryImageCard({ image, selected, onToggle }: GalleryImageCardProps) 
           className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
         />
 
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
 
         <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 p-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <Badge variant="secondary" className="bg-white/90 text-xs uppercase backdrop-blur-sm">
