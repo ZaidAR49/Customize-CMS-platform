@@ -19,68 +19,70 @@ import { deletePostAction } from '@/actions/posts.actions'
 import type { Post } from '@/types/post'
 import { FileText, Layers3, Tags, ChevronDown, Plus } from 'lucide-react'
 import { ClearFiltersButton } from '@/components/shared/ClearFiltersButton'
+import { SearchBar } from '@/components/shared/SearchBar'
 import { cn } from '@/lib/utils'
 
 interface PostsOverviewProps {
   posts: Post[]
 }
 
-const typeLabels: Record<string, string> = {
-  all: 'كل الأنواع',
-  news: 'أخبار',
-  activity: 'نشاطات',
-  program: 'برامج',
-  center: 'مراكز',
-}
-
 export function PostsOverview({ posts }: PostsOverviewProps) {
   const router = useRouter()
   const [, startTransition] = useTransition()
   const [activeCategory, setActiveCategory] = useState<string>('all')
-  const [activeType, setActiveType] = useState<Post['type'] | 'all'>('all')
+  const [searchQuery, setSearchQuery] = useState<string>('')
   const [activeTag, setActiveTag] = useState<string>('all')
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [postToDelete, setPostToDelete] = useState<Post | null>(null)
 
+  const visiblePosts = useMemo(() => {
+    return posts.filter((post) => post.type !== 'center' && post.type !== 'program')
+  }, [posts])
+
   const availableCategories = useMemo(() => {
     const categories = new Map<string, string>()
-    for (const post of posts) {
+    for (const post of visiblePosts) {
       if (!post.category || !post.categoryId) continue
       categories.set(post.category, post.categoryLabel ?? post.category)
     }
     return Array.from(categories.entries())
       .map(([key, label]) => ({ key, label }))
       .sort((a, b) => a.label.localeCompare(b.label, 'ar'))
-  }, [posts])
+  }, [visiblePosts])
 
   const availableTags = useMemo(() => {
     const tags = new Set<string>()
-    for (const post of posts) {
+    for (const post of visiblePosts) {
       for (const tag of post.tags ?? []) tags.add(tag)
     }
     return Array.from(tags).sort((a, b) => a.localeCompare(b, 'ar'))
-  }, [posts])
+  }, [visiblePosts])
 
   const filteredPosts = useMemo(() => {
-    return posts.filter((post) => {
+    return visiblePosts.filter((post) => {
       const categoryMatch = activeCategory === 'all' || post.category === activeCategory
-      const typeMatch = activeType === 'all' || post.type === activeType
       const tagMatch = activeTag === 'all' || (post.tags ?? []).includes(activeTag)
-      return categoryMatch && typeMatch && tagMatch
+      const matchesSearch =
+        !searchQuery.trim() ||
+        post.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.title_en?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.excerpt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.descripcion?.toLowerCase().includes(searchQuery.toLowerCase())
+      return categoryMatch && tagMatch && matchesSearch
     })
-  }, [activeCategory, activeType, activeTag, posts])
+  }, [activeCategory, activeTag, searchQuery, visiblePosts])
 
   const hasActiveFilters =
-    activeCategory !== 'all' || activeType !== 'all' || activeTag !== 'all'
+    activeCategory !== 'all' || activeTag !== 'all' || searchQuery.trim() !== ''
 
   function clearFilters() {
     setActiveCategory('all')
-    setActiveType('all')
+    setSearchQuery('')
     setActiveTag('all')
   }
 
   const stats = [
-    { label: 'إجمالي المقالات', value: posts.length, icon: FileText, color: 'bg-blue-500' },
+    { label: 'إجمالي المقالات', value: visiblePosts.length, icon: FileText, color: 'bg-blue-500' },
     { label: 'التصنيفات', value: availableCategories.length, icon: Layers3, color: 'bg-(--fcps-primary)' },
     { label: 'الوسوم', value: availableTags.length, icon: Tags, color: 'bg-amber-500' },
   ]
@@ -140,12 +142,12 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
       </div>
 
       <Card className="border-none shadow-sm">
-        <CardContent className="p-5">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <CardContent className="p-5 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="text-sm font-medium text-(--fcps-dark)">تصفية المقالات</h3>
             <ClearFiltersButton onClear={clearFilters} disabled={!hasActiveFilters} />
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-medium text-(--fcps-dark)">
                 التصفية حسب التصنيف
@@ -180,35 +182,6 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
 
             <div>
               <label className="mb-2 block text-sm font-medium text-(--fcps-dark)">
-                التصفية حسب نوع المنشور
-              </label>
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  className={cn(
-                    buttonVariants({ variant: 'outline' }),
-                    'w-full justify-between border-(--fcps-primary)/20 bg-white text-(--fcps-dark) hover:bg-(--fcps-bg-soft)'
-                  )}
-                >
-                  {typeLabels[activeType]}
-                  <ChevronDown className="h-4 w-4" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" side="bottom" className="w-(--radix-popper-anchor-width)">
-                  <DropdownMenuRadioGroup
-                    value={activeType}
-                    onValueChange={(value) => setActiveType(value as Post['type'] | 'all')}
-                  >
-                    {Object.entries(typeLabels).map(([value, label]) => (
-                      <DropdownMenuRadioItem key={value} value={value}>
-                        {label}
-                      </DropdownMenuRadioItem>
-                    ))}
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-(--fcps-dark)">
                 التصفية حسب الوسم
               </label>
               <DropdownMenu>
@@ -233,6 +206,18 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-(--fcps-dark)">
+              البحث عن المقالات
+            </label>
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="ابحث بالعنوان أو المحتوى..."
+              aria-label="البحث عن المقالات"
+            />
           </div>
         </CardContent>
       </Card>

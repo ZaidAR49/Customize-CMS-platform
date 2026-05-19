@@ -14,7 +14,7 @@ const quickLinks = [
 
 export function Footer() {
   return (
-    <footer className="mt-16 bg-(--fcps-dark) text-white">
+    <footer className="mt-16 bg-(--fcps-dark) text-white py-12">
       <div className="container py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {/* Column 1: About */}

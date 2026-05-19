@@ -14,6 +14,8 @@ interface SearchBarProps {
   className?: string
   inputClassName?: string
   showClear?: boolean
+  onFocus?: () => void
+  onBlur?: () => void
 }
 
 export function SearchBar({
@@ -26,6 +28,8 @@ export function SearchBar({
   className,
   inputClassName,
   showClear = true,
+  onFocus,
+  onBlur,
 }: SearchBarProps) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -45,7 +49,9 @@ export function SearchBar({
         placeholder={placeholder}
         aria-label={ariaLabel}
         dir={dir}
-        className={cn('h-10 pe-9 ps-9', inputClassName)}
+        className={cn('h-10 pe-9 ps-9 [&::-webkit-search-cancel-button]:appearance-none', inputClassName)}
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
       {showClear && value && (
         <button

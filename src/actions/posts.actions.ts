@@ -80,3 +80,25 @@ export async function togglePostPublishAction(id: string, published: boolean) {
     return { success: false, error: error.message || 'Failed to update publish status' };
   }
 }
+
+export async function getSearchPostsAction() {
+  try {
+    const posts = await postsService.getPosts(undefined, true);
+    // Filter to only include public news and activities
+    const filtered = posts.filter((p) => p.type === 'news' || p.type === 'activity');
+    return {
+      success: true,
+      data: filtered.map((p) => ({
+        id: p.id,
+        slug: p.slug,
+        title: p.title,
+        publishedAt: p.publishedAt,
+        type: p.type,
+        coverImage: p.coverImage,
+      })),
+    };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to fetch search posts' };
+  }
+}
+
