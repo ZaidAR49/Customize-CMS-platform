@@ -33,7 +33,7 @@ export function ProgramCenterFormEditor({
   const [pending, startTransition] = useTransition()
   const [formValue, setFormValue] = useState<SimplePostFormValue>(
     mode === 'edit' && post 
-      ? { title: post.title, slug: post.slug, descripcion: post.descripcion }
+      ? { title: post.title, title_en: post.title_en ?? '', slug: post.slug, descripcion: post.descripcion, descripcion_en: post.descripcion_en ?? '' }
       : emptySimplePostFormValue
   )
 
@@ -47,8 +47,10 @@ export function ProgramCenterFormEditor({
       
       const payload = {
         title: formValue.title,
+        title_en: formValue.title_en,
         slug: slug,
         descripcion: formValue.descripcion,
+        descripcion_en: formValue.descripcion_en,
         type: type,
         published: true,
       }

@@ -10,14 +10,18 @@ import { Textarea } from '@/components/ui/textarea'
 
 export interface SimplePostFormValue {
   title: string
+  title_en: string
   slug: string
   descripcion: string
+  descripcion_en: string
 }
 
 export const emptySimplePostFormValue: SimplePostFormValue = {
   title: '',
+  title_en: '',
   slug: '',
   descripcion: '',
+  descripcion_en: '',
 }
 
 interface SimplePostFormProps {
@@ -67,16 +71,29 @@ export function SimplePostForm({
       }}
     >
       <div className="grid gap-4">
-        <div className="grid gap-2">
-          <Label htmlFor="post-title">العنوان</Label>
-          <Input
-            id="post-title"
-            value={value.title}
-            onChange={(e) => handleTitleChange(e.target.value)}
-            disabled={pending}
-            dir="auto"
-            required
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="post-title-ar">العنوان (بالعربية)</Label>
+            <Input
+              id="post-title-ar"
+              value={value.title}
+              onChange={(e) => handleTitleChange(e.target.value)}
+              disabled={pending}
+              dir="auto"
+              required
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="post-title-en">العنوان (بالإنجليزية)</Label>
+            <Input
+              id="post-title-en"
+              value={value.title_en || ''}
+              onChange={(e) => onChange('title_en', e.target.value)}
+              disabled={pending}
+              dir="ltr"
+              className="text-left"
+            />
+          </div>
         </div>
 
         <div className="grid gap-2">
@@ -97,19 +114,19 @@ export function SimplePostForm({
         <div className="grid gap-2">
           <div className="flex items-center justify-between pb-2">
             <div>
-              <Label htmlFor="post-descripcion">الوصف</Label>
+              <Label htmlFor="post-descripcion">المحتوى (بالعربية)</Label>
               <p className="text-xs text-[#777777] mt-1">
                 يدعم HTML مثل <code className="rounded bg-[#f0f0f0] px-1">&lt;h2&gt;عنوان&lt;/h2&gt;</code>
               </p>
             </div>
             <div className="flex items-center space-x-3 flex-row-reverse">
               <Switch
-                id="theme-mode"
+                id="theme-mode-ar"
                 checked={isHtml}
                 onCheckedChange={setIsHtml}
                 className="data-[state=checked]:bg-blue-500 mr-3"
               />
-              <Label htmlFor="theme-mode" className="font-medium text-gray-700">
+              <Label htmlFor="theme-mode-ar" className="font-medium text-gray-700">
                 {isHtml ? "HTML" : "نص"}
               </Label>
             </div>
@@ -117,7 +134,7 @@ export function SimplePostForm({
 
           {isHtml ? (
             <CodeEditor
-              id="post-descripcion"
+              id="post-descripcion-ar"
               value={value.descripcion}
               onChange={(e) => onChange('descripcion', e.target.value)}
               disabled={pending}
@@ -137,7 +154,7 @@ export function SimplePostForm({
             />
           ) : (
             <Textarea
-              id="post-descripcion"
+              id="post-descripcion-ar"
               value={value.descripcion}
               onChange={(e) => onChange('descripcion', e.target.value)}
               disabled={pending}
@@ -145,6 +162,47 @@ export function SimplePostForm({
               className="min-h-[320px] text-base leading-relaxed p-4"
               placeholder="أدخل الوصف..."
               dir="rtl"
+            />
+          )}
+        </div>
+
+        <div className="grid gap-2">
+          <div className="flex items-center justify-between pb-2">
+            <div>
+              <Label htmlFor="post-descripcion-en">المحتوى (بالإنجليزية)</Label>
+            </div>
+          </div>
+
+          {isHtml ? (
+            <CodeEditor
+              id="post-descripcion-en"
+              value={value.descripcion_en || ''}
+              onChange={(e) => onChange('descripcion_en', e.target.value)}
+              disabled={pending}
+              language="html"
+              className="min-h-[320px] font-mono text-sm leading-relaxed rounded-md border"
+              placeholder="Enter HTML code..."
+              dir="ltr"
+              style={{
+                direction: 'ltr',
+                unicodeBidi: 'isolate',
+                textAlign: 'left',
+                color: "#333333",
+                fontSize: 14,
+                backgroundColor: "#f5f5f5",
+                fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
+              }}
+            />
+          ) : (
+            <Textarea
+              id="post-descripcion-en"
+              value={value.descripcion_en || ''}
+              onChange={(e) => onChange('descripcion_en', e.target.value)}
+              disabled={pending}
+              rows={12}
+              className="min-h-[320px] text-base leading-relaxed p-4 text-left"
+              placeholder="Enter description..."
+              dir="ltr"
             />
           )}
         </div>

@@ -57,10 +57,15 @@ export const updateOrganizationSchema = z.object({
     .string()
     .min(1, 'أدخل الاسم بالعربية')
     .max(MAX_NAME, `يجب ألا يتجاوز الاسم العربي ${MAX_NAME} حرفًا`),
+  name_en: z.string().max(MAX_NAME, `يجب ألا يتجاوز الاسم الإنجليزي ${MAX_NAME} حرفًا`).optional(),
   tagline_ar: optionalArTagline,
+  tagline_en: z.string().max(MAX_TAGLINE, `يجب ألا يتجاوز الشعار الإنجليزي ${MAX_TAGLINE} حرفًا`).optional(),
   about_ar: optionalArLong,
+  about_en: z.string().max(MAX_LONG_TEXT, `النص الإنجليزي طويل جدًا (الحد ${MAX_LONG_TEXT} حرفًا)`).optional(),
   mission_ar: optionalArLong,
+  mission_en: z.string().max(MAX_LONG_TEXT, `النص الإنجليزي طويل جدًا (الحد ${MAX_LONG_TEXT} حرفًا)`).optional(),
   vision_ar: optionalArLong,
+  vision_en: z.string().max(MAX_LONG_TEXT, `النص الإنجليزي طويل جدًا (الحد ${MAX_LONG_TEXT} حرفًا)`).optional(),
   founded_year: foundedYearSchema,
   phone: phoneSchema,
   email: emailSchema,

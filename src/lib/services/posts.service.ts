@@ -3,7 +3,7 @@ import { normalizeSlug } from '@/lib/slug';
 import type { Post } from '@/types/post';
 
 const POST_SELECT =
-  '*, author:users(name, avatar_url), category:categories!posts_category_id_fkey(id, key, label_ar, label_en)';
+  '*, author:users(name, avatar_url), category:categories!posts_category_id_fkey(id, key, translations:category_translations(lang, label)), translations:post_translations(lang, title, description)';
 type RawPost = Record<string, any>;
 
 function normalizePostType(type: string | null | undefined): Post['type'] {
@@ -38,24 +38,34 @@ function parseLikes(metadata: Record<string, unknown>): number {
 function mapPost(row: RawPost): Post {
   const metadata = row.metadata ?? {};
   const excerpt = metadata.excerpt ?? '';
-  const descripcion =
-    row.descripcion ??
-    row.description ??
-    (typeof metadata.body === 'string' ? metadata.body : '') ??
-    '';
+  const postTrans = Array.isArray(row.translations) ? row.translations : [];
+  const postAr = postTrans.find((t: any) => t.lang === 'ar') || {};
+  const postEn = postTrans.find((t: any) => t.lang === 'en') || {};
+
+  const titleAr = postAr.title ?? row.title ?? '';
+  const titleEn = postEn.title ?? '';
+
+  const descripcionAr = postAr.description ?? row.descripcion ?? row.description ?? (typeof metadata.body === 'string' ? metadata.body : '') ?? '';
+  const descripcionEn = postEn.description ?? '';
+
   const category = Array.isArray(row.category) ? row.category[0] : row.category;
+  const catTrans = Array.isArray(category?.translations) ? category.translations : [];
+  const catAr = catTrans.find((t: any) => t.lang === 'ar') || {};
+  const catEn = catTrans.find((t: any) => t.lang === 'en') || {};
 
   return {
     id: row.id,
     slug: row.slug ?? '',
-    title: row.title ?? '',
+    title: titleAr,
+    title_en: titleEn,
     excerpt,
-    descripcion,
+    descripcion: descripcionAr,
+    descripcion_en: descripcionEn,
     coverImage: row.cover_image ?? row.coverImage ?? '',
     type: normalizePostType(row.type),
     categoryId: row.category_id ?? category?.id ?? undefined,
     category: category?.key ?? metadata.category ?? undefined,
-    categoryLabel: category?.label_ar ?? category?.label_en ?? category?.key ?? metadata.category ?? undefined,
+    categoryLabel: catAr.label ?? catEn.label ?? category?.key ?? metadata.category ?? undefined,
     tags: Array.isArray(row.tags) ? row.tags : [],
     gallery: parseGallery(metadata),
     likes: parseLikes(metadata),
@@ -117,40 +127,46 @@ export const postsService = {
   },
 
   async createPost(postData: any): Promise<Post> {
-    const { title, slug, descripcion, excerpt, cover_image, type, published, author_id, category_id } = postData;
+    const { title, title_en, slug, descripcion, descripcion_en, excerpt, cover_image, type, published, author_id, category_id } = postData;
     const metadata: Record<string, unknown> = { likes: 0 };
     if (excerpt !== undefined) metadata.excerpt = excerpt;
 
-    const { data, error } = await supabase
+    const { data: postRow, error } = await supabase
       .from('posts')
       .insert({
-        title,
         slug,
         cover_image: cover_image ?? null,
         type: toDatabasePostType(type),
         metadata,
-        description: descripcion ?? null,
         category_id: category_id || null,
         published: published ?? false,
         author_id,
       })
-      .select(POST_SELECT)
+      .select('id')
       .single();
 
     if (error) throw error;
-    return mapPost(data);
+
+    const postId = postRow.id;
+    const trans = [];
+    if (title || descripcion) trans.push({ post_id: postId, lang: 'ar', title: title ?? '', description: descripcion ?? '' });
+    if (title_en || descripcion_en) trans.push({ post_id: postId, lang: 'en', title: title_en ?? '', description: descripcion_en ?? '' });
+    
+    if (trans.length > 0) {
+      await supabase.from('post_translations').insert(trans);
+    }
+
+    const fullPost = await this.getPostById(postId);
+    if (!fullPost) throw new Error('Post not found after insert');
+    return fullPost;
   },
 
   async updatePost(id: string, postData: any): Promise<Post> {
-    const { descripcion, excerpt, type, category_id, ...rest } = postData;
+    const { title, title_en, descripcion, descripcion_en, excerpt, type, category_id, ...rest } = postData;
     const payload: Record<string, any> = { ...rest };
 
     if (type !== undefined) payload.type = toDatabasePostType(type);
     if (category_id !== undefined) payload.category_id = category_id || null;
-
-    if (descripcion !== undefined) {
-      payload.description = descripcion;
-    }
 
     if (excerpt !== undefined) {
       const { data: existingPost, error: existingError } = await supabase
@@ -167,16 +183,30 @@ export const postsService = {
       };
     }
 
-    const { data, error } = await supabase
-      .from('posts')
-      .update(payload)
-      .eq('id', id)
-      .select(POST_SELECT)
-      .single();
+    if (Object.keys(payload).length > 0) {
+      const { error } = await supabase
+        .from('posts')
+        .update(payload)
+        .eq('id', id);
+      if (error) throw error;
+    }
 
-    if (error) throw error;
-    if (!data) throw new Error('Post not found');
-    return mapPost(data);
+    const trans = [];
+    if (title !== undefined || descripcion !== undefined) {
+      trans.push({ post_id: id, lang: 'ar', title: title ?? '', description: descripcion ?? '' });
+    }
+    if (title_en !== undefined || descripcion_en !== undefined) {
+      trans.push({ post_id: id, lang: 'en', title: title_en ?? '', description: descripcion_en ?? '' });
+    }
+
+    if (trans.length > 0) {
+      const { error: transError } = await supabase.from('post_translations').upsert(trans, { onConflict: 'post_id, lang' });
+      if (transError) throw transError;
+    }
+
+    const fullPost = await this.getPostById(id);
+    if (!fullPost) throw new Error('Post not found after update');
+    return fullPost;
   },
 
   async deletePost(id: string): Promise<void> {

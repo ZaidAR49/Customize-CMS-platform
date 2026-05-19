@@ -114,11 +114,16 @@ function buildInitial(org: OrganizationRow | null) {
 
   return {
     name_ar: org?.name_ar ?? '',
+    name_en: empty(org?.name_en),
     tagline_ar: empty(org?.tagline_ar),
+    tagline_en: empty(org?.tagline_en),
     founded_year: org?.founded_year != null ? String(org.founded_year) : '',
     about_ar: empty(org?.about_ar),
+    about_en: empty(org?.about_en),
     mission_ar: empty(org?.mission_ar),
+    mission_en: empty(org?.mission_en),
     vision_ar: empty(org?.vision_ar),
+    vision_en: empty(org?.vision_en),
     phone: empty(org?.phone),
     email: empty(org?.email),
     socialEnabled,
@@ -255,11 +260,16 @@ export function OrganizationSettingsForm({
 
     const payload = {
       name_ar: form.name_ar.trim(),
+      name_en: form.name_en.trim(),
       tagline_ar: form.tagline_ar.trim(),
+      tagline_en: form.tagline_en.trim(),
       founded_year,
       about_ar: form.about_ar.trim(),
+      about_en: form.about_en.trim(),
       mission_ar: form.mission_ar.trim(),
+      mission_en: form.mission_en.trim(),
       vision_ar: form.vision_ar.trim(),
+      vision_en: form.vision_en.trim(),
       phone: form.phone.trim(),
       email: form.email.trim(),
       social,
@@ -325,7 +335,7 @@ export function OrganizationSettingsForm({
           <CardDescription>الاسم، الشعارات، وسنة التأسيس</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2 sm:col-span-2">
+          <div className="space-y-2 sm:col-span-1">
             <Label htmlFor="name_ar">الاسم بالعربية</Label>
             <Input
               id="name_ar"
@@ -337,6 +347,19 @@ export function OrganizationSettingsForm({
               className={cn(e.name_ar && 'border-destructive')}
             />
             <FieldError message={e.name_ar} />
+          </div>
+          <div className="space-y-2 sm:col-span-1">
+            <Label htmlFor="name_en">الاسم بالإنجليزية</Label>
+            <Input
+              id="name_en"
+              value={form.name_en}
+              onChange={(ev) => update('name_en', ev.target.value)}
+              placeholder="Example: Family and Childhood Protection Society"
+              dir="ltr"
+              aria-invalid={!!e.name_en}
+              className={cn('text-left', e.name_en && 'border-destructive')}
+            />
+            <FieldError message={e.name_en} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="founded_year">سنة التأسيس</Label>
@@ -353,7 +376,7 @@ export function OrganizationSettingsForm({
             />
             <FieldError message={e.founded_year} />
           </div>
-          <div className="space-y-2 sm:col-span-2">
+          <div className="space-y-2 sm:col-span-1">
             <Label htmlFor="tagline_ar">الشعار بالعربية</Label>
             <Input
               id="tagline_ar"
@@ -366,6 +389,19 @@ export function OrganizationSettingsForm({
             />
             <FieldError message={e.tagline_ar} />
           </div>
+          <div className="space-y-2 sm:col-span-1">
+            <Label htmlFor="tagline_en">الشعار بالإنجليزية</Label>
+            <Input
+              id="tagline_en"
+              value={form.tagline_en}
+              onChange={(ev) => update('tagline_en', ev.target.value)}
+              placeholder="Short tagline or promotional phrase..."
+              dir="ltr"
+              aria-invalid={!!e.tagline_en}
+              className={cn('text-left', e.tagline_en && 'border-destructive')}
+            />
+            <FieldError message={e.tagline_en} />
+          </div>
         </CardContent>
       </Card>
 
@@ -375,47 +411,95 @@ export function OrganizationSettingsForm({
           <CardDescription>نبذة، الرسالة، والرؤية</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="about_ar">عن المنظمة</Label>
-            <Textarea
-              id="about_ar"
-              value={form.about_ar}
-              onChange={(ev) => update('about_ar', ev.target.value)}
-              placeholder="نبذة تعريفية شاملة عن المنظمة، أهدافها، وتاريخها..."
-              rows={5}
-              dir="rtl"
-              aria-invalid={!!e.about_ar}
-              className={cn(e.about_ar && 'border-destructive')}
-            />
-            <FieldError message={e.about_ar} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="about_ar">عن المنظمة (بالعربية)</Label>
+              <Textarea
+                id="about_ar"
+                value={form.about_ar}
+                onChange={(ev) => update('about_ar', ev.target.value)}
+                placeholder="نبذة تعريفية شاملة عن المنظمة، أهدافها، وتاريخها..."
+                rows={5}
+                dir="rtl"
+                aria-invalid={!!e.about_ar}
+                className={cn(e.about_ar && 'border-destructive')}
+              />
+              <FieldError message={e.about_ar} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="about_en">عن المنظمة (بالإنجليزية)</Label>
+              <Textarea
+                id="about_en"
+                value={form.about_en}
+                onChange={(ev) => update('about_en', ev.target.value)}
+                placeholder="Comprehensive overview of the organization, its goals, and history..."
+                rows={5}
+                dir="ltr"
+                aria-invalid={!!e.about_en}
+                className={cn('text-left', e.about_en && 'border-destructive')}
+              />
+              <FieldError message={e.about_en} />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="mission_ar">الرسالة</Label>
-            <Textarea
-              id="mission_ar"
-              value={form.mission_ar}
-              onChange={(ev) => update('mission_ar', ev.target.value)}
-              placeholder="رسالة المنظمة التي تسعى لتحقيقها في المجتمع..."
-              rows={4}
-              dir="rtl"
-              aria-invalid={!!e.mission_ar}
-              className={cn(e.mission_ar && 'border-destructive')}
-            />
-            <FieldError message={e.mission_ar} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="mission_ar">الرسالة (بالعربية)</Label>
+              <Textarea
+                id="mission_ar"
+                value={form.mission_ar}
+                onChange={(ev) => update('mission_ar', ev.target.value)}
+                placeholder="رسالة المنظمة التي تسعى لتحقيقها في المجتمع..."
+                rows={4}
+                dir="rtl"
+                aria-invalid={!!e.mission_ar}
+                className={cn(e.mission_ar && 'border-destructive')}
+              />
+              <FieldError message={e.mission_ar} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="mission_en">الرسالة (بالإنجليزية)</Label>
+              <Textarea
+                id="mission_en"
+                value={form.mission_en}
+                onChange={(ev) => update('mission_en', ev.target.value)}
+                placeholder="The organization's mission in society..."
+                rows={4}
+                dir="ltr"
+                aria-invalid={!!e.mission_en}
+                className={cn('text-left', e.mission_en && 'border-destructive')}
+              />
+              <FieldError message={e.mission_en} />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="vision_ar">الرؤية</Label>
-            <Textarea
-              id="vision_ar"
-              value={form.vision_ar}
-              onChange={(ev) => update('vision_ar', ev.target.value)}
-              placeholder="الرؤية المستقبلية والغاية الكبرى للمنظمة..."
-              rows={3}
-              dir="rtl"
-              aria-invalid={!!e.vision_ar}
-              className={cn(e.vision_ar && 'border-destructive')}
-            />
-            <FieldError message={e.vision_ar} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="vision_ar">الرؤية (بالعربية)</Label>
+              <Textarea
+                id="vision_ar"
+                value={form.vision_ar}
+                onChange={(ev) => update('vision_ar', ev.target.value)}
+                placeholder="الرؤية المستقبلية والغاية الكبرى للمنظمة..."
+                rows={3}
+                dir="rtl"
+                aria-invalid={!!e.vision_ar}
+                className={cn(e.vision_ar && 'border-destructive')}
+              />
+              <FieldError message={e.vision_ar} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="vision_en">الرؤية (بالإنجليزية)</Label>
+              <Textarea
+                id="vision_en"
+                value={form.vision_en}
+                onChange={(ev) => update('vision_en', ev.target.value)}
+                placeholder="The future vision and ultimate goal of the organization..."
+                rows={3}
+                dir="ltr"
+                aria-invalid={!!e.vision_en}
+                className={cn('text-left', e.vision_en && 'border-destructive')}
+              />
+              <FieldError message={e.vision_en} />
+            </div>
           </div>
         </CardContent>
       </Card>

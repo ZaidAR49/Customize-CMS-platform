@@ -47,10 +47,12 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
       setFormData({
         key: '',
         label_ar: '',
+        label_en: '',
         value: '',
         icon: 'Activity',
         display_order: 0,
         description_ar: '',
+        description_en: '',
       });
     }
   }, [stat, open]);
@@ -96,16 +98,30 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
             />
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="stat-label-ar">العنوان</Label>
-            <Input
-              id="stat-label-ar"
-              value={formData.label_ar || ''}
-              onChange={(e) => handleChange('label_ar', e.target.value)}
-              disabled={pending}
-              required
-              placeholder="مثال: العائلات المستفيدة"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="stat-label-ar">العنوان (بالعربية)</Label>
+              <Input
+                id="stat-label-ar"
+                value={formData.label_ar || ''}
+                onChange={(e) => handleChange('label_ar', e.target.value)}
+                disabled={pending}
+                required
+                placeholder="مثال: العائلات المستفيدة"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="stat-label-en">العنوان (بالإنجليزية)</Label>
+              <Input
+                id="stat-label-en"
+                value={formData.label_en || ''}
+                onChange={(e) => handleChange('label_en', e.target.value)}
+                disabled={pending}
+                dir="ltr"
+                className="text-left"
+                placeholder="Example: Beneficiary Families"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -159,14 +175,27 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
             </div>
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="stat-desc">وصف إضافي (عربي) - اختياري</Label>
-            <Input
-              id="stat-desc"
-              value={formData.description_ar || ''}
-              onChange={(e) => handleChange('description_ar', e.target.value)}
-              disabled={pending}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="stat-desc-ar">وصف إضافي (عربي) - اختياري</Label>
+              <Input
+                id="stat-desc-ar"
+                value={formData.description_ar || ''}
+                onChange={(e) => handleChange('description_ar', e.target.value)}
+                disabled={pending}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="stat-desc-en">وصف إضافي (إنجليزي) - اختياري</Label>
+              <Input
+                id="stat-desc-en"
+                value={formData.description_en || ''}
+                onChange={(e) => handleChange('description_en', e.target.value)}
+                disabled={pending}
+                dir="ltr"
+                className="text-left"
+              />
+            </div>
           </div>
         </form>
         <DialogFooter className="gap-2 sm:justify-start">

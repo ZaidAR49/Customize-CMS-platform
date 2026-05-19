@@ -4,8 +4,10 @@ export interface Post {
   id: string | undefined
   slug: string
   title: string
+  title_en?: string
   excerpt: string
   descripcion: string
+  descripcion_en?: string
   coverImage: string
   type: PostType
   categoryId?: string
