@@ -15,6 +15,7 @@ import {
   Target,
   MapPin,
   DatabaseBackup,
+  FolderOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { signOut } from 'next-auth/react'
@@ -27,6 +28,7 @@ const sidebarItems = [
   { label: 'المعرض', href: '/dashboard/gallery', icon: Images },
   { label: 'المستخدمون', href: '/dashboard/users', icon: Users },
   { label: 'الاحصائيات', href: '/dashboard/statistics', icon: BarChart3 },
+  { label: 'التصنيفات', href: '/dashboard/categories', icon: FolderOpen },
   { label: 'معلومات المنظمة', href: '/dashboard/settings', icon: Building2 },
   { label: 'التعليقات', href: '/dashboard/comments', icon: MessageSquare },
   { label: 'إدارة البيانات', href: '/dashboard/data-management', icon: DatabaseBackup },

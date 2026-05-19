@@ -1,4 +1,5 @@
 import { PostContent } from '@/components/news/PostContent'
+import { categoriesService } from '@/lib/services/categories.service'
 import { commentsService } from '@/lib/services/comments.service'
 import { postsService } from '@/lib/services/posts.service'
 import { normalizeSlug } from '@/lib/slug'
@@ -41,16 +42,7 @@ function pickRelated(post: Post, all: Post[]): Post[] {
   return source.slice(0, 3)
 }
 
-function buildCategories(posts: Post[]) {
-  const map = new Map<string, string>()
-  for (const p of posts) {
-    if (!p.category) continue
-    map.set(p.category, p.categoryLabel ?? p.category)
-  }
-  return Array.from(map.entries())
-    .map(([key, label]) => ({ key, label }))
-    .sort((a, b) => a.label.localeCompare(b.label, 'ar'))
-}
+// Function removed as we will fetch directly from db
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug: rawSlug } = await params
@@ -58,8 +50,12 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const post = await postsService.getPostBySlug(slug)
   if (!post || (post.type !== 'news' && post.type !== 'activity')) notFound()
 
-  const allPosts = await postsService.getPosts(undefined, true)
+  const [allPosts, dbCategories] = await Promise.all([
+    postsService.getPosts(undefined, true),
+    categoriesService.getAllCategories(),
+  ])
   const newsPosts = allPosts.filter((p) => p.type === 'news' || p.type === 'activity')
+  const mappedCategories = dbCategories.map(c => ({ key: c.key, label: c.label_ar }))
 
   const sorted = [...newsPosts].sort(
     (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
@@ -93,7 +89,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       related={related}
       previousPost={previousPost}
       latestPosts={latestWithCounts}
-      categories={buildCategories(newsPosts)}
+      categories={mappedCategories}
       approvedComments={approvedComments}
     />
   )

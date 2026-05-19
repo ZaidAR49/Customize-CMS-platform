@@ -145,7 +145,6 @@ CREATE TABLE organization_stats_translations (
 CREATE TABLE categories (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   key varchar NOT NULL,
-  icon varchar,
   display_order int4 NOT NULL DEFAULT 0,
   created_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT categories_pkey PRIMARY KEY (id),

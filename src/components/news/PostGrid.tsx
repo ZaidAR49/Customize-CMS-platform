@@ -9,6 +9,7 @@ interface PostGridProps {
   posts: Post[]
   initialSearchQuery?: string
   initialCategory?: string
+  dbCategories?: Array<{ key: string; label: string }>
 }
 
 const POSTS_PER_PAGE = 8
@@ -48,6 +49,7 @@ export function PostGrid({
   posts,
   initialSearchQuery = '',
   initialCategory = 'all',
+  dbCategories,
 }: PostGridProps) {
   const [activeFilter, setActiveFilter] = useState<PostType | 'all'>('all')
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
@@ -65,6 +67,10 @@ export function PostGrid({
   }, [initialCategory])
 
   const categories = useMemo(() => {
+    if (dbCategories && dbCategories.length > 0) {
+      return dbCategories
+    }
+    // Fallback: derive from posts
     const values = new Map<string, string>()
     for (const post of posts) {
       if (!post.category) continue
@@ -73,7 +79,7 @@ export function PostGrid({
     return Array.from(values.entries())
       .map(([key, label]) => ({ key, label }))
       .sort((a, b) => a.label.localeCompare(b.label, 'ar'))
-  }, [posts])
+  }, [posts, dbCategories])
 
   const filteredPosts = useMemo(() => {
     return posts.filter((post) => {
