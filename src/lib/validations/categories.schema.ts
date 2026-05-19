@@ -5,6 +5,7 @@ export const categorySchema = z.object({
   label_ar: z.string().min(1, 'الاسم بالعربية مطلوب').max(100, 'الاسم يجب ألا يتجاوز 100 حرف'),
   display_order: z.number().int().default(0),
   description_ar: z.string().optional().nullable(),
+  description_en: z.string().optional().nullable(),
 });
 
 export type CategoryInput = z.infer<typeof categorySchema>;

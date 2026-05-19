@@ -33,6 +33,7 @@ export function CategoryDialog({ open, onOpenChange, category, onSave, pending }
         label_ar: '',
         display_order: 0,
         description_ar: '',
+        description_en: '',
       });
     }
   }, [category, open]);
@@ -91,14 +92,27 @@ export function CategoryDialog({ open, onOpenChange, category, onSave, pending }
             />
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="cat-desc-ar">وصف إضافي (عربي) - اختياري</Label>
-            <Input
-              id="cat-desc-ar"
-              value={formData.description_ar || ''}
-              onChange={(e) => handleChange('description_ar', e.target.value)}
-              disabled={pending}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="cat-desc-ar">وصف إضافي (عربي) - اختياري</Label>
+              <Input
+                id="cat-desc-ar"
+                value={formData.description_ar || ''}
+                onChange={(e) => handleChange('description_ar', e.target.value)}
+                disabled={pending}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="cat-desc-en">وصف إضافي (إنجليزي) - اختياري</Label>
+              <Input
+                id="cat-desc-en"
+                value={formData.description_en || ''}
+                onChange={(e) => handleChange('description_en', e.target.value)}
+                disabled={pending}
+                dir="ltr"
+                className="text-left"
+              />
+            </div>
           </div>
         </form>
         <DialogFooter className="gap-2 sm:justify-start">
