@@ -121,7 +121,7 @@ export function CategoriesManager({ initialCategories, isAdmin }: CategoriesMana
             ) : (
               categories.map((cat) => (
                 <TableRow key={cat.id} className="group">
-                  <TableCell className="font-medium font-mono text-sm" dir="ltr">{cat.key}</TableCell>
+                  <TableCell className="font-medium font-mono text-sm" dir="rtl">{cat.key}</TableCell>
                   <TableCell>{cat.label_ar}</TableCell>
                   <TableCell>{cat.display_order}</TableCell>
                   {isAdmin && (

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { PostFormEditor } from '@/components/dashboard/PostFormEditor'
-import { getFormCategories } from '@/lib/posts-form'
+import { categoriesService } from '@/lib/services/categories.service'
 import { postsService } from '@/lib/services/posts.service'
 
 interface EditPostPageProps {
@@ -9,14 +9,14 @@ interface EditPostPageProps {
 
 export default async function EditPostPage({ params }: EditPostPageProps) {
   const { id } = await params
-  const [post, posts] = await Promise.all([
+  const [post, dbCategories] = await Promise.all([
     postsService.getPostById(id),
-    postsService.getPosts(),
+    categoriesService.getAllCategories(),
   ])
 
   if (!post) notFound()
 
-  const categories = getFormCategories(posts)
+  const categories = dbCategories.map((c) => ({ id: c.id, label: c.label_ar }))
 
   return <PostFormEditor mode="edit" post={post} categories={categories} />
 }

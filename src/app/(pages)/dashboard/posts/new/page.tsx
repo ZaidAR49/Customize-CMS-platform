@@ -1,10 +1,9 @@
 import { PostFormEditor } from '@/components/dashboard/PostFormEditor'
-import { getFormCategories } from '@/lib/posts-form'
-import { postsService } from '@/lib/services/posts.service'
+import { categoriesService } from '@/lib/services/categories.service'
 
 export default async function NewPostPage() {
-  const posts = await postsService.getPosts()
-  const categories = getFormCategories(posts)
+  const dbCategories = await categoriesService.getAllCategories()
+  const categories = dbCategories.map((c) => ({ id: c.id, label: c.label_ar }))
 
   return <PostFormEditor mode="create" categories={categories} />
 }

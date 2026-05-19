@@ -13,13 +13,7 @@ export interface PostFormValue {
   published: boolean
 }
 
-export function getFormCategories(posts: Post[]): Array<{ id: string; label: string }> {
-  return posts
-    .filter((post) => post.categoryId && post.categoryLabel)
-    .map((post) => ({ id: post.categoryId as string, label: post.categoryLabel as string }))
-    .filter((v, i, arr) => arr.findIndex((x) => x.id === v.id) === i)
-    .sort((a, b) => a.label.localeCompare(b.label, 'ar'))
-}
+
 
 export function postToFormValue(post: Post): PostFormValue {
   return {
