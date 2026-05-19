@@ -47,7 +47,6 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
       setFormData({
         key: '',
         label_ar: '',
-        label_en: '',
         value: '',
         icon: 'Activity',
         display_order: 0,
@@ -97,30 +96,16 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="stat-label-ar">العنوان (عربي)</Label>
-              <Input
-                id="stat-label-ar"
-                value={formData.label_ar || ''}
-                onChange={(e) => handleChange('label_ar', e.target.value)}
-                disabled={pending}
-                required
-                placeholder="مثال: العائلات المستفيدة"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="stat-label-en">العنوان (إنجليزي) - اختياري</Label>
-              <Input
-                id="stat-label-en"
-                value={formData.label_en || ''}
-                onChange={(e) => handleChange('label_en', e.target.value)}
-                disabled={pending}
-                dir="ltr"
-                className="text-left"
-                placeholder="e.g. Families Served"
-              />
-            </div>
+          <div className="grid gap-2">
+            <Label htmlFor="stat-label-ar">العنوان</Label>
+            <Input
+              id="stat-label-ar"
+              value={formData.label_ar || ''}
+              onChange={(e) => handleChange('label_ar', e.target.value)}
+              disabled={pending}
+              required
+              placeholder="مثال: العائلات المستفيدة"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">

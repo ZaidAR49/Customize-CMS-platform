@@ -22,18 +22,7 @@ const socialShape = Object.fromEntries(
 
 export const organizationSocialSchema = z.object(socialShape);
 
-/** Optional English / optional Arabic text: empty allowed, otherwise max length */
-const optionalEnName = z
-  .string()
-  .max(MAX_NAME, `يجب ألا يتجاوز الاسم الإنجليزي ${MAX_NAME} حرفًا`);
 
-const optionalEnTagline = z
-  .string()
-  .max(MAX_TAGLINE, `يجب ألا يتجاوز الشعار الإنجليزي ${MAX_TAGLINE} حرفًا`);
-
-const optionalEnLong = z
-  .string()
-  .max(MAX_LONG_TEXT, `النص الإنجليزي طويل جدًا (الحد ${MAX_LONG_TEXT} حرفًا)`);
 
 const optionalArTagline = z
   .string()
@@ -68,16 +57,10 @@ export const updateOrganizationSchema = z.object({
     .string()
     .min(1, 'أدخل الاسم بالعربية')
     .max(MAX_NAME, `يجب ألا يتجاوز الاسم العربي ${MAX_NAME} حرفًا`),
-  /** All English fields optional (empty allowed) */
-  name_en: optionalEnName,
   tagline_ar: optionalArTagline,
-  tagline_en: optionalEnTagline,
   about_ar: optionalArLong,
-  about_en: optionalEnLong,
   mission_ar: optionalArLong,
-  mission_en: optionalEnLong,
   vision_ar: optionalArLong,
-  vision_en: optionalEnLong,
   founded_year: foundedYearSchema,
   phone: phoneSchema,
   email: emailSchema,

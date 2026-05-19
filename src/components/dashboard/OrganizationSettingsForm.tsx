@@ -114,16 +114,11 @@ function buildInitial(org: OrganizationRow | null) {
 
   return {
     name_ar: org?.name_ar ?? '',
-    name_en: empty(org?.name_en),
     tagline_ar: empty(org?.tagline_ar),
-    tagline_en: empty(org?.tagline_en),
     founded_year: org?.founded_year != null ? String(org.founded_year) : '',
     about_ar: empty(org?.about_ar),
-    about_en: empty(org?.about_en),
     mission_ar: empty(org?.mission_ar),
-    mission_en: empty(org?.mission_en),
     vision_ar: empty(org?.vision_ar),
-    vision_en: empty(org?.vision_en),
     phone: empty(org?.phone),
     email: empty(org?.email),
     socialEnabled,
@@ -147,9 +142,7 @@ function FieldError({ message }: { message?: string }) {
   )
 }
 
-function OptionalEnHint() {
-  return <span className="mr-1 text-xs font-normal text-muted-foreground">(اختياري)</span>
-}
+
 
 export function OrganizationSettingsForm({
   organization,
@@ -262,16 +255,11 @@ export function OrganizationSettingsForm({
 
     const payload = {
       name_ar: form.name_ar.trim(),
-      name_en: form.name_en.trim(),
       tagline_ar: form.tagline_ar.trim(),
-      tagline_en: form.tagline_en.trim(),
       founded_year,
       about_ar: form.about_ar.trim(),
-      about_en: form.about_en.trim(),
       mission_ar: form.mission_ar.trim(),
-      mission_en: form.mission_en.trim(),
       vision_ar: form.vision_ar.trim(),
-      vision_en: form.vision_en.trim(),
       phone: form.phone.trim(),
       email: form.email.trim(),
       social,
@@ -351,22 +339,6 @@ export function OrganizationSettingsForm({
             <FieldError message={e.name_ar} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="name_en" className="flex flex-wrap items-center  gap-1">
-              الاسم بالإنجليزية
-              <OptionalEnHint />
-            </Label>
-            <Input
-              id="name_en"
-              value={form.name_en}
-              onChange={(ev) => update('name_en', ev.target.value)}
-              placeholder="Example: Family and Child Protection Society"
-              dir="ltr"
-              className={cn('text-left', e.name_en && 'border-destructive')}
-              aria-invalid={!!e.name_en}
-            />
-            <FieldError message={e.name_en} />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="founded_year">سنة التأسيس</Label>
             <Input
               id="founded_year"
@@ -394,129 +366,56 @@ export function OrganizationSettingsForm({
             />
             <FieldError message={e.tagline_ar} />
           </div>
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="tagline_en" className="flex flex-wrap items-center  gap-1">
-              الشعار بالإنجليزية
-              <OptionalEnHint />
-            </Label>
-            <Input
-              id="tagline_en"
-              value={form.tagline_en}
-              onChange={(ev) => update('tagline_en', ev.target.value)}
-              placeholder="Short promotional slogan or tagline..."
-              dir="ltr"
-              className={cn('text-left', e.tagline_en && 'border-destructive')}
-              aria-invalid={!!e.tagline_en}
-            />
-            <FieldError message={e.tagline_en} />
-          </div>
         </CardContent>
       </Card>
 
       <Card className="border-none shadow-sm">
         <CardHeader className="text-right">
           <CardTitle>المحتوى</CardTitle>
-          <CardDescription>نبذة، الرسالة، والرؤية (عربي / إنجليزي)</CardDescription>
+          <CardDescription>نبذة، الرسالة، والرؤية</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="about_ar">عن المنظمة (عربي)</Label>
-              <Textarea
-                id="about_ar"
-                value={form.about_ar}
-                onChange={(ev) => update('about_ar', ev.target.value)}
-                placeholder="نبذة تعريفية شاملة عن المنظمة، أهدافها، وتاريخها..."
-                rows={5}
-                dir="rtl"
-                aria-invalid={!!e.about_ar}
-                className={cn(e.about_ar && 'border-destructive')}
-              />
-              <FieldError message={e.about_ar} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="about_en" className="flex flex-wrap items-center  gap-1">
-                عن المنظمة (إنجليزي)
-                <OptionalEnHint />
-              </Label>
-              <Textarea
-                id="about_en"
-                value={form.about_en}
-                onChange={(ev) => update('about_en', ev.target.value)}
-                placeholder="Comprehensive overview of the organization, its goals, and history..."
-                rows={5}
-                dir="ltr"
-                className={cn('text-left', e.about_en && 'border-destructive')}
-                aria-invalid={!!e.about_en}
-              />
-              <FieldError message={e.about_en} />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="about_ar">عن المنظمة</Label>
+            <Textarea
+              id="about_ar"
+              value={form.about_ar}
+              onChange={(ev) => update('about_ar', ev.target.value)}
+              placeholder="نبذة تعريفية شاملة عن المنظمة، أهدافها، وتاريخها..."
+              rows={5}
+              dir="rtl"
+              aria-invalid={!!e.about_ar}
+              className={cn(e.about_ar && 'border-destructive')}
+            />
+            <FieldError message={e.about_ar} />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="mission_ar">الرسالة (عربي)</Label>
-              <Textarea
-                id="mission_ar"
-                value={form.mission_ar}
-                onChange={(ev) => update('mission_ar', ev.target.value)}
-                placeholder="رسالة المنظمة التي تسعى لتحقيقها في المجتمع..."
-                rows={4}
-                dir="rtl"
-                aria-invalid={!!e.mission_ar}
-                className={cn(e.mission_ar && 'border-destructive')}
-              />
-              <FieldError message={e.mission_ar} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="mission_en" className="flex flex-wrap items-center  gap-1">
-                الرسالة (إنجليزي)
-                <OptionalEnHint />
-              </Label>
-              <Textarea
-                id="mission_en"
-                value={form.mission_en}
-                onChange={(ev) => update('mission_en', ev.target.value)}
-                placeholder="The organization's mission statement..."
-                rows={4}
-                dir="ltr"
-                className={cn('text-left', e.mission_en && 'border-destructive')}
-                aria-invalid={!!e.mission_en}
-              />
-              <FieldError message={e.mission_en} />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="mission_ar">الرسالة</Label>
+            <Textarea
+              id="mission_ar"
+              value={form.mission_ar}
+              onChange={(ev) => update('mission_ar', ev.target.value)}
+              placeholder="رسالة المنظمة التي تسعى لتحقيقها في المجتمع..."
+              rows={4}
+              dir="rtl"
+              aria-invalid={!!e.mission_ar}
+              className={cn(e.mission_ar && 'border-destructive')}
+            />
+            <FieldError message={e.mission_ar} />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="vision_ar">الرؤية (عربي)</Label>
-              <Textarea
-                id="vision_ar"
-                value={form.vision_ar}
-                onChange={(ev) => update('vision_ar', ev.target.value)}
-                placeholder="الرؤية المستقبلية والغاية الكبرى للمنظمة..."
-                rows={3}
-                dir="rtl"
-                aria-invalid={!!e.vision_ar}
-                className={cn(e.vision_ar && 'border-destructive')}
-              />
-              <FieldError message={e.vision_ar} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="vision_en" className="flex flex-wrap items-center  gap-1">
-                الرؤية (إنجليزي)
-                <OptionalEnHint />
-              </Label>
-              <Textarea
-                id="vision_en"
-                value={form.vision_en}
-                onChange={(ev) => update('vision_en', ev.target.value)}
-                placeholder="The future vision and ultimate goal of the organization..."
-                rows={3}
-                dir="ltr"
-                className={cn('text-left', e.vision_en && 'border-destructive')}
-                aria-invalid={!!e.vision_en}
-              />
-              <FieldError message={e.vision_en} />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="vision_ar">الرؤية</Label>
+            <Textarea
+              id="vision_ar"
+              value={form.vision_ar}
+              onChange={(ev) => update('vision_ar', ev.target.value)}
+              placeholder="الرؤية المستقبلية والغاية الكبرى للمنظمة..."
+              rows={3}
+              dir="rtl"
+              aria-invalid={!!e.vision_ar}
+              className={cn(e.vision_ar && 'border-destructive')}
+            />
+            <FieldError message={e.vision_ar} />
           </div>
         </CardContent>
       </Card>
