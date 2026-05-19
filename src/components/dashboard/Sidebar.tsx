@@ -14,6 +14,7 @@ import {
   Images,
   Target,
   MapPin,
+  DatabaseBackup,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { signOut } from 'next-auth/react'
@@ -28,6 +29,7 @@ const sidebarItems = [
   { label: 'الاحصائيات', href: '/dashboard/statistics', icon: BarChart3 },
   { label: 'معلومات المنظمة', href: '/dashboard/settings', icon: Building2 },
   { label: 'التعليقات', href: '/dashboard/comments', icon: MessageSquare },
+  { label: 'إدارة البيانات', href: '/dashboard/data-management', icon: DatabaseBackup },
 ]
 
 export function Sidebar() {
