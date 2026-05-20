@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import supabase from '@/lib/supabase'
 import { NextResponse } from 'next/server'
+import { postsService } from '@/lib/services/posts.service'
 
 function toDatabasePostType(type: string | null | undefined): string {
   if (type === 'activity') return 'activities'
@@ -29,28 +30,9 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json()
-    const { title, slug, descripcion, excerpt, cover_image, type, category_id, published, author_id } = body
-    const metadata: Record<string, unknown> = { likes: 0 }
-    if (typeof excerpt === 'string') metadata.excerpt = excerpt
-
-    const { data, error } = await supabase
-      .from('posts')
-      .insert({
-        title,
-        slug,
-        cover_image: cover_image ?? null,
-        type: toDatabasePostType(type),
-        category_id: category_id || null,
-        metadata,
-        description: typeof descripcion === 'string' ? descripcion : null,
-        published: published ?? false,
-        author_id,
-      })
-      .select()
-      .single()
-
-    if (error) throw error
-    return NextResponse.json(data, { status: 201 })
+    const postData = { ...body, author_id: body.author_id || session.user.id }
+    const post = await postsService.createPost(postData)
+    return NextResponse.json(post, { status: 201 })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }

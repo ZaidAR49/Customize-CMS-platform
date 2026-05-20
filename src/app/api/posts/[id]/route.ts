@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import supabase from '@/lib/supabase'
 import { NextResponse } from 'next/server'
+import { postsService } from '@/lib/services/posts.service'
 
 function toDatabasePostType(type: string | null | undefined): string {
   if (type === 'activity') return 'activities'
@@ -22,41 +23,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const keys = Object.keys(body)
     if (keys.length === 0) return NextResponse.json({ error: 'No data' }, { status: 400 })
 
-    const { descripcion, excerpt, type, category_id, ...rest } = body
-    const payload: Record<string, unknown> = { ...rest }
-
-    if (type !== undefined) payload.type = toDatabasePostType(type)
-    if (category_id !== undefined) payload.category_id = category_id || null
-
-    if (descripcion !== undefined) {
-      payload.description = descripcion
-    }
-
-    if (excerpt !== undefined) {
-      const { data: existingPost, error: existingError } = await supabase
-        .from('posts')
-        .select('metadata')
-        .eq('id', id)
-        .single()
-
-      if (existingError) throw existingError
-
-      payload.metadata = {
-        ...(existingPost?.metadata ?? {}),
-        excerpt,
-      }
-    }
-
-    const { data, error } = await supabase
-      .from('posts')
-      .update(payload)
-      .eq('id', id)
-      .select()
-      .single()
-
-    if (error) throw error
-    if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-    return NextResponse.json(data)
+    const post = await postsService.updatePost(id, body)
+    return NextResponse.json(post)
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }

@@ -6,6 +6,7 @@ export interface Post {
   title: string
   title_en?: string
   excerpt: string
+  excerpt_en?: string
   descripcion: string
   descripcion_en?: string
   coverImage: string

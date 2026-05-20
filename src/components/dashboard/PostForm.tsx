@@ -160,16 +160,29 @@ export function PostForm({
             placeholder="https://..."
           />
         </div>
-
-        <div className="grid gap-2">
-          <Label htmlFor="post-excerpt">ملخص</Label>
-          <Textarea
-            id="post-excerpt"
-            value={value.excerpt}
-            onChange={(e) => onChange('excerpt', e.target.value)}
-            disabled={pending}
-            rows={4}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="post-excerpt-ar">الملخص (بالعربية)</Label>
+            <Textarea
+              id="post-excerpt-ar"
+              value={value.excerpt}
+              onChange={(e) => onChange('excerpt', e.target.value)}
+              disabled={pending}
+              rows={4}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="post-excerpt-en">الملخص (بالإنجليزية)</Label>
+            <Textarea
+              id="post-excerpt-en"
+              value={value.excerpt_en || ''}
+              onChange={(e) => onChange('excerpt_en', e.target.value)}
+              disabled={pending}
+              rows={4}
+              dir="ltr"
+              className="text-left"
+            />
+          </div>
         </div>
 
         <div className="grid gap-2">

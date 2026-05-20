@@ -38,8 +38,8 @@ export function TruncateFullTextPopup({
   const [hoverOpen, setHoverOpen] = useState(false)
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 320 })
   const wrapRef = useRef<HTMLDivElement>(null)
-  const hoverOpenTimerRef = useRef<ReturnType<typeof setTimeout>>()
-  const hoverCloseTimerRef = useRef<ReturnType<typeof setTimeout>>()
+  const hoverOpenTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const hoverCloseTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
     setMounted(true)

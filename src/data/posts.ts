@@ -15,6 +15,7 @@ export const posts: Post[] = [
     coverImage: '/images/news/family-day.jpg',
     type: 'activity',
     likes: 288,
+    published: true,
     publishedAt: '2024-05-18',
     author: { name: 'إدارة الجمعية', avatarUrl: '/images/avatar.png' }
   },
@@ -32,6 +33,7 @@ export const posts: Post[] = [
     coverImage: '/images/news/seminar.jpg',
     type: 'news',
     likes: 287,
+    published: true,
     publishedAt: '2024-04-01',
     author: { name: 'إدارة الجمعية', avatarUrl: '/images/avatar.png' }
   },
@@ -49,6 +51,7 @@ export const posts: Post[] = [
     coverImage: '/images/news/tv-seminar.jpg',
     type: 'news',
     likes: 286,
+    published: true,
     publishedAt: '2024-03-25',
     author: { name: 'إدارة الجمعية', avatarUrl: '/images/avatar.png' }
   },
@@ -65,6 +68,7 @@ export const posts: Post[] = [
     coverImage: '/images/news/workshop.jpg',
     type: 'activity',
     likes: 195,
+    published: true,
     publishedAt: '2024-02-15',
     author: { name: 'إدارة الجمعية', avatarUrl: '/images/avatar.png' }
   },
@@ -81,6 +85,7 @@ export const posts: Post[] = [
     coverImage: '/images/news/youth.jpg',
     type: 'program',
     likes: 164,
+    published: true,
     publishedAt: '2024-01-20',
     author: { name: 'إدارة الجمعية', avatarUrl: '/images/avatar.png' }
   },
@@ -97,6 +102,7 @@ export const posts: Post[] = [
     coverImage: '/images/news/women.jpg',
     type: 'program',
     likes: 210,
+    published: true,
     publishedAt: '2024-01-10',
     author: { name: 'إدارة الجمعية', avatarUrl: '/images/avatar.png' }
   }
