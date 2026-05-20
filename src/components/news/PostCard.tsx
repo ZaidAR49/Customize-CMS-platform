@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Heart, ArrowLeft } from 'lucide-react'
@@ -28,13 +29,23 @@ export function PostCard({ post }: PostCardProps) {
     <Card className="group overflow-hidden border-none shadow-(--fcps-shadow-card) transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
       {/* Image */}
       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-(--fcps-primary) to-(--fcps-primary-light)">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-6xl opacity-20">📰</div>
-        </div>
+        {post.coverImage ? (
+          <Image
+            src={post.coverImage}
+            alt={post.title}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-6xl opacity-20">📰</div>
+          </div>
+        )}
         {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         {/* Badge */}
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 z-10">
           <Badge className={`${typeColors[post.type]} border-none text-xs font-medium`}>
             {typeLabels[post.type]}
           </Badge>
