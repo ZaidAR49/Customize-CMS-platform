@@ -1,19 +1,19 @@
--- ==============================================================
--- schema.sql
--- Full portable schema — copy/paste to any PostgreSQL provider
--- Includes: enums, tables, indexes, functions, triggers
--- Languages supported: English (en), Arabic (ar)
--- ==============================================================
--- ==============================================================
+-- =============================================================================
+-- CMS — Full Database Schema
+-- Project : uzihedieuzkjaeabggxi
+-- Generated: 2026-05-20
+-- =============================================================================
+-- =============================================================================
 -- EXTENSIONS
--- ==============================================================
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
--- provides gen_random_uuid()
--- ==============================================================
--- ENUMS
--- ==============================================================
-CREATE TYPE lang_code AS ENUM ('en', 'ar');
-CREATE TYPE post_type AS ENUM (
+-- =============================================================================
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS "pg_stat_statements" WITH SCHEMA extensions;
+-- =============================================================================
+-- ENUM TYPES
+-- =============================================================================
+CREATE TYPE public.lang_code AS ENUM ('en', 'ar');
+CREATE TYPE public.post_type AS ENUM (
   'news',
   'posts',
   'activities',
@@ -22,16 +22,177 @@ CREATE TYPE post_type AS ENUM (
   'centers',
   'center'
 );
--- ==============================================================
+-- =============================================================================
+-- TABLES
+-- =============================================================================
+-- -----------------------------------------------------------------------------
+-- users
+-- -----------------------------------------------------------------------------
+CREATE TABLE public.users (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email text NOT NULL UNIQUE,
+  name text NOT NULL,
+  avatar_url varchar,
+  role varchar NOT NULL DEFAULT 'viewer' CHECK (role IN ('admin', 'editor', 'viewer')),
+  provider varchar DEFAULT 'google',
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+-- -----------------------------------------------------------------------------
+-- organization  (singleton row)
+-- -----------------------------------------------------------------------------
+CREATE TABLE public.organization (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  founded_year int4,
+  logo_url varchar,
+  phone varchar,
+  email varchar,
+  website_url varchar,
+  social jsonb DEFAULT '{}',
+  metadata jsonb DEFAULT '{}',
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  updated_by uuid REFERENCES public.users (id)
+);
+-- -----------------------------------------------------------------------------
+-- organization_translations
+-- -----------------------------------------------------------------------------
+CREATE TABLE public.organization_translations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id uuid NOT NULL REFERENCES public.organization (id),
+  lang public.lang_code NOT NULL,
+  name varchar NOT NULL,
+  tagline varchar,
+  about text,
+  mission text,
+  vision text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (organization_id, lang)
+);
+-- -----------------------------------------------------------------------------
+-- organization_stats
+-- -----------------------------------------------------------------------------
+CREATE TABLE public.organization_stats (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id uuid NOT NULL REFERENCES public.organization (id),
+  key varchar NOT NULL,
+  value varchar NOT NULL DEFAULT '0',
+  icon varchar,
+  display_order int4 NOT NULL DEFAULT 0,
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  updated_by uuid REFERENCES public.users (id),
+  UNIQUE (organization_id, key)
+);
+-- -----------------------------------------------------------------------------
+-- organization_stats_translations
+-- -----------------------------------------------------------------------------
+CREATE TABLE public.organization_stats_translations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  stat_id uuid NOT NULL REFERENCES public.organization_stats (id),
+  lang public.lang_code NOT NULL,
+  label varchar NOT NULL,
+  description text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (stat_id, lang)
+);
+-- -----------------------------------------------------------------------------
+-- categories
+-- -----------------------------------------------------------------------------
+CREATE TABLE public.categories (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  key varchar NOT NULL UNIQUE,
+  display_order int4 NOT NULL DEFAULT 0,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+-- -----------------------------------------------------------------------------
+-- category_translations
+-- -----------------------------------------------------------------------------
+CREATE TABLE public.category_translations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  category_id uuid NOT NULL REFERENCES public.categories (id),
+  lang public.lang_code NOT NULL,
+  label varchar NOT NULL,
+  description text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (category_id, lang)
+);
+-- -----------------------------------------------------------------------------
+-- posts
+-- -----------------------------------------------------------------------------
+CREATE TABLE public.posts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  type public.post_type NOT NULL,
+  slug varchar NOT NULL UNIQUE,
+  metadata jsonb DEFAULT '{}',
+  published bool DEFAULT false,
+  published_at timestamptz DEFAULT now(),
+  author_id uuid NOT NULL,
+  tags text [] DEFAULT '{}',
+  category_id uuid REFERENCES public.categories (id),
+  CONSTRAINT fk_posts_author FOREIGN KEY (author_id) REFERENCES public.users (id)
+);
+-- -----------------------------------------------------------------------------
+-- post_translations
+-- -----------------------------------------------------------------------------
+CREATE TABLE public.post_translations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_id uuid NOT NULL REFERENCES public.posts (id),
+  lang public.lang_code NOT NULL,
+  title varchar NOT NULL,
+  description text,
+  excerpt text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (post_id, lang)
+);
+-- -----------------------------------------------------------------------------
+-- post_comments
+-- -----------------------------------------------------------------------------
+CREATE TABLE public.post_comments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_id uuid NOT NULL REFERENCES public.posts (id),
+  author_name text NOT NULL,
+  author_email text,
+  body text NOT NULL,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  moderated_at timestamptz,
+  moderated_by uuid REFERENCES public.users (id)
+);
+-- =============================================================================
+-- INDEXES  (non-PK / non-unique-constraint indexes only)
+-- =============================================================================
+-- categories
+CREATE INDEX idx_categories_key ON public.categories (key);
+-- organization
+CREATE INDEX idx_org_updated_by ON public.organization (updated_by);
+-- organization_stats
+CREATE INDEX idx_org_stats_org_id ON public.organization_stats (organization_id);
+-- posts
+CREATE INDEX idx_posts_type ON public.posts (type);
+CREATE INDEX idx_posts_author_id ON public.posts (author_id);
+CREATE INDEX idx_posts_category_id ON public.posts (category_id);
+CREATE INDEX idx_posts_published_at ON public.posts (published, published_at DESC);
+CREATE INDEX idx_posts_latest_published ON public.posts (published_at DESC)
+WHERE published = true;
+CREATE INDEX idx_posts_tags ON public.posts USING gin (tags);
+CREATE INDEX idx_posts_metadata_category ON public.posts ((metadata->>'category'))
+WHERE (metadata->>'category') IS NOT NULL;
+-- post_comments
+CREATE INDEX idx_post_comments_post_id ON public.post_comments (post_id);
+CREATE INDEX idx_post_comments_status ON public.post_comments (status);
+-- =============================================================================
 -- FUNCTIONS
--- ==============================================================
--- Automatically stamps updated_at on every UPDATE
-CREATE OR REPLACE FUNCTION update_updated_at() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN NEW.updated_at = now();
+-- =============================================================================
+-- Auto-update updated_at on any row change
+CREATE OR REPLACE FUNCTION public.update_updated_at() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN NEW.updated_at = now();
 RETURN NEW;
 END;
 $$;
--- Called by Supabase Auth trigger to mirror auth.users → public.users
-CREATE OR REPLACE FUNCTION handle_new_user() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN
+-- Sync new Supabase Auth users into public.users
+CREATE OR REPLACE FUNCTION public.handle_new_user() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER AS $$ BEGIN
 INSERT INTO public.users (id, email, name, avatar_url, provider)
 VALUES (
     NEW.id,
@@ -47,8 +208,8 @@ VALUES (
 RETURN NEW;
 END;
 $$;
--- Purges rejected comments older than 1 month (call via pg_cron or manually)
-CREATE OR REPLACE FUNCTION delete_old_rejected_comments() RETURNS void LANGUAGE plpgsql AS $$
+-- Hard-delete rejected comments older than 1 month (called by pg_cron job)
+CREATE OR REPLACE FUNCTION public.delete_old_rejected_comments() RETURNS void LANGUAGE plpgsql AS $$
 DECLARE deleted_count INTEGER;
 BEGIN
 DELETE FROM public.post_comments
@@ -60,181 +221,166 @@ deleted_count,
 now();
 END;
 $$;
--- ==============================================================
--- TABLES
--- ==============================================================
--- --------------------------------------------------------------
--- USERS
--- --------------------------------------------------------------
-CREATE TABLE users (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  email text NOT NULL,
-  name text NOT NULL,
-  avatar_url varchar,
-  role varchar NOT NULL DEFAULT 'viewer' CHECK (role IN ('admin', 'editor', 'viewer')),
-  provider varchar DEFAULT 'google',
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  CONSTRAINT users_pkey PRIMARY KEY (id),
-  CONSTRAINT users_email_key UNIQUE (email)
-);
--- --------------------------------------------------------------
--- ORGANIZATION
--- --------------------------------------------------------------
-CREATE TABLE organization (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  founded_year int4 DEFAULT 1992,
-  logo_url varchar,
-  phone varchar,
-  email varchar,
-  website_url varchar,
-  social jsonb NOT NULL DEFAULT '{}',
-  metadata jsonb NOT NULL DEFAULT '{}',
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  updated_by uuid,
-  CONSTRAINT organization_pkey PRIMARY KEY (id),
-  CONSTRAINT fk_org_updated_by FOREIGN KEY (updated_by) REFERENCES users(id)
-);
-CREATE TABLE organization_translations (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  organization_id uuid NOT NULL,
-  lang lang_code NOT NULL,
-  name varchar NOT NULL,
-  tagline varchar,
-  about text,
-  mission text,
-  vision text,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  CONSTRAINT organization_translations_pkey PRIMARY KEY (id),
-  CONSTRAINT organization_translations_org_id_lang_key UNIQUE (organization_id, lang),
-  CONSTRAINT organization_translations_org_id_fkey FOREIGN KEY (organization_id) REFERENCES organization(id) ON DELETE CASCADE
-);
--- --------------------------------------------------------------
--- ORGANIZATION STATS
--- --------------------------------------------------------------
-CREATE TABLE organization_stats (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  organization_id uuid NOT NULL,
-  key varchar NOT NULL,
-  value varchar NOT NULL DEFAULT '0',
-  icon varchar,
-  display_order int4 NOT NULL DEFAULT 0,
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  updated_by uuid,
-  CONSTRAINT organization_stats_pkey PRIMARY KEY (id),
-  CONSTRAINT organization_stats_organization_id_key_key UNIQUE (organization_id, key),
-  CONSTRAINT organization_stats_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES organization(id),
-  CONSTRAINT organization_stats_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES users(id)
-);
-CREATE TABLE organization_stats_translations (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  stat_id uuid NOT NULL,
-  lang lang_code NOT NULL,
-  label varchar NOT NULL,
-  description text,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  CONSTRAINT organization_stats_translations_pkey PRIMARY KEY (id),
-  CONSTRAINT organization_stats_translations_stat_id_lang_key UNIQUE (stat_id, lang),
-  CONSTRAINT organization_stats_translations_stat_id_fkey FOREIGN KEY (stat_id) REFERENCES organization_stats(id) ON DELETE CASCADE
-);
--- --------------------------------------------------------------
--- CATEGORIES
--- --------------------------------------------------------------
-CREATE TABLE categories (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  key varchar NOT NULL,
-  display_order int4 NOT NULL DEFAULT 0,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  CONSTRAINT categories_pkey PRIMARY KEY (id),
-  CONSTRAINT categories_key_key UNIQUE (key)
-);
-CREATE TABLE category_translations (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  category_id uuid NOT NULL,
-  lang lang_code NOT NULL,
-  label varchar NOT NULL,
-  description text,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  CONSTRAINT category_translations_pkey PRIMARY KEY (id),
-  CONSTRAINT category_translations_category_id_lang_key UNIQUE (category_id, lang),
-  CONSTRAINT category_translations_category_id_fkey FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
-);
--- --------------------------------------------------------------
--- POSTS
--- --------------------------------------------------------------
-CREATE TABLE posts (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  type post_type NOT NULL,
-  slug varchar NOT NULL,
-  cover_image varchar,
-  metadata jsonb NOT NULL DEFAULT '{}',
-  published bool NOT NULL DEFAULT false,
-  published_at timestamptz DEFAULT now(),
-  author_id uuid NOT NULL,
-  tags text [] NOT NULL DEFAULT '{}',
-  category_id uuid,
-  CONSTRAINT posts_pkey PRIMARY KEY (id),
-  CONSTRAINT posts_slug_key UNIQUE (slug),
-  CONSTRAINT fk_posts_author FOREIGN KEY (author_id) REFERENCES users(id),
-  CONSTRAINT posts_category_id_fkey FOREIGN KEY (category_id) REFERENCES categories(id)
-);
-CREATE TABLE post_translations (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  post_id uuid NOT NULL,
-  lang lang_code NOT NULL,
-  title varchar NOT NULL,
-  description text,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now(),
-  CONSTRAINT post_translations_pkey PRIMARY KEY (id),
-  CONSTRAINT post_translations_post_id_lang_key UNIQUE (post_id, lang),
-  CONSTRAINT post_translations_post_id_fkey FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
-);
--- --------------------------------------------------------------
--- POST COMMENTS
--- --------------------------------------------------------------
-CREATE TABLE post_comments (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  post_id uuid NOT NULL,
-  author_name text NOT NULL,
-  author_email text,
-  body text NOT NULL,
-  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
-  created_at timestamptz NOT NULL DEFAULT now(),
-  moderated_at timestamptz,
-  moderated_by uuid,
-  CONSTRAINT post_comments_pkey PRIMARY KEY (id),
-  CONSTRAINT post_comments_post_id_fkey FOREIGN KEY (post_id) REFERENCES posts(id),
-  CONSTRAINT post_comments_moderated_by_fkey FOREIGN KEY (moderated_by) REFERENCES users(id)
-);
--- ==============================================================
--- INDEXES
--- (PKs and UNIQUE constraints already create implicit indexes;
---  only additional performance indexes are listed here)
--- ==============================================================
--- posts
-CREATE INDEX idx_posts_type ON posts(type);
-CREATE INDEX idx_posts_published_at ON posts(published, published_at DESC);
-CREATE INDEX idx_posts_category_id ON posts(category_id);
-CREATE INDEX idx_posts_tags ON posts USING gin(tags);
--- organization_stats
-CREATE INDEX idx_organization_stats_org_id ON organization_stats(organization_id);
--- post_comments
-CREATE INDEX idx_post_comments_post_id ON post_comments(post_id);
-CREATE INDEX idx_post_comments_status ON post_comments(status);
--- ==============================================================
+-- Increment post likes  (NOTE: posts table has no `likes` column yet — dead code)
+CREATE OR REPLACE FUNCTION public.increment_likes(post_id uuid) RETURNS void LANGUAGE sql AS $$
+UPDATE posts
+SET likes = likes + 1
+WHERE id = post_id;
+$$;
+-- =============================================================================
 -- TRIGGERS
--- ==============================================================
+-- =============================================================================
+-- updated_at on users
 CREATE TRIGGER users_updated_at BEFORE
-UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+UPDATE ON public.users FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+-- updated_at on organization
 CREATE TRIGGER organization_updated_at BEFORE
-UPDATE ON organization FOR EACH ROW EXECUTE FUNCTION update_updated_at();
--- NOTE: add the trigger below on any provider that uses Supabase Auth.
--- On plain PostgreSQL without Supabase Auth, omit it.
---
--- CREATE TRIGGER on_auth_user_created
---   AFTER INSERT ON auth.users
---   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+UPDATE ON public.organization FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+-- Auth hook: mirror new auth.users → public.users
+CREATE TRIGGER on_auth_user_created
+AFTER
+INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+-- =============================================================================
+-- ROW-LEVEL SECURITY
+-- =============================================================================
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.organization ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.organization_translations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.organization_stats ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.organization_stats_translations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.category_translations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.post_translations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.post_comments ENABLE ROW LEVEL SECURITY;
+-- Helper: is the caller an admin?
+-- (inline subquery used directly in policies — no helper function needed)
+-- ── users ────────────────────────────────────────────────────────────────────
+CREATE POLICY "Users read own row" ON public.users FOR
+SELECT USING (id::text = auth.uid()::text);
+CREATE POLICY "Admins read all users" ON public.users FOR
+SELECT USING (
+    EXISTS (
+      SELECT 1
+      FROM users u
+      WHERE u.id = auth.uid()
+        AND u.role = 'admin'
+    )
+  );
+-- ── organization ─────────────────────────────────────────────────────────────
+CREATE POLICY "Public read org" ON public.organization FOR
+SELECT USING (true);
+CREATE POLICY "Admins update org" ON public.organization FOR
+UPDATE USING (
+    EXISTS (
+      SELECT 1
+      FROM users
+      WHERE id = auth.uid()
+        AND role = 'admin'
+    )
+  );
+-- ── organization_stats ───────────────────────────────────────────────────────
+CREATE POLICY "Public read org stats" ON public.organization_stats FOR
+SELECT USING (true);
+CREATE POLICY "Admins manage org stats" ON public.organization_stats FOR ALL USING (
+  EXISTS (
+    SELECT 1
+    FROM users
+    WHERE id = auth.uid()
+      AND role = 'admin'
+  )
+) WITH CHECK (
+  EXISTS (
+    SELECT 1
+    FROM users
+    WHERE id = auth.uid()
+      AND role = 'admin'
+  )
+);
+-- ── categories ───────────────────────────────────────────────────────────────
+CREATE POLICY "Public read categories" ON public.categories FOR
+SELECT USING (true);
+CREATE POLICY "Admins manage categories" ON public.categories FOR ALL USING (
+  EXISTS (
+    SELECT 1
+    FROM users
+    WHERE id = auth.uid()
+      AND role = 'admin'
+  )
+) WITH CHECK (
+  EXISTS (
+    SELECT 1
+    FROM users
+    WHERE id = auth.uid()
+      AND role = 'admin'
+  )
+);
+-- ── posts ────────────────────────────────────────────────────────────────────
+CREATE POLICY "Public read published posts" ON public.posts FOR
+SELECT USING (published = true);
+CREATE POLICY "Editors read all posts" ON public.posts FOR
+SELECT USING (
+    EXISTS (
+      SELECT 1
+      FROM users
+      WHERE id = auth.uid()
+        AND role = ANY(ARRAY ['admin','editor'])
+    )
+  );
+CREATE POLICY "Editors insert posts" ON public.posts FOR
+INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1
+      FROM users
+      WHERE id = auth.uid()
+        AND role = ANY(ARRAY ['admin','editor'])
+    )
+  );
+CREATE POLICY "Editors update posts" ON public.posts FOR
+UPDATE USING (
+    EXISTS (
+      SELECT 1
+      FROM users
+      WHERE id = auth.uid()
+        AND role = ANY(ARRAY ['admin','editor'])
+    )
+  );
+CREATE POLICY "Admins delete posts" ON public.posts FOR DELETE USING (
+  EXISTS (
+    SELECT 1
+    FROM users
+    WHERE id = auth.uid()
+      AND role = 'admin'
+  )
+);
+-- ── post_comments ────────────────────────────────────────────────────────────
+CREATE POLICY "Public read approved comments" ON public.post_comments FOR
+SELECT USING (status = 'approved');
+CREATE POLICY "Editors read all comments" ON public.post_comments FOR
+SELECT USING (
+    EXISTS (
+      SELECT 1
+      FROM users
+      WHERE id = auth.uid()
+        AND role = ANY(ARRAY ['admin','editor'])
+    )
+  );
+CREATE POLICY "Anyone submit comment" ON public.post_comments FOR
+INSERT WITH CHECK (true);
+CREATE POLICY "Editors moderate comments" ON public.post_comments FOR
+UPDATE USING (
+    EXISTS (
+      SELECT 1
+      FROM users
+      WHERE id = auth.uid()
+        AND role = ANY(ARRAY ['admin','editor'])
+    )
+  );
+CREATE POLICY "Admins delete comments" ON public.post_comments FOR DELETE USING (
+  EXISTS (
+    SELECT 1
+    FROM users
+    WHERE id = auth.uid()
+      AND role = 'admin'
+  )
+);
