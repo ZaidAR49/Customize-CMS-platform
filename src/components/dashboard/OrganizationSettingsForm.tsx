@@ -12,7 +12,7 @@ import {
   FaXTwitter,
   FaYoutube,
 } from 'react-icons/fa6'
-import { Plus, Trash2 } from 'lucide-react'
+import { Images, Plus, Trash2 } from 'lucide-react'
 import { createOrganizationAction, updateOrganizationAction } from '@/actions/organization.actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -29,6 +29,7 @@ import { cn } from '@/lib/utils'
 import type { OrganizationRow, SocialPlatformKey } from '@/types/organization'
 import { SOCIAL_PLATFORM_KEYS } from '@/types/organization'
 import { ReadOnlyField } from '@/components/dashboard/ReadOnlyField'
+import { HeroSliderImagesField } from '@/components/dashboard/HeroSliderImagesField'
 
 function empty(v: string | null | undefined) {
   return v ?? ''
@@ -57,13 +58,33 @@ function parseSocialFromRow(raw: unknown): Partial<Record<SocialPlatformKey, str
 
 type MetadataRow = { clientId: string; key: string; value: string }
 
+/** Reserved metadata keys managed by dedicated UI — hidden from the generic rows table */
+const RESERVED_METADATA_KEYS = new Set(['hero_slides'])
+
 function metadataToRows(metadata: unknown): MetadataRow[] {
   if (!metadata || typeof metadata !== 'object') return []
-  return Object.entries(metadata as Record<string, unknown>).map(([key, val]) => ({
-    clientId: crypto.randomUUID(),
-    key,
-    value: valueToMetadataString(val),
-  }))
+  return Object.entries(metadata as Record<string, unknown>)
+    .filter(([key]) => !RESERVED_METADATA_KEYS.has(key))
+    .map(([key, val]) => ({
+      clientId: crypto.randomUUID(),
+      key,
+      value: valueToMetadataString(val),
+    }))
+}
+
+function parseHeroSlides(metadata: unknown): string[] {
+  if (!metadata || typeof metadata !== 'object') return []
+  const raw = (metadata as Record<string, unknown>)['hero_slides']
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) return parsed.filter((u): u is string => typeof u === 'string')
+    } catch {
+      return []
+    }
+  }
+  if (Array.isArray(raw)) return raw.filter((u): u is string => typeof u === 'string')
+  return []
 }
 
 const SOCIAL_ICONS: Record<SocialPlatformKey, ReactNode> = {
@@ -129,6 +150,7 @@ function buildInitial(org: OrganizationRow | null) {
     socialEnabled,
     socialUrls,
     metadataRows: org ? metadataToRows(org.metadata) : [],
+    heroSlides: org ? parseHeroSlides(org.metadata) : [],
   }
 }
 
@@ -249,6 +271,10 @@ export function OrganizationSettingsForm({
       const k = row.key.trim()
       if (!k || !METADATA_KEY_REGEX.test(k)) continue
       metadata[k] = row.value
+    }
+    // Persist hero slides as a JSON string under the reserved key
+    if (form.heroSlides.length > 0) {
+      metadata['hero_slides'] = JSON.stringify(form.heroSlides)
     }
 
     const foundedRaw = form.founded_year.trim()
@@ -599,6 +625,26 @@ export function OrganizationSettingsForm({
               </p>
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* ── Hero Slider Images ──────────────────────────────────────────── */}
+      <Card className="border-none shadow-sm">
+        <CardHeader className="text-right">
+          <CardTitle className="flex items-center gap-2">
+            <Images className="size-5 text-muted-foreground" />
+            صور الشريط الترحيبي
+          </CardTitle>
+          <CardDescription>
+            أضف حتى 5 صور تُعرض في الشريط الدوّار على الصفحة الرئيسية
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <HeroSliderImagesField
+            slides={form.heroSlides}
+            onChange={(slides) => update('heroSlides', slides)}
+            disabled={pending}
+          />
         </CardContent>
       </Card>
 
