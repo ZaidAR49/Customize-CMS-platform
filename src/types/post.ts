@@ -3,6 +3,7 @@ export type PostType = 'news' | 'activity' | 'program' | 'center'
 export interface Post {
   id: string | undefined
   slug: string
+  slug_en?: string
   title: string
   title_en?: string
   excerpt: string

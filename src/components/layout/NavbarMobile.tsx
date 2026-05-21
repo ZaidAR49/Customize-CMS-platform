@@ -39,13 +39,15 @@ export function NavbarMobile({ navItems = [] }: { navItems?: SiteNavItem[] }) {
 
         {/* Mobile Menu */}
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild>
-            <button
-              className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-(--fcps-bg-soft)"
-              aria-label="القائمة"
-            >
-              <Menu className="h-5 w-5 text-(--fcps-text)" />
-            </button>
+          <SheetTrigger
+            render={
+              <button
+                className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-(--fcps-bg-soft)"
+                aria-label="القائمة"
+              />
+            }
+          >
+            <Menu className="h-5 w-5 text-(--fcps-text)" />
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px] p-0">
             <SheetTitle className="sr-only">القائمة الرئيسية</SheetTitle>

@@ -107,6 +107,7 @@ export function CategoriesManager({ initialCategories, isAdmin }: CategoriesMana
             <TableRow className="bg-(--fcps-bg-soft) hover:bg-(--fcps-bg-soft)">
               <TableHead className="w-[100px] text-right font-semibold text-(--fcps-dark)">المفتاح</TableHead>
               <TableHead className="text-right font-semibold text-(--fcps-dark)">الاسم (عربي)</TableHead>
+              <TableHead className="text-right font-semibold text-(--fcps-dark)">الاسم (إنجليزي)</TableHead>
               <TableHead className="text-right font-semibold text-(--fcps-dark)">الترتيب</TableHead>
               {isAdmin && <TableHead className="text-right font-semibold text-(--fcps-dark)">الإجراءات</TableHead>}
             </TableRow>
@@ -114,7 +115,7 @@ export function CategoriesManager({ initialCategories, isAdmin }: CategoriesMana
           <TableBody>
             {categories.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 4 : 3} className="text-center text-(--fcps-gray-text) h-32">
+                <TableCell colSpan={isAdmin ? 5 : 4} className="text-center text-(--fcps-gray-text) h-32">
                   لا توجد تصنيفات.
                 </TableCell>
               </TableRow>
@@ -123,6 +124,7 @@ export function CategoriesManager({ initialCategories, isAdmin }: CategoriesMana
                 <TableRow key={cat.id} className="group">
                   <TableCell className="font-medium font-mono text-sm" dir="rtl">{cat.key}</TableCell>
                   <TableCell>{cat.label_ar}</TableCell>
+                  <TableCell>{cat.label_en || '-'}</TableCell>
                   <TableCell>{cat.display_order}</TableCell>
                   {isAdmin && (
                     <TableCell>

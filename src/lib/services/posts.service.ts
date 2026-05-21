@@ -135,9 +135,10 @@ export const postsService = {
   },
 
   async createPost(postData: any): Promise<Post> {
-    const { title, title_en, slug, descripcion, descripcion_en, excerpt, excerpt_en, cover_image, type, published, author_id, category_id, tags } = postData;
+    const { title, title_en, slug, slug_en, descripcion, descripcion_en, excerpt, excerpt_en, cover_image, gallery, type, published, author_id, category_id, tags } = postData;
     const metadata: Record<string, unknown> = { likes: 0 };
     if (cover_image !== undefined) metadata.cover_image = cover_image ?? null;
+    if (gallery !== undefined) metadata.gallery = Array.isArray(gallery) ? gallery : [];
 
     const { data: postRow, error } = await supabase
       .from('posts')
@@ -159,7 +160,7 @@ export const postsService = {
 
     const postId = postRow.id;
     const trans = [];
-    if (title || descripcion || excerpt) {
+    if (title || descripcion || excerpt || slug) {
       trans.push({
         post_id: postId,
         lang: 'ar',
@@ -169,11 +170,11 @@ export const postsService = {
         excerpt: excerpt ?? '',
       });
     }
-    if (title_en || descripcion_en || excerpt_en) {
+    if (title_en || descripcion_en || excerpt_en || slug_en) {
       trans.push({
         post_id: postId,
         lang: 'en',
-        slug: slug ?? '',
+        slug: slug_en ?? slug ?? '',
         title: title_en ?? '',
         description: descripcion_en ?? '',
         excerpt: excerpt_en ?? '',
@@ -191,14 +192,14 @@ export const postsService = {
   },
 
   async updatePost(id: string, postData: any): Promise<Post> {
-    const { slug, title, title_en, descripcion, descripcion_en, excerpt, excerpt_en, cover_image, type, category_id, tags, ...rest } = postData;
+    const { slug, slug_en, title, title_en, descripcion, descripcion_en, excerpt, excerpt_en, cover_image, gallery, type, category_id, tags, ...rest } = postData;
     const payload: Record<string, any> = { ...rest };
 
     if (type !== undefined) payload.type = toDatabasePostType(type);
     if (category_id !== undefined) payload.category_id = category_id || null;
     if (tags !== undefined) payload.tags = Array.isArray(tags) ? tags : [];
 
-    if (cover_image !== undefined) {
+    if (cover_image !== undefined || gallery !== undefined) {
       const { data: existingPost, error: existingError } = await supabase
         .from('posts')
         .select('metadata')
@@ -207,10 +208,14 @@ export const postsService = {
 
       if (existingError) throw existingError;
 
-      payload.metadata = {
+      const nextMetadata = {
         ...(existingPost?.metadata ?? {}),
-        cover_image: cover_image ?? null,
       };
+
+      if (cover_image !== undefined) nextMetadata.cover_image = cover_image ?? null;
+      if (gallery !== undefined) nextMetadata.gallery = Array.isArray(gallery) ? gallery : [];
+
+      payload.metadata = nextMetadata;
     }
 
     if (Object.keys(payload).length > 0) {
@@ -221,25 +226,50 @@ export const postsService = {
       if (error) throw error;
     }
 
-    // Update slug in translation for each language
+    // Update translations for each language
     for (const lang of ['ar', 'en'] as const) {
-      if (slug !== undefined) {
+      const transPayload: Record<string, any> = {};
+      if (lang === 'ar') {
+        if (slug !== undefined) transPayload.slug = slug;
+        if (title !== undefined) transPayload.title = title;
+        if (descripcion !== undefined) transPayload.description = descripcion;
+        if (excerpt !== undefined) transPayload.excerpt = excerpt;
+      } else {
+        if (slug_en !== undefined) transPayload.slug = slug_en;
+        if (title_en !== undefined) transPayload.title = title_en;
+        if (descripcion_en !== undefined) transPayload.description = descripcion_en;
+        if (excerpt_en !== undefined) transPayload.excerpt = excerpt_en;
+      }
+
+      if (Object.keys(transPayload).length > 0) {
         const { data: existingTrans, error: transFetchError } = await supabase
           .from('post_translations')
           .select('id')
           .eq('post_id', id)
           .eq('lang', lang)
           .maybeSingle();
+        
         if (transFetchError) throw transFetchError;
-        const transPayload: Record<string, any> = { slug };
+
         if (existingTrans) {
-          await supabase.from('post_translations').update(transPayload).eq('id', existingTrans.id);
+          const { error: updateErr } = await supabase
+            .from('post_translations')
+            .update(transPayload)
+            .eq('id', existingTrans.id);
+          if (updateErr) throw updateErr;
         } else {
-          await supabase.from('post_translations').insert({
-            post_id: id,
-            lang,
-            slug: slug,
-          });
+          // For insert, make sure required fields are present
+          const { error: insertErr } = await supabase
+            .from('post_translations')
+            .insert({
+              post_id: id,
+              lang,
+              slug: transPayload.slug ?? '',
+              title: transPayload.title ?? '',
+              description: transPayload.description ?? '',
+              excerpt: transPayload.excerpt ?? '',
+            });
+          if (insertErr) throw insertErr;
         }
       }
     }

@@ -108,7 +108,7 @@ export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
         fd.append('avatar', newAvatarFile)
       }
       const res = await createUserAction(fd)
-      if (res.success) {
+      if (res.success && res.data) {
         toast.success('تم إضافة المستخدم')
         setAddOpen(false)
         setNewAvatarFile(null)

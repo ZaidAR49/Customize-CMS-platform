@@ -81,6 +81,20 @@ export function CategoryDialog({ open, onOpenChange, category, onSave, pending }
           </div>
 
           <div className="grid gap-2">
+            <Label htmlFor="cat-label-en">الاسم (بالإنجليزية)</Label>
+            <Input
+              id="cat-label-en"
+              value={formData.label_en || ''}
+              onChange={(e) => handleChange('label_en', e.target.value)}
+              disabled={pending}
+              required
+              dir="ltr"
+              className="text-left"
+              placeholder="e.g. Education, Health"
+            />
+          </div>
+
+          <div className="grid gap-2">
             <Label htmlFor="cat-order">الترتيب</Label>
             <Input
               id="cat-order"
@@ -119,7 +133,7 @@ export function CategoryDialog({ open, onOpenChange, category, onSave, pending }
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
             إلغاء
           </Button>
-          <Button type="submit" form="category-form" disabled={pending || !formData.key || !formData.label_ar}>
+          <Button type="submit" form="category-form" disabled={pending || !formData.key || !formData.label_ar || !formData.label_en}>
             {pending ? 'جاري الحفظ...' : 'حفظ'}
           </Button>
         </DialogFooter>

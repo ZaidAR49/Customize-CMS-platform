@@ -10,6 +10,7 @@ import type { Post } from '@/types/post'
 import CodeEditor from '@uiw/react-textarea-code-editor'
 import { Switch } from "@/components/ui/switch";
 import { ReadOnlyField } from '@/components/dashboard/ReadOnlyField';
+import { PostImageGallery } from '@/components/dashboard/PostImageGallery';
 
 const typeOptions: Array<{ value: Post['type']; label: string }> = [
   { value: 'news', label: 'أخبار' },
@@ -40,9 +41,11 @@ export function PostForm({
   onCancel,
 }: PostFormProps) {
   const [slugTouched, setSlugTouched] = useState(mode === 'edit')
+  const [slugEnTouched, setSlugEnTouched] = useState(mode === 'edit')
   const [isHtml, setIsHtml] = useState(false)
   useEffect(() => {
     setSlugTouched(mode === 'edit')
+    setSlugEnTouched(mode === 'edit')
   }, [mode])
 
   function handleTitleChange(nextTitle: string) {
@@ -55,6 +58,19 @@ export function PostForm({
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')
       onChange('slug', nextSlug)
+    }
+  }
+
+  function handleTitleEnChange(nextTitleEn: string) {
+    onChange('title_en', nextTitleEn)
+    if (mode === 'create' && !slugEnTouched) {
+      const nextSlugEn = nextTitleEn
+        .trim()
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+      onChange('slug_en', nextSlugEn)
     }
   }
 
@@ -88,7 +104,7 @@ export function PostForm({
             <Input
               id="post-title-en"
               value={value.title_en || ''}
-              onChange={(e) => onChange('title_en', e.target.value)}
+              onChange={(e) => handleTitleEnChange(e.target.value)}
               disabled={pending}
               dir="ltr"
               className="text-left"
@@ -96,9 +112,9 @@ export function PostForm({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="post-slug">الرابط (Slug)</Label>
+            <Label htmlFor="post-slug">الرابط بالعربية (Slug AR)</Label>
             <Input
               id="post-slug"
               value={value.slug}
@@ -111,7 +127,23 @@ export function PostForm({
               className="text-left"
             />
           </div>
+          <div className="grid gap-2">
+            <Label htmlFor="post-slug-en">الرابط بالإنجليزية (Slug EN)</Label>
+            <Input
+              id="post-slug-en"
+              value={value.slug_en || ''}
+              onChange={(e) => {
+                setSlugEnTouched(true)
+                onChange('slug_en', e.target.value.trim())
+              }}
+              disabled={pending}
+              dir="ltr"
+              className="text-left"
+            />
+          </div>
+        </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="grid gap-2">
             <Label htmlFor="post-type">النوع</Label>
             <select
@@ -128,38 +160,26 @@ export function PostForm({
               ))}
             </select>
           </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="post-category">التصنيف</Label>
+            <select
+              id="post-category"
+              value={value.category_id}
+              onChange={(e) => onChange('category_id', e.target.value)}
+              disabled={pending}
+              className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring"
+            >
+              <option value="">بدون تصنيف</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div className="grid gap-2">
-          <Label htmlFor="post-category">التصنيف</Label>
-          <select
-            id="post-category"
-            value={value.category_id}
-            onChange={(e) => onChange('category_id', e.target.value)}
-            disabled={pending}
-            className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring"
-          >
-            <option value="">بدون تصنيف</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="grid gap-2">
-          <Label htmlFor="post-cover">رابط الصورة</Label>
-          <Input
-            id="post-cover"
-            value={value.cover_image}
-            onChange={(e) => onChange('cover_image', e.target.value)}
-            disabled={pending}
-            dir="ltr"
-            className="text-left"
-            placeholder="https://..."
-          />
-        </div>
 
         <div className="grid gap-2">
           <Label htmlFor="post-tags-input">الوسوم (Tags)</Label>
@@ -364,6 +384,16 @@ export function PostForm({
               dir="ltr"
             />
           )}
+        </div>
+
+        <div className="grid gap-2 border-t pt-6 mt-4">
+          <Label className="text-base font-bold text-slate-800">صور المقال ومعرض الوسائط (الحد الأقصى 20 صورة)</Label>
+          <PostImageGallery
+            coverImage={value.cover_image}
+            gallery={value.gallery || []}
+            onChange={onChange}
+            disabled={pending}
+          />
         </div>
 
         <label className="flex items-center gap-2 text-sm">

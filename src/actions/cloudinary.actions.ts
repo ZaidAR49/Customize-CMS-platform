@@ -69,3 +69,23 @@ export async function DeleteImages(imageIds: string[]) {
         return { success: false, deleted: [] as string[], failed: imageIds };
     }
 }
+
+export async function uploadImagesToCloudinary(imageUrls: string[]): Promise<string[]> {
+    if (!imageUrls || imageUrls.length === 0) return [];
+
+    const uploadPromises = imageUrls.map(async (url) => {
+        try {
+            const result = await cloudinary.uploader.upload(url, {
+                folder: process.env.CLOUDINARY_FILE,
+                resource_type: 'image',
+            });
+            return result.secure_url;
+        } catch (error) {
+            console.error(`Failed to upload image to Cloudinary: ${url}`, error);
+            return null;
+        }
+    });
+    const results = await Promise.all(uploadPromises);
+    //clear
+    return results.filter((url): url is string => url !== null);
+}
