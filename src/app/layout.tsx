@@ -29,7 +29,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   ])
 
   return (
-    <html lang="ar" dir="rtl" className={cairo.variable} suppressHydrationWarning>
+    <html lang="ar" dir="rtl" className={cairo.variable} suppressHydrationWarning data-scroll-behavior="smooth">
       <body className="bg-white text-[#333] antialiased" style={{ fontFamily: 'var(--font-cairo), sans-serif' }}>
         <SessionProvider>
           <ConditionalHeader programs={programs} centers={centers} />
