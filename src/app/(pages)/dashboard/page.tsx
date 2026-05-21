@@ -4,7 +4,8 @@ import { postsService } from '@/lib/services/posts.service'
 import { FileText, Heart, Users, Clock } from 'lucide-react'
 
 export default async function DashboardPage() {
-  const posts = await postsService.getPosts()
+  const allPosts = await postsService.getPosts()
+  const posts = allPosts.filter((post) => post.type !== 'center' && post.type !== 'program')
   const stats = [
     { label: 'إجمالي المقالات', value: posts.length, icon: FileText, color: 'bg-blue-500' },
     { label: 'إجمالي الإعجابات', value: posts.reduce((sum, p) => sum + p.likes, 0), icon: Heart, color: 'bg-red-500' },

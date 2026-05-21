@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'lh6.googleusercontent.com', pathname: '/**' },
       { protocol: 'https', hostname: 'fcpsjo.org', pathname: '/**' },
       { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
+      // Facebook CDN — covers scontent-*.fbcdn.net and similar subdomains
+      { protocol: 'https', hostname: '**.fbcdn.net', pathname: '/**' },
+      { protocol: 'https', hostname: '**.cdninstagram.com', pathname: '/**' },
     ],
   },
 }

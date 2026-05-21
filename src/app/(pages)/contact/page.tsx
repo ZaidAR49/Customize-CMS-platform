@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { organization } from '@/data/organization'
 import { Phone, Mail, MapPin, Send, CheckCircle } from 'lucide-react'
 import { useState } from 'react'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { submitContactFormAction } from '@/actions/malis.actions'
 
 const contactSchema = z.object({
@@ -25,6 +26,7 @@ type ContactForm = z.infer<typeof contactSchema>
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [showConfirmClear, setShowConfirmClear] = useState(false)
   const {
     register,
     handleSubmit,
@@ -176,24 +178,44 @@ export default function ContactPage() {
                       {errors.message && <p className="mt-1 text-xs text-red-500">{errors.message.message}</p>}
                     </div>
 
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full bg-(--fcps-primary) hover:bg-(--fcps-primary-dark) text-white"
-                    >
-                      {isSubmitting ? (
-                        <span className="flex items-center gap-2">
-                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                          جاري الإرسال...
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-2">
-                          <Send className="h-4 w-4" />
-                          إرسال الرسالة
-                        </span>
-                      )}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex-1 bg-(--fcps-primary) hover:bg-(--fcps-primary-dark) text-white"
+                      >
+                        {isSubmitting ? (
+                          <span className="flex items-center gap-2 justify-center">
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                            جاري الإرسال...
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2 justify-center">
+                            <Send className="h-4 w-4" />
+                            إرسال الرسالة
+                          </span>
+                        )}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowConfirmClear(true)}
+                        disabled={isSubmitting}
+                        className="text-red-500 border-red-200 hover:bg-red-50"
+                      >
+                        مسح
+                      </Button>
+                    </div>
                   </form>
+
+                  <ConfirmDialog
+                    open={showConfirmClear}
+                    onOpenChange={setShowConfirmClear}
+                    title="تأكيد مسح البيانات"
+                    description="هل أنت متأكد من مسح جميع الحقول؟ لا يمكن التراجع عن هذا الإجراء."
+                    confirmText="مسح الكل"
+                    onConfirm={reset}
+                  />
                 </CardContent>
               </Card>
             </div>

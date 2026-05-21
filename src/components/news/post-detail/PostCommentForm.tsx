@@ -149,13 +149,29 @@ export function PostCommentForm({ postId }: PostCommentFormProps) {
           <span>احفظ اسمي، بريدي الإلكتروني، والموقع الإلكتروني في هذا المتصفح</span>
         </label>
 
-        <div className="flex justify-start">
+        <div className="flex justify-start gap-2">
           <Button
             type="submit"
             disabled={pending}
             className="bg-[#0073aa] px-8 hover:bg-[#005580]"
           >
             {pending ? 'جاري الإرسال...' : 'إرسال التعليق'}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              if (window.confirm('هل أنت متأكد من مسح جميع الحقول؟')) {
+                setBody('')
+                setName('')
+                setEmail('')
+                setWebsite('')
+              }
+            }}
+            disabled={pending}
+            className="text-red-500 border-red-200 hover:bg-red-50"
+          >
+            مسح
           </Button>
         </div>
       </form>

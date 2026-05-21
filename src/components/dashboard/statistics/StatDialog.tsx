@@ -202,6 +202,32 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
             إلغاء
           </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              if (window.confirm('هل أنت متأكد من مسح الحقول؟')) {
+                if (stat) {
+                  setFormData(stat);
+                } else {
+                  setFormData({
+                    key: '',
+                    label_ar: '',
+                    label_en: '',
+                    value: '',
+                    icon: 'Activity',
+                    display_order: 0,
+                    description_ar: '',
+                    description_en: '',
+                  });
+                }
+              }
+            }}
+            disabled={pending}
+            className="text-red-500 border-red-200 hover:bg-red-50"
+          >
+            مسح
+          </Button>
           <Button type="submit" form="stat-form" disabled={pending || !formData.key || !formData.label_ar || !formData.value}>
             {pending ? 'جاري الحفظ...' : 'حفظ'}
           </Button>

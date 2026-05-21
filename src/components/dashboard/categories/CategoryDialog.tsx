@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import type { CategoryRow } from '@/types/category';
 
 interface CategoryDialogProps {
@@ -23,6 +24,22 @@ interface CategoryDialogProps {
 
 export function CategoryDialog({ open, onOpenChange, category, onSave, pending }: CategoryDialogProps) {
   const [formData, setFormData] = useState<Partial<CategoryRow>>({});
+  const [showConfirmClear, setShowConfirmClear] = useState(false);
+
+  function executeClear() {
+    if (category) {
+      setFormData(category);
+    } else {
+      setFormData({
+        key: '',
+        label_ar: '',
+        label_en: '',
+        display_order: 0,
+        description_ar: '',
+        description_en: '',
+      });
+    }
+  }
 
   useEffect(() => {
     if (category) {
@@ -133,11 +150,29 @@ export function CategoryDialog({ open, onOpenChange, category, onSave, pending }
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
             إلغاء
           </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowConfirmClear(true)}
+            disabled={pending}
+            className="text-red-500 border-red-200 hover:bg-red-50"
+          >
+            مسح
+          </Button>
           <Button type="submit" form="category-form" disabled={pending || !formData.key || !formData.label_ar || !formData.label_en}>
             {pending ? 'جاري الحفظ...' : 'حفظ'}
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      <ConfirmDialog
+        open={showConfirmClear}
+        onOpenChange={setShowConfirmClear}
+        title="تأكيد مسح البيانات"
+        description="هل أنت متأكد من مسح الحقول؟ لا يمكن التراجع عن هذا الإجراء."
+        confirmText="مسح"
+        onConfirm={executeClear}
+      />
     </Dialog>
   );
 }

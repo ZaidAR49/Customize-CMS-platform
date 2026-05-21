@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import CodeEditor from '@uiw/react-textarea-code-editor'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 export interface SimplePostFormValue {
   title: string
@@ -43,6 +44,17 @@ export function SimplePostForm({
 }: SimplePostFormProps) {
   const [slugTouched, setSlugTouched] = useState(mode === 'edit')
   const [isHtml, setIsHtml] = useState(false)
+  const [showConfirmClear, setShowConfirmClear] = useState(false)
+
+  function handleClear() {
+    setShowConfirmClear(true)
+  }
+
+  function executeClear() {
+    Object.entries(emptySimplePostFormValue).forEach(([key, val]) => {
+      onChange(key as keyof SimplePostFormValue, val)
+    })
+  }
 
   useEffect(() => {
     setSlugTouched(mode === 'edit')
@@ -216,10 +228,28 @@ export function SimplePostForm({
         >
           {pending ? 'جاري الحفظ...' : mode === 'create' ? 'إنشاء' : 'حفظ التعديلات'}
         </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleClear}
+          disabled={pending}
+          className="text-red-500 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/20"
+        >
+          مسح البيانات
+        </Button>
         <Button type="button" variant="outline" onClick={onCancel} disabled={pending}>
           إلغاء
         </Button>
       </div>
+
+      <ConfirmDialog
+        open={showConfirmClear}
+        onOpenChange={setShowConfirmClear}
+        title="تأكيد مسح البيانات"
+        description="هل أنت متأكد من مسح جميع الحقول؟ لا يمكن التراجع عن هذا الإجراء."
+        confirmText="مسح الكل"
+        onConfirm={executeClear}
+      />
     </form>
   )
 }

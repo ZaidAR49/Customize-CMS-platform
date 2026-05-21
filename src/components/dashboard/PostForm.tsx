@@ -5,19 +5,22 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import type { PostFormValue } from '@/lib/posts-form'
+import { type PostFormValue, emptyPostFormValue } from '@/lib/posts-form'
 import type { Post } from '@/types/post'
 import CodeEditor from '@uiw/react-textarea-code-editor'
 import { Switch } from "@/components/ui/switch";
 import { ReadOnlyField } from '@/components/dashboard/ReadOnlyField';
 import { PostImageGallery } from '@/components/dashboard/PostImageGallery';
+import { importFacebookPost } from '@/actions/apify.action'
+import { toast } from 'sonner'
+import { DownloadCloud, Loader2 } from 'lucide-react'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
-const typeOptions: Array<{ value: Post['type']; label: string }> = [
-  { value: 'news', label: 'أخبار' },
-  { value: 'activity', label: 'نشاطات' },
-  { value: 'program', label: 'برامج' },
-  { value: 'center', label: 'مراكز' },
-]
+const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+  </svg>
+)
 
 interface PostFormProps {
   mode: 'create' | 'edit'
@@ -43,6 +46,21 @@ export function PostForm({
   const [slugTouched, setSlugTouched] = useState(mode === 'edit')
   const [slugEnTouched, setSlugEnTouched] = useState(mode === 'edit')
   const [isHtml, setIsHtml] = useState(false)
+  const [facebookUrl, setFacebookUrl] = useState('')
+  const [isImporting, setIsImporting] = useState(false)
+  const [showConfirmClear, setShowConfirmClear] = useState(false)
+
+  function handleClear() {
+    setShowConfirmClear(true)
+  }
+
+  function executeClear() {
+    Object.entries(emptyPostFormValue).forEach(([key, val]) => {
+      onChange(key as keyof PostFormValue, val)
+    })
+    toast.success('تم تفريغ الحقول بنجاح')
+  }
+
   useEffect(() => {
     setSlugTouched(mode === 'edit')
     setSlugEnTouched(mode === 'edit')
@@ -74,6 +92,105 @@ export function PostForm({
     }
   }
 
+  async function handleFacebookImport() {
+    const url = facebookUrl.trim()
+    if (!url) return
+
+    // URL validation
+    let parsedUrl: URL
+    try {
+      parsedUrl = new URL(url)
+    } catch (e) {
+      toast.error('يرجى إدخال رابط صحيح (URL)')
+      return
+    }
+
+    // Facebook domain validation
+    const hostname = parsedUrl.hostname.toLowerCase()
+    const isFacebook = hostname.includes('facebook.com') || hostname.includes('fb.com') || hostname.includes('fb.watch')
+    if (!isFacebook) {
+      toast.error('يرجى إدخال رابط منشور فيسبوك صالح')
+      return
+    }
+
+    setIsImporting(true)
+    try {
+      const result = await importFacebookPost(url)
+      if (result.success && result.post) {
+        const post = result.post
+        const isArabic = post.isArabic
+
+        // Helper to build a slug from a title string
+        function toSlug(text: string) {
+          return text.trim().toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-')
+        }
+
+        if (isArabic) {
+          // --- Arabic post: fill Arabic fields only, clear English fields ---
+          const text = post.descripcion || ''
+          const firstLine = text.split('\n')[0].trim()
+          const cleanTitle = firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
+          const cleanExcerpt = text.length > 150 ? text.substring(0, 150) + '...' : text
+
+          onChange('title', cleanTitle)
+          if (mode === 'create') onChange('slug', toSlug(cleanTitle))
+          onChange('excerpt', cleanExcerpt)
+          onChange('descripcion', text)
+
+          // Clear English fields
+          onChange('title_en', '')
+          onChange('slug_en', '')
+          onChange('excerpt_en', '')
+          onChange('descripcion_en', '')
+        } else {
+          // --- English post: fill English fields only, clear Arabic fields ---
+          const text = post.descripcion_en || ''
+          const firstLine = text.split('\n')[0].trim()
+          const cleanTitleEn = firstLine.length > 50 ? firstLine.substring(0, 50) + '...' : firstLine
+          const cleanExcerptEn = text.length > 150 ? text.substring(0, 150) + '...' : text
+
+          onChange('title_en', cleanTitleEn)
+          if (mode === 'create') onChange('slug_en', toSlug(cleanTitleEn))
+          onChange('excerpt_en', cleanExcerptEn)
+          onChange('descripcion_en', text)
+
+          // Clear Arabic fields
+          onChange('title', '')
+          onChange('slug', '')
+          onChange('excerpt', '')
+          onChange('descripcion', '')
+        }
+
+        // Cover image
+        if (post.cover_image) {
+          onChange('cover_image', post.cover_image)
+        }
+
+        // Gallery images — populate from imported images array
+        if (Array.isArray(post.images) && post.images.length > 0) {
+          onChange('gallery', post.images)
+        }
+
+        if (post.type) {
+          onChange('type', post.type as Post['type'])
+        }
+        if (post.published !== undefined) {
+          onChange('published', post.published)
+        }
+
+        toast.success('تم استيراد بيانات المنشور بنجاح!')
+        setFacebookUrl('')
+      } else {
+        toast.error(result.error || 'فشل استيراد المنشور. يرجى التحقق من الرابط.')
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error('حدث خطأ أثناء الاتصال بـ Apify')
+    } finally {
+      setIsImporting(false)
+    }
+  }
+
   return (
     <form
       dir="rtl"
@@ -83,6 +200,46 @@ export function PostForm({
         onSubmit()
       }}
     >
+      {/* Import from Facebook Section */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 border border-blue-100 dark:border-slate-700 rounded-xl p-5 mb-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="p-2 bg-blue-500 rounded-lg text-white">
+            <FacebookIcon className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">الاستيراد من فيسبوك</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">أدخل رابط منشور فيسبوك لاستخراج المحتوى والصورة تلقائياً</p>
+          </div>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Input
+            type="url"
+            placeholder="https://www.facebook.com/username/posts/123456789"
+            value={facebookUrl}
+            onChange={(e) => setFacebookUrl(e.target.value)}
+            disabled={isImporting || pending}
+            className="flex-1 border-slate-200 focus-visible:ring-blue-500"
+          />
+          <Button
+            type="button"
+            onClick={handleFacebookImport}
+            disabled={isImporting || pending || !facebookUrl.trim()}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition-all duration-200 shadow-sm flex items-center justify-center gap-2 h-8"
+          >
+            {isImporting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                جاري الاستيراد...
+              </>
+            ) : (
+              <>
+                <DownloadCloud className="h-4 w-4" />
+                استيراد المحتوى
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
       <div className="grid gap-4">
         {mode === 'edit' && authorName ? (
           <ReadOnlyField id="post-author" label="الكاتب" value={authorName} />
@@ -143,41 +300,22 @@ export function PostForm({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="post-type">النوع</Label>
-            <select
-              id="post-type"
-              value={value.type}
-              onChange={(e) => onChange('type', e.target.value as Post['type'])}
-              disabled={pending}
-              className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring"
-            >
-              {typeOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="post-category">التصنيف</Label>
-            <select
-              id="post-category"
-              value={value.category_id}
-              onChange={(e) => onChange('category_id', e.target.value)}
-              disabled={pending}
-              className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring"
-            >
-              <option value="">بدون تصنيف</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.label}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="grid gap-2">
+          <Label htmlFor="post-category">التصنيف</Label>
+          <select
+            id="post-category"
+            value={value.category_id}
+            onChange={(e) => onChange('category_id', e.target.value)}
+            disabled={pending}
+            className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring"
+          >
+            <option value="">بدون تصنيف</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.label}
+              </option>
+            ))}
+          </select>
         </div>
 
 
@@ -415,10 +553,28 @@ export function PostForm({
         >
           {pending ? 'جاري الحفظ...' : mode === 'create' ? 'إنشاء المقال' : 'حفظ التعديلات'}
         </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleClear}
+          disabled={pending}
+          className="text-red-500 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/20"
+        >
+          مسح البيانات
+        </Button>
         <Button type="button" variant="outline" onClick={onCancel} disabled={pending}>
           إلغاء
         </Button>
       </div>
+
+      <ConfirmDialog
+        open={showConfirmClear}
+        onOpenChange={setShowConfirmClear}
+        title="تأكيد مسح البيانات"
+        description="هل أنت متأكد من مسح جميع الحقول؟ لا يمكن التراجع عن هذا الإجراء."
+        confirmText="مسح الكل"
+        onConfirm={executeClear}
+      />
     </form>
   )
 }
