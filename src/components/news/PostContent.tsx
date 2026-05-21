@@ -125,6 +125,20 @@ export function PostContent({
               dangerouslySetInnerHTML={{ __html: postBodyHtml }}
             />
 
+            {post.tags && post.tags.length > 0 && (
+              <div className="mt-8 mb-6 flex flex-wrap gap-2 items-center border-t border-[#f0f0f0] pt-6" dir="rtl">
+                <span className="text-sm font-medium text-gray-500 ml-2">الوسوم:</span>
+                {post.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-blue-50/70 border border-blue-100/50 px-3 py-1 text-xs font-medium text-blue-600 transition-all hover:bg-blue-50 hover:border-blue-200"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
             <PostShareBar
               postId={post.id ?? ''}
               postUrl={postUrl}

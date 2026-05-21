@@ -15,6 +15,7 @@ export const createPostSchema = z.object({
   }),
   published: z.boolean().default(false),
   published_at: z.string().datetime().optional().or(z.literal('')),
+  tags: z.array(z.string()).optional(),
 });
 
 export const updatePostSchema = createPostSchema.partial().extend({

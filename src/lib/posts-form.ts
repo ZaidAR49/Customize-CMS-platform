@@ -2,6 +2,7 @@ import type { Post } from '@/types/post'
 
 export interface PostFormValue {
   slug: string
+  slug_en: string
   title: string
   title_en: string
   category_id: string
@@ -12,6 +13,7 @@ export interface PostFormValue {
   cover_image: string
   type: Post['type']
   published: boolean
+  tags: string[]
 }
 
 
@@ -19,6 +21,7 @@ export interface PostFormValue {
 export function postToFormValue(post: Post): PostFormValue {
   return {
     slug: post.slug,
+    slug_en: post.slug_en ?? '',
     title: post.title,
     title_en: post.title_en ?? '',
     category_id: post.categoryId ?? '',
@@ -29,11 +32,12 @@ export function postToFormValue(post: Post): PostFormValue {
     cover_image: post.coverImage ?? '',
     type: post.type,
     published: post.published,
+    tags: Array.isArray(post.tags) ? post.tags : [],
   }
 }
 
 export const emptyPostFormValue: PostFormValue = {
-  slug: '',
+  slug_en: '',
   title: '',
   title_en: '',
   category_id: '',
@@ -44,4 +48,5 @@ export const emptyPostFormValue: PostFormValue = {
   cover_image: '',
   type: 'news',
   published: false,
+  tags: [],
 }

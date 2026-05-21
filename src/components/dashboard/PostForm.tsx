@@ -160,6 +160,90 @@ export function PostForm({
             placeholder="https://..."
           />
         </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor="post-tags-input">الوسوم (Tags)</Label>
+          <p className="text-xs text-gray-500">
+            أدخل الوسوم للمقال. اضغط على زر Enter أو أضف فاصلة (، أو ,) لإضافة الوسم.
+          </p>
+          <div className="flex flex-wrap gap-2 p-2 border rounded-lg bg-gray-50/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all duration-200">
+            {/* Tag Pills */}
+            {(value.tags || []).map((tag, idx) => (
+              <span
+                key={`${tag}-${idx}`}
+                className="inline-flex items-center gap-1.5 rounded-md bg-blue-50 border border-blue-100/60 px-2.5 py-0.5 text-xs font-medium text-blue-600 animate-in fade-in zoom-in-95 duration-150"
+              >
+                <span>{tag}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextTags = (value.tags || []).filter((_, i) => i !== idx)
+                    onChange('tags', nextTags)
+                  }}
+                  disabled={pending}
+                  className="rounded-full p-0.5 hover:bg-blue-100/80 text-blue-500 hover:text-blue-700 transition-colors"
+                  aria-label={`إزالة الوسم ${tag}`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-3 w-3"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                </button>
+              </span>
+            ))}
+            
+            {/* Tag Input Field */}
+            <input
+              id="post-tags-input"
+              type="text"
+              placeholder={(value.tags || []).length === 0 ? "مثال: نشاطات، أيتام، إنجازات..." : "إضافة وسم..."}
+              disabled={pending}
+              className="flex-1 min-w-[120px] bg-transparent text-sm outline-none border-none py-0.5 px-1 placeholder:text-gray-400"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  const target = e.currentTarget
+                  const val = target.value.trim().replace(/[،,]/g, '')
+                  if (val && !(value.tags || []).includes(val)) {
+                    onChange('tags', [...(value.tags || []), val])
+                    target.value = ''
+                  }
+                }
+              }}
+              onInput={(e) => {
+                const target = e.currentTarget
+                const val = target.value
+                if (val.endsWith(',') || val.endsWith('،')) {
+                  const tag = val.slice(0, -1).trim()
+                  if (tag && !(value.tags || []).includes(tag)) {
+                    onChange('tags', [...(value.tags || []), tag])
+                  }
+                  target.value = ''
+                }
+              }}
+              onBlur={(e) => {
+                const target = e.currentTarget
+                const val = target.value.trim().replace(/[،,]/g, '')
+                if (val && !(value.tags || []).includes(val)) {
+                  onChange('tags', [...(value.tags || []), val])
+                  target.value = ''
+                }
+              }}
+            />
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="grid gap-2">
             <Label htmlFor="post-excerpt-ar">الملخص (بالعربية)</Label>

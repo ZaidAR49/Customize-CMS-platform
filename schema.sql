@@ -124,7 +124,6 @@ CREATE TABLE public.category_translations (
 CREATE TABLE public.posts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   type public.post_type NOT NULL,
-  slug varchar NOT NULL UNIQUE,
   metadata jsonb DEFAULT '{}',
   published bool DEFAULT false,
   published_at timestamptz DEFAULT now(),
@@ -140,6 +139,7 @@ CREATE TABLE public.post_translations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id uuid NOT NULL REFERENCES public.posts (id),
   lang public.lang_code NOT NULL,
+  slug varchar UNIQUE,
   title varchar NOT NULL,
   description text,
   excerpt text,
