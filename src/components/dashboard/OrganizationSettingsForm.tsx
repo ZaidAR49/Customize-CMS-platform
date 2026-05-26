@@ -636,7 +636,11 @@ export function OrganizationSettingsForm({
             صور الشريط الترحيبي
           </CardTitle>
           <CardDescription>
-            أضف حتى 5 صور تُعرض في الشريط الدوّار على الصفحة الرئيسية
+            أضف حتى 5 صور تُعرض في الشريط الدوّار على الصفحة الرئيسية.
+            <br />
+            <span className="inline-block mt-1 text-xs font-medium text-amber-600 dark:text-amber-400">
+              💡 الأبعاد الموصى بها للصور: 1920×1080 بكسل (نسبة 16:9) للحصول على أفضل جودة
+            </span>
           </CardDescription>
         </CardHeader>
         <CardContent>

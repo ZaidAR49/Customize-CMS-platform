@@ -27,14 +27,11 @@ export default function N8nChatbot() {
           },
         },
         theme: {
-          // CSS var() is not supported here — use a literal hex value
           primaryColor: "#2e7d32",
         },
       });
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // `greeting` is derived from the hour at mount time; re-running on change
-  // would reinitialise the widget mid-session, so the empty dep array is intentional.
+  }, []);
 
   return <div id="n8n-chat" />;
 }
