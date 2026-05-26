@@ -144,10 +144,10 @@
 }
 
 /* Force shadow on n8n chat window for a modern look */
-:global(.chat-layout) {
+.chat-layout {
   box-shadow: var(--fcps-shadow-card) !important;
 }
-:global(.chat-header) {
+.chat-header {
   border-bottom: 1px solid rgba(255,255,255,0.1) !important;
 }
 

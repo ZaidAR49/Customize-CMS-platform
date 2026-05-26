@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  turbopack: {},
   experimental: {
     serverActions: {
       /** Default is 1 MB; avatars allow up to 4 MB in `updateUserProfileAction`. */
@@ -24,3 +25,5 @@ const nextConfig: NextConfig = {
 }
 
 export default nextConfig
+
+

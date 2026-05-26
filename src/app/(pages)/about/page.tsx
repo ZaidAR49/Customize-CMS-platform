@@ -2,7 +2,7 @@ import { organization } from '@/data/organization'
 import { formatSiteNumber } from '@/lib/date-format'
 import { Card, CardContent } from '@/components/ui/card'
 import { SectionTitle } from '@/components/shared/SectionTitle'
-import { Target, Eye, Calendar, MapPin, Phone, Mail } from 'lucide-react'
+import { Target, Eye, Calendar, MapPin, Phone, Mail, Users, Baby, Heart, Sparkles } from 'lucide-react'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'عن الجمعية' }
@@ -68,22 +68,34 @@ export default function AboutPage() {
       </section>
 
       {/* Stats Row */}
-      <section className="py-16 bg-gradient-to-l from-[#1b5e20] to-[#2e7d32]">
+      <section className="py-16 bg-gradient-to-l from-[#1b5e20] to-[#2e7d32] relative overflow-hidden">
         <div className="container">
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-4 text-center text-white">
-            <div>
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4 text-center text-white">
+            <div className="group">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 transition-transform group-hover:scale-110">
+                <Users className="h-7 w-7 text-white/90" />
+              </div>
               <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(organization.stats.families)}</div>
               <div className="mt-2 text-white/80">أسرة</div>
             </div>
-            <div>
+            <div className="group">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 transition-transform group-hover:scale-110">
+                <Baby className="h-7 w-7 text-white/90" />
+              </div>
               <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(organization.stats.children)}</div>
               <div className="mt-2 text-white/80">طفل</div>
             </div>
-            <div>
+            <div className="group">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 transition-transform group-hover:scale-110">
+                <Heart className="h-7 w-7 text-white/90" />
+              </div>
               <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(organization.stats.women)}</div>
               <div className="mt-2 text-white/80">من النساء</div>
             </div>
-            <div>
+            <div className="group">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 transition-transform group-hover:scale-110">
+                <Sparkles className="h-7 w-7 text-white/90" />
+              </div>
               <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(organization.stats.activities)}</div>
               <div className="mt-2 text-white/80">نشاط</div>
             </div>
