@@ -521,4 +521,59 @@
 }
 .chat-window .get-started-button:hover {
   opacity: 0.88 !important;
-}
+}
+
+/* ============================================================
+   n8n Chat Widget — Quick Replies
+   ============================================================ */
+.chat-quick-replies {
+  padding: 12px 14px 4px 14px !important;
+  background: #f8faf8 !important;
+  border-top: 1px dashed rgba(46, 125, 50, 0.15) !important;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  direction: rtl;
+}
+
+.chat-quick-replies-title {
+  font-size: 0.72rem !important;
+  color: var(--fcps-gray-text) !important;
+  font-weight: 600 !important;
+  margin-bottom: 2px;
+  opacity: 0.8;
+}
+
+.chat-quick-replies-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chat-quick-reply-btn {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(46, 125, 50, 0.18) !important;
+  border-radius: 20px !important;
+  padding: 5px 12px !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  color: var(--fcps-primary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chat-quick-reply-btn:hover {
+  background: var(--fcps-primary-light) !important;
+  border-color: var(--fcps-primary-light) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.15) !important;
+}
+
+.chat-quick-reply-btn:active {
+  transform: translateY(0);
+}
+

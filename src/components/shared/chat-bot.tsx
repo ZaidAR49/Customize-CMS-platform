@@ -36,7 +36,69 @@ export default function N8nChatbot() {
         },
       });
     });
-  }, []);
+
+    // Observer to dynamically inject quick reply buttons inside n8n chat input area
+    const targetNode = document.getElementById("n8n-chat");
+    if (!targetNode) return;
+
+    const observer = new MutationObserver(() => {
+      const chatInput = targetNode.querySelector(".chat-window .chat-input");
+      const hasQuickReplies = targetNode.querySelector(".chat-quick-replies");
+
+      if (chatInput && !hasQuickReplies) {
+        const container = document.createElement("div");
+        container.className = "chat-quick-replies";
+
+        const title = document.createElement("div");
+        title.className = "chat-quick-replies-title";
+        title.textContent = "الأسئلة الشائعة المقترحة:";
+
+        const list = document.createElement("div");
+        list.className = "chat-quick-replies-list";
+
+        const suggestions = [
+          { text: "أين يقع مقر الجمعية؟", label: "📍 أين يقع مقر الجمعية؟" },
+          { text: "كيف يمكنني التبرع للجمعية؟", label: "❤️ كيف يمكنني التبرع؟" },
+          { text: "أخبرني عن الجمعية ونشاطاتها", label: "ℹ️ أخبرني عن الجمعية" }
+        ];
+
+        suggestions.forEach((item) => {
+          const button = document.createElement("button");
+          button.className = "chat-quick-reply-btn";
+          button.textContent = item.label;
+          button.type = "button";
+          button.addEventListener("click", () => {
+            const textarea = chatInput.querySelector("textarea");
+            const sendBtn = chatInput.querySelector('button[type="submit"]');
+            if (textarea && sendBtn) {
+              textarea.value = item.text;
+              textarea.dispatchEvent(new Event("input", { bubbles: true }));
+              // Small delay to let Vue/React catch the input value change before sending
+              setTimeout(() => {
+                sendBtn.dispatchEvent(new Event("click", { bubbles: true }));
+              }, 50);
+            }
+          });
+          list.appendChild(button);
+        });
+
+        container.appendChild(title);
+        container.appendChild(list);
+
+        // Inject the container right above the input box
+        chatInput.parentNode?.insertBefore(container, chatInput);
+      }
+    });
+
+    observer.observe(targetNode, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [greeting]);
 
   return <div id="n8n-chat" />;
-}
+}

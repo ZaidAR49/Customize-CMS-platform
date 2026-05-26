@@ -257,7 +257,7 @@ export function HeroSliderImagesField({
             أضف حتى {MAX_SLIDES} صور لعرضها في الشريط الترحيبي
           </p>
           <p className="text-[11px] font-medium text-amber-600/80 dark:text-amber-400/80 mt-1">
-            الأبعاد الموصى بها: 1920×1080 بكسل (16:9)
+            الأبعاد الموصى بها: 16:9 (ويتم تكييف الأبعاد الأخرى تلقائياً بمظهر احترافي)
           </p>
         </div>
       )}
