@@ -1,0 +1,369 @@
+{
+  "homePage": {
+    "heroSlider": {
+      "slide1Title": "Snippets of Our Activities",
+      "slide1Subtitle": "The Family and Child Protection Society works to protect and support families and children in Irbid.",
+      "slide2Title": "Towards a Safe Childhood",
+      "slide2Subtitle": "We seek to provide a safe and stimulating environment for children's growth and protection from all forms of violence.",
+      "slide3Title": "Together for a Better Society",
+      "slide3Subtitle": "We believe that community cooperation is the foundation for building a bright future for our children and families.",
+      "learnAboutUs": "Learn About Us",
+      "contactUs": "Contact Us",
+      "sliderTitle": "Snippets of Our Activities"
+    },
+    "targetSectors": {
+      "title": "Targeted Sectors",
+      "subtitle": "We work to serve different segments of society through specialized programs.",
+      "womenSector": {
+        "title": "Women's Sector",
+        "economicEmpowerment": "Women's Economic Empowerment",
+        "literacyPrograms": "Literacy Programs",
+        "psychoSocialSupport": "Psychosocial Support",
+        "legalAwareness": "Legal & Rights Awareness",
+        "vocationalRehab": "Vocational Rehabilitation & Training"
+      },
+      "childhoodSector": {
+        "title": "Childhood Sector",
+        "protectionFromViolence": "Protecting Children from Violence & Abuse",
+        "educationalPrograms": "Educational & Recreational Programs",
+        "healthCare": "Healthcare & Psychological Support"
+      },
+      "youthSector": {
+        "title": "Youth Sector",
+        "leadershipSkills": "Leadership Skills Development",
+        "vocationalTraining": "Vocational & Technical Training Programs"
+      },
+      "elderlySector": {
+        "title": "Elderly Care Sector",
+        "comprehensiveSupport": "Providing comprehensive support and care for the elderly, meeting their social, psychological, and health needs."
+      }
+    },
+    "missionVision": {
+      "title": "Our Mission & Vision",
+      "subtitle": "We work sincerely to achieve our goals in serving the community.",
+      "mission": {
+        "title": "Our Mission",
+        "content": "Providing support and assistance to all target groups through scientifically based programs, enabling them to overcome their circumstances and integrate into society."
+      },
+      "vision": {
+        "title": "Our Vision",
+        "content": "Towards a safe childhood and a violence-free society."
+      }
+    },
+    "statsCounter": {
+      "title": "Our Achievements in Numbers",
+      "families": "Families",
+      "children": "Children",
+      "women": "Women",
+      "activities": "Activities"
+    },
+    "latestNews": {
+      "title": "Latest News & Activities",
+      "subtitle": "Follow our latest news and activities in serving the community.",
+      "viewAllNews": "View All News"
+    }
+  },
+  "aboutPage": {
+    "metaTitle": "About Us",
+    "hero": {
+      "title": "About Us",
+      "tagline": "Childhood, innocence, and the hope for survival"
+    },
+    "history": {
+      "foundedIn": "Founded in",
+      "name": "Family and Child Protection Society",
+      "description": "The Family and Child Protection Society in Irbid was established in 1992 and works to protect the family and childhood through an integrated set of programs and projects. The society seeks to provide various services including social and psychological care, vocational training, and economic empowerment for the most needy groups."
+    },
+    "missionVision": {
+      "title": "Our Mission & Vision",
+      "mission": {
+        "title": "Our Mission",
+        "content": "Providing support and assistance to all target groups through scientifically based programs, enabling them to overcome their circumstances and integrate into society."
+      },
+      "vision": {
+        "title": "Our Vision",
+        "content": "Towards a safe childhood and a violence-free society."
+      }
+    },
+    "stats": {
+      "families": "Families",
+      "children": "Children",
+      "women": "Women",
+      "activities": "Activities"
+    },
+    "contactInfo": {
+      "title": "Contact Information",
+      "address": "Irbid, Hashemite Kingdom of Jordan"
+    }
+  },
+  "contactPage": {
+    "metaTitle": "Contact Us",
+    "hero": {
+      "title": "Contact Us",
+      "subtitle": "We are pleased to connect with you"
+    },
+    "info": {
+      "title": "Contact Information",
+      "description": "You can contact us via any of the following means or by filling out the contact form.",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address"
+    },
+    "form": {
+      "title": "Send a Message",
+      "error": "Could not send the message. Please try again later.",
+      "success": "Your message has been sent successfully. We will contact you soon.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Enter your full name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "example@email.com",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "Message subject",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Write your message here...",
+      "sending": "Sending...",
+      "sendMessage": "Send Message",
+      "clear": "Clear"
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "emailInvalid": "Invalid email address",
+      "subjectRequired": "Subject is required",
+      "messageMinLength": "Message must be at least 10 characters long"
+    },
+    "confirmDialog": {
+      "title": "Confirm Data Clear",
+      "description": "Are you sure you want to clear all fields? This action cannot be undone.",
+      "confirm": "Clear All"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "centers": "Society Centers",
+    "programs": "Programs & Projects",
+    "news": "News & Activities",
+    "about": "About Us",
+    "contact": "Contact Us",
+    "dashboard": "Dashboard",
+    "societyName": "Family and Child Protection Society",
+    "societyNameShort": "Family & Child Protection",
+    "menu": "Menu",
+    "mainMenu": "Main Menu"
+  },
+  "footer": {
+    "foundedIn": "Founded in",
+    "quickLinks": "Quick Links",
+    "contactUs": "Contact Us",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "allRightsReserved": "All rights reserved."
+  },
+  "newsPage": {
+    "metaTitle": "News & Activities",
+    "title": "News & Activities",
+    "subtitle": "Follow our latest news, activities, and programs",
+    "searchPlaceholder": "Search for an article or post...",
+    "searchBySlugPlaceholder": "Search by slug (e.g. news-2026)",
+    "searchBySlugAria": "Search by slug",
+    "searchAria": "Search news",
+    "clearFilters": "Clear Filters",
+    "noResults": "No results match the current filter.",
+    "resultsCount": "Showing {count} of {total} results",
+    "prev": "Previous",
+    "next": "Next",
+    "allCategories": "All Categories",
+    "readMore": "Read More",
+    "share": "Share",
+    "like": "Like",
+    "breadcrumbs": {
+      "home": "Home",
+      "news": "News & Activities",
+      "tags": "Tags:"
+    },
+    "sidebar": {
+      "latestPosts": "Latest Posts",
+      "categories": "Categories",
+      "newsBadge": "News",
+      "activityBadge": "Activity",
+      "searching": "Searching...",
+      "noSearchMatches": "No results match \"{search}\""
+    },
+    "comments": {
+      "title": "Comments",
+      "beFirst": "Be the first to comment",
+      "leaveComment": "Leave a Comment",
+      "emailDisclaimer": "Your email address will not be published. Required fields are marked with",
+      "commentLabel": "Comment",
+      "commentPlaceholder": "Write your comment here...",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "rememberMe": "Save my name, email, and website in this browser for the next time I comment.",
+      "submit": "Submit Comment",
+      "submitting": "Submitting...",
+      "success": "Your comment has been submitted and will be displayed after review.",
+      "error": "Could not submit comment.",
+      "clearConfirm": "Are you sure you want to clear all fields?",
+      "clear": "Clear",
+      "showMore": "Show More"
+    }
+  },
+  "authPage": {
+    "welcomeBack": "Welcome Back",
+    "signInPrompt": "Please sign in to access the dashboard.",
+    "continueWithGoogle": "Continue with Google",
+    "adminsOnly": "This page is dedicated only to the society's administrators and editors.",
+    "unauthorized": {
+      "title": "Access Denied",
+      "description": "Your account does not have the necessary permissions (admin or editor) to access the dashboard. Please contact management if you believe this is a mistake.",
+      "backToHome": "Return to Homepage"
+    }
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "Sorry, the page you are looking for does not exist or has been moved.",
+    "backToHome": "Return to Homepage"
+  },
+  "chatbot": {
+    "goodMorning": "Good morning",
+    "goodEvening": "Good evening",
+    "howCanIHelp": "How can I help you?",
+    "liveChat": "Live Chat",
+    "subtitle": "Chat with us for any inquiry",
+    "startConversation": "Start Conversation",
+    "inputPlaceholder": "Write your message here...",
+    "close": "Close",
+    "suggestedFaq": "Suggested FAQ:",
+    "faq": {
+      "location": "Where is the society's headquarters located?",
+      "locationLabel": "📍 Where is the headquarters?",
+      "donate": "How can I donate to the society?",
+      "donateLabel": "❤️ How can I donate?",
+      "about": "Tell me about the society and its activities.",
+      "aboutLabel": "ℹ️ About the society"
+    }
+  },
+  "dashboardCategories": {
+    "title": "Categories",
+    "addCategory": "Add Category",
+    "editCategory": "Edit Category",
+    "deleteCategory": "Delete Category",
+    "confirmDelete": "Are you sure you want to delete this category?",
+    "tableHeaders": {
+      "name": "Name",
+      "description": "Description",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "successCreate": "Category created successfully.",
+    "successUpdate": "Category updated successfully.",
+    "successDelete": "Category deleted successfully.",
+    "error": "An error occurred. Please try again."
+  },
+  "dashboardCenters": {
+    "title": "Centers",
+    "addCenter": "Add Center",
+    "editCenter": "Edit Center",
+    "deleteCenter": "Delete Center",
+    "confirmDelete": "Are you sure you want to delete this center?",
+    "tableHeaders": {
+      "name": "Name",
+      "location": "Location",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "successCreate": "Center created successfully.",
+    "successUpdate": "Center updated successfully.",
+    "successDelete": "Center deleted successfully.",
+    "error": "An error occurred. Please try again."
+  },
+  "dashboardComments": {
+    "title": "Comments",
+    "approve": "Approve",
+    "reject": "Reject",
+    "delete": "Delete",
+    "confirmDelete": "Are you sure you want to delete this comment?",
+    "statusApproved": "Approved",
+    "statusPending": "Pending",
+    "statusRejected": "Rejected",
+    "successApprove": "Comment approved.",
+    "successReject": "Comment rejected.",
+    "successDelete": "Comment deleted.",
+    "error": "An error occurred. Please try again."
+  },
+  "dashboardDataManagement": {
+    "title": "Data Management",
+    "import": "Import",
+    "export": "Export",
+    "importSuccess": "Data imported successfully.",
+    "exportSuccess": "Data exported successfully.",
+    "error": "An error occurred. Please try again."
+  },
+  "dashboardGallery": {
+    "title": "Gallery",
+    "upload": "Upload Image",
+    "delete": "Delete Image",
+    "confirmDelete": "Are you sure you want to delete this image?",
+    "successUpload": "Image uploaded successfully.",
+    "successDelete": "Image deleted successfully.",
+    "error": "An error occurred. Please try again."
+  },
+  "dashboardPosts": {
+    "title": "Posts",
+    "addPost": "Add Post",
+    "editPost": "Edit Post",
+    "deletePost": "Delete Post",
+    "confirmDelete": "Are you sure you want to delete this post?",
+    "statusPublished": "Published",
+    "statusDraft": "Draft",
+    "successCreate": "Post created successfully.",
+    "successUpdate": "Post updated successfully.",
+    "successDelete": "Post deleted successfully.",
+    "error": "An error occurred. Please try again."
+  },
+  "dashboardPrograms": {
+    "title": "Programs",
+    "addProgram": "Add Program",
+    "editProgram": "Edit Program",
+    "deleteProgram": "Delete Program",
+    "confirmDelete": "Are you sure you want to delete this program?",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "successCreate": "Program created successfully.",
+    "successUpdate": "Program updated successfully.",
+    "successDelete": "Program deleted successfully.",
+    "error": "An error occurred. Please try again."
+  },
+  "dashboardSettings": {
+    "title": "Settings",
+    "save": "Save Settings",
+    "reset": "Reset to Default",
+    "success": "Settings saved successfully.",
+    "error": "An error occurred. Please try again."
+  },
+  "dashboardStatistics": {
+    "title": "Statistics",
+    "viewReport": "View Report",
+    "download": "Download CSV",
+    "error": "An error occurred. Please try again."
+  },
+  "dashboardUsers": {
+    "title": "Users",
+    "addUser": "Add User",
+    "editUser": "Edit User",
+    "deleteUser": "Delete User",
+    "confirmDelete": "Are you sure you want to delete this user?",
+    "roleAdmin": "Admin",
+    "roleEditor": "Editor",
+    "roleViewer": "Viewer",
+    "successCreate": "User created successfully.",
+    "successUpdate": "User updated successfully.",
+    "successDelete": "User deleted successfully.",
+    "error": "An error occurred. Please try again."
+  }
+}
+

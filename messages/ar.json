@@ -1,0 +1,368 @@
+{
+  "homePage": {
+    "heroSlider": {
+      "slide1Title": "مقتطفات من نشاطاتنا",
+      "slide1Subtitle": "جمعية حماية الأسرة والطفولة تعمل على حماية ودعم الأسر والأطفال في إربد.",
+      "slide2Title": "نحو طفولة آمنة",
+      "slide2Subtitle": "نسعى لتوفير بيئة آمنة ومحفزة لنمو الأطفال وحمايتهم من جميع أشكال العنف.",
+      "slide3Title": "معاً من أجل مجتمع أفضل",
+      "slide3Subtitle": "نؤمن بأن التعاون المجتمعي هو الأساس لبناء مستقبل مشرق لأطفالنا وأسرنا.",
+      "learnAboutUs": "تعرف علينا",
+      "contactUs": "تواصل معنا",
+      "sliderTitle": "مقتطفات من نشاطاتنا"
+    },
+    "targetSectors": {
+      "title": "القطاعات المستهدفة",
+      "subtitle": "نعمل على خدمة مختلف شرائح المجتمع من خلال برامج متخصصة.",
+      "womenSector": {
+        "title": "قطاع المرأة",
+        "economicEmpowerment": "التمكين الاقتصادي للمرأة",
+        "literacyPrograms": "برامج محو الأمية",
+        "psychoSocialSupport": "الدعم النفسي والاجتماعي",
+        "legalAwareness": "التوعية القانونية والحقوقية",
+        "vocationalRehab": "التأهيل المهني والتدريب"
+      },
+      "childhoodSector": {
+        "title": "قطاع الطفولة",
+        "protectionFromViolence": "حماية الأطفال من العنف والإساءة",
+        "educationalPrograms": "برامج تعليمية وترفيهية",
+        "healthCare": "الرعاية الصحية والنفسية"
+      },
+      "youthSector": {
+        "title": "قطاع الشباب",
+        "leadershipSkills": "تنمية المهارات القيادية",
+        "vocationalTraining": "برامج التدريب المهني والتقني"
+      },
+      "elderlySector": {
+        "title": "قطاع كبار السن",
+        "comprehensiveSupport": "تقديم الدعم والرعاية الشاملة لكبار السن وتلبية احتياجاتهم الاجتماعية والنفسية والصحية."
+      }
+    },
+    "missionVision": {
+      "title": "رسالتنا ورؤيتنا",
+      "subtitle": "نعمل بإخلاص لتحقيق أهدافنا في خدمة المجتمع.",
+      "mission": {
+        "title": "رسالتنا",
+        "content": "تقديم يد العون والمساعدة لكافة الفئات المستهدفة من خلال برامج مبنية على أسس علمية بهدف مساعدتها على تجاوز ظروفها والاندماج في المجتمع."
+      },
+      "vision": {
+        "title": "رؤيتنا",
+        "content": "نحو طفولة آمنة ومجتمع خالٍ من العنف."
+      }
+    },
+    "statsCounter": {
+      "title": "إنجازاتنا بالأرقام",
+      "families": "أسرة",
+      "children": "طفل",
+      "women": "من النساء",
+      "activities": "نشاط"
+    },
+    "latestNews": {
+      "title": "آخر الأخبار والنشاطات",
+      "subtitle": "تابع أحدث أخبارنا ونشاطاتنا في خدمة المجتمع.",
+      "viewAllNews": "عرض جميع الأخبار"
+    }
+  },
+  "aboutPage": {
+    "metaTitle": "عن الجمعية",
+    "hero": {
+      "title": "عن الجمعية",
+      "tagline": "الطفولة والبراءة والامل بالبقاء"
+    },
+    "history": {
+      "foundedIn": "تأسست عام",
+      "name": "جمعية حماية الأسرة والطفولة",
+      "description": "جمعية حماية الأسرة والطفولة في إربد تأسست عام 1992 وتعمل على حماية الأسرة والطفولة من خلال مجموعة متكاملة من البرامج والمشاريع. تسعى الجمعية إلى تقديم خدمات متنوعة تشمل الرعاية الاجتماعية والنفسية والتدريب المهني والتمكين الاقتصادي للفئات الأكثر احتياجاً."
+    },
+    "missionVision": {
+      "title": "رسالتنا ورؤيتنا",
+      "mission": {
+        "title": "رسالتنا",
+        "content": "تقديم يد العون والمساعدة لكافة الفئات المستهدفة من خلال برامج مبنية على أسس علمية بهدف مساعدتها على تجاوز ظروفها والاندماج في المجتمع."
+      },
+      "vision": {
+        "title": "رؤيتنا",
+        "content": "نحو طفولة آمنة ومجتمع خالٍ من العنف."
+      }
+    },
+    "stats": {
+      "families": "أسرة",
+      "children": "طفل",
+      "women": "من النساء",
+      "activities": "نشاط"
+    },
+    "contactInfo": {
+      "title": "معلومات التواصل",
+      "address": "إربد، المملكة الأردنية الهاشمية"
+    }
+  },
+  "contactPage": {
+    "metaTitle": "اتصل بنا",
+    "hero": {
+      "title": "اتصل بنا",
+      "subtitle": "نسعد بتواصلكم معنا"
+    },
+    "info": {
+      "title": "معلومات التواصل",
+      "description": "يمكنكم التواصل معنا عبر أي من الوسائل التالية أو من خلال تعبئة نموذج التواصل.",
+      "phone": "الهاتف",
+      "email": "البريد الإلكتروني",
+      "address": "العنوان"
+    },
+    "form": {
+      "title": "أرسل رسالة",
+      "error": "تعذّر إرسال الرسالة. يُرجى المحاولة لاحقاً.",
+      "success": "تم إرسال رسالتك بنجاح. سنتواصل معك قريباً.",
+      "nameLabel": "الاسم",
+      "namePlaceholder": "أدخل اسمك الكامل",
+      "emailLabel": "البريد الإلكتروني",
+      "emailPlaceholder": "example@email.com",
+      "subjectLabel": "الموضوع",
+      "subjectPlaceholder": "موضوع الرسالة",
+      "messageLabel": "الرسالة",
+      "messagePlaceholder": "اكتب رسالتك هنا...",
+      "sending": "جاري الإرسال...",
+      "sendMessage": "إرسال الرسالة",
+      "clear": "مسح"
+    },
+    "validation": {
+      "nameRequired": "الاسم مطلوب",
+      "emailInvalid": "البريد الإلكتروني غير صالح",
+      "subjectRequired": "الموضوع مطلوب",
+      "messageMinLength": "الرسالة يجب أن تكون 10 أحرف على الأقل"
+    },
+    "confirmDialog": {
+      "title": "تأكيد مسح البيانات",
+      "description": "هل أنت متأكد من مسح جميع الحقول؟ لا يمكن التراجع عن هذا الإجراء.",
+      "confirm": "مسح الكل"
+    }
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "centers": "مراكز الجمعية",
+    "programs": "البرامج والمشاريع",
+    "news": "نشاطات وأخبار",
+    "about": "عن الجمعية",
+    "contact": "اتصل بنا",
+    "dashboard": "لوحة التحكم",
+    "societyName": "جمعية حماية الأسرة والطفولة",
+    "societyNameShort": "حماية الأسرة والطفولة",
+    "menu": "القائمة",
+    "mainMenu": "القائمة الرئيسية"
+  },
+  "footer": {
+    "foundedIn": "تأسست عام",
+    "quickLinks": "روابط سريعة",
+    "contactUs": "تواصل معنا",
+    "phone": "الهاتف",
+    "email": "البريد الإلكتروني",
+    "address": "العنوان",
+    "allRightsReserved": "جميع الحقوق محفوظة."
+  },
+  "newsPage": {
+    "metaTitle": "الأخبار والنشاطات",
+    "title": "الأخبار والنشاطات",
+    "subtitle": "تابع آخر أخبارنا ونشاطاتنا وبرامجنا",
+    "searchPlaceholder": "بحث عن مقال أو منشور...",
+    "searchBySlugPlaceholder": "ابحث بالـ slug (مثل: news-2026)",
+    "searchBySlugAria": "بحث بالـ slug",
+    "searchAria": "بحث في الأخبار",
+    "clearFilters": "مسح التصفية",
+    "noResults": "لا توجد نتائج مطابقة للتصفية الحالية",
+    "resultsCount": "عرض {count} من أصل {total} نتيجة",
+    "prev": "السابق",
+    "next": "التالي",
+    "allCategories": "كل التصنيفات",
+    "readMore": "اقرأ المزيد",
+    "share": "مشاركة",
+    "like": "إعجاب",
+    "breadcrumbs": {
+      "home": "الرئيسية",
+      "news": "نشاطات وأخبار الجمعية",
+      "tags": "الوسوم:"
+    },
+    "sidebar": {
+      "latestPosts": "احدث المنشورات",
+      "categories": "التصنيفات",
+      "newsBadge": "خبر",
+      "activityBadge": "نشاط",
+      "searching": "جاري البحث...",
+      "noSearchMatches": "لا توجد نتائج مطابقة لـ \"{search}\""
+    },
+    "comments": {
+      "title": "التعليقات",
+      "beFirst": "كن أول من يعلق",
+      "leaveComment": "اترك تعليقاً",
+      "emailDisclaimer": "لن يتم نشر عنوان بريدك الإلكتروني. الحقول الإلزامية مشار إليها بـ",
+      "commentLabel": "التعليق",
+      "commentPlaceholder": "اكتب تعليقك هنا...",
+      "nameLabel": "الاسم",
+      "emailLabel": "البريد الإلكتروني",
+      "rememberMe": "احفظ اسمي، بريدي الإلكتروني، والموقع الإلكتروني في هذا المتصفح",
+      "submit": "إرسال التعليق",
+      "submitting": "جاري الإرسال...",
+      "success": "تم إرسال تعليقك وسيُعرض بعد المراجعة",
+      "error": "تعذّر إرسال التعليق",
+      "clearConfirm": "هل أنت متأكد من مسح جميع الحقول؟",
+      "clear": "مسح",
+      "showMore": "عرض المزيد"
+    }
+  },
+  "authPage": {
+    "welcomeBack": "مرحباً بك مجدداً",
+    "signInPrompt": "الرجاء تسجيل الدخول للوصول إلى لوحة التحكم",
+    "continueWithGoogle": "المتابعة باستخدام Google",
+    "adminsOnly": "هذه الصفحة مخصصة فقط للمشرفين والمحررين في الجمعية",
+    "unauthorized": {
+      "title": "عذراً، غير مصرح لك بالدخول",
+      "description": "حسابك لا يملك الصلاحيات اللازمة (مشرف أو محرر) للوصول إلى لوحة التحكم. يرجى التواصل مع الإدارة إذا كنت تعتقد أن هذا خطأ.",
+      "backToHome": "العودة إلى الصفحة الرئيسية"
+    }
+  },
+  "notFound": {
+    "title": "الصفحة غير موجودة",
+    "description": "عذراً، الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    "backToHome": "العودة للرئيسية"
+  },
+  "chatbot": {
+    "goodMorning": "صباح الخير",
+    "goodEvening": "مساء الخير",
+    "howCanIHelp": "كيف يمكنني مساعدتك؟",
+    "liveChat": "المحادثة المباشرة",
+    "subtitle": "تحدث معنا لأي استفسار",
+    "startConversation": "ابدأ المحادثة",
+    "inputPlaceholder": "اكتب رسالتك هنا...",
+    "close": "إغلاق",
+    "suggestedFaq": "الأسئلة الشائعة المقترحة:",
+    "faq": {
+      "location": "أين يقع مقر الجمعية؟",
+      "locationLabel": "📍 أين يقع مقر الجمعية؟",
+      "donate": "كيف يمكنني التبرع للجمعية؟",
+      "donateLabel": "❤️ كيف يمكنني التبرع؟",
+      "about": "أخبرني عن الجمعية ونشاطاتها",
+      "aboutLabel": "ℹ️ أخبرني عن الجمعية"
+    }
+  },
+  "dashboardCategories": {
+    "title": "الفئات",
+    "addCategory": "إضافة فئة",
+    "editCategory": "تعديل الفئة",
+    "deleteCategory": "حذف الفئة",
+    "confirmDelete": "هل أنت متأكد من حذف هذه الفئة؟",
+    "tableHeaders": {
+      "name": "الاسم",
+      "description": "الوصف",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "statusActive": "نشط",
+    "statusInactive": "غير نشط",
+    "successCreate": "تم إنشاء الفئة بنجاح.",
+    "successUpdate": "تم تعديل الفئة بنجاح.",
+    "successDelete": "تم حذف الفئة بنجاح.",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+  },
+  "dashboardCenters": {
+    "title": "المراكز",
+    "addCenter": "إضافة مركز",
+    "editCenter": "تعديل مركز",
+    "deleteCenter": "حذف مركز",
+    "confirmDelete": "هل أنت متأكد من حذف هذا المركز؟",
+    "tableHeaders": {
+      "name": "الاسم",
+      "location": "الموقع",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "statusActive": "نشط",
+    "statusInactive": "غير نشط",
+    "successCreate": "تم إنشاء المركز بنجاح.",
+    "successUpdate": "تم تعديل المركز بنجاح.",
+    "successDelete": "تم حذف المركز بنجاح.",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+  },
+  "dashboardComments": {
+    "title": "التعليقات",
+    "approve": "الموافقة",
+    "reject": "رفض",
+    "delete": "حذف",
+    "confirmDelete": "هل أنت متأكد من حذف هذا التعليق؟",
+    "statusApproved": "موافق عليه",
+    "statusPending": "قيد الانتظار",
+    "statusRejected": "مرفوض",
+    "successApprove": "تمت الموافقة على التعليق.",
+    "successReject": "تم رفض التعليق.",
+    "successDelete": "تم حذف التعليق.",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+  },
+  "dashboardDataManagement": {
+    "title": "إدارة البيانات",
+    "import": "استيراد",
+    "export": "تصدير",
+    "importSuccess": "تم استيراد البيانات بنجاح.",
+    "exportSuccess": "تم تصدير البيانات بنجاح.",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+  },
+  "dashboardGallery": {
+    "title": "المعرض",
+    "upload": "رفع صورة",
+    "delete": "حذف صورة",
+    "confirmDelete": "هل أنت متأكد من حذف هذه الصورة؟",
+    "successUpload": "تم رفع الصورة بنجاح.",
+    "successDelete": "تم حذف الصورة بنجاح.",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+  },
+  "dashboardPosts": {
+    "title": "المشاركات",
+    "addPost": "إضافة مشاركة",
+    "editPost": "تعديل مشاركة",
+    "deletePost": "حذف مشاركة",
+    "confirmDelete": "هل أنت متأكد من حذف هذه المشاركة؟",
+    "statusPublished": "منشور",
+    "statusDraft": "مسودة",
+    "successCreate": "تم إنشاء المشاركة بنجاح.",
+    "successUpdate": "تم تعديل المشاركة بنجاح.",
+    "successDelete": "تم حذف المشاركة بنجاح.",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+  },
+  "dashboardPrograms": {
+    "title": "البرامج",
+    "addProgram": "إضافة برنامج",
+    "editProgram": "تعديل برنامج",
+    "deleteProgram": "حذف برنامج",
+    "confirmDelete": "هل أنت متأكد من حذف هذا البرنامج؟",
+    "statusActive": "نشط",
+    "statusInactive": "غير نشط",
+    "successCreate": "تم إنشاء البرنامج بنجاح.",
+    "successUpdate": "تم تعديل البرنامج بنجاح.",
+    "successDelete": "تم حذف البرنامج بنجاح.",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+  },
+  "dashboardSettings": {
+    "title": "الإعدادات",
+    "save": "حفظ الإعدادات",
+    "reset": "إعادة تعيين",
+    "success": "تم حفظ الإعدادات بنجاح.",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+  },
+  "dashboardStatistics": {
+    "title": "الإحصائيات",
+    "viewReport": "عرض التقرير",
+    "download": "تحميل CSV",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+  },
+  "dashboardUsers": {
+    "title": "المستخدمون",
+    "addUser": "إضافة مستخدم",
+    "editUser": "تعديل مستخدم",
+    "deleteUser": "حذف مستخدم",
+    "confirmDelete": "هل أنت متأكد من حذف هذا المستخدم؟",
+    "roleAdmin": "مشرف",
+    "roleEditor": "محرر",
+    "roleViewer": "مستعرض",
+    "successCreate": "تم إنشاء المستخدم بنجاح.",
+    "successUpdate": "تم تعديل المستخدم بنجاح.",
+    "successDelete": "تم حذف المستخدم بنجاح.",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+  }
+}
