@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Cairo } from 'next/font/google'
 import './globals.css'
-import { ConditionalHeader, ConditionalFooter } from '@/components/layout/ConditionalLayout'
+import { ConditionalHeader, ConditionalFooter,ConditionalChatBot } from '@/components/layout/ConditionalLayout'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 import { ScrollToTop } from '@/components/shared/ScrollToTop'
 import { Toaster } from 'sonner'
@@ -37,6 +37,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <ConditionalFooter />
           <ScrollToTop />
           <Toaster richColors position="top-center" dir="rtl" />
+          <ConditionalChatBot />
         </SessionProvider>
       </body>
     </html>
