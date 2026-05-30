@@ -5,6 +5,7 @@ import { ConditionalHeader, ConditionalFooter,ConditionalChatBot } from '@/compo
 import { SessionProvider } from '@/components/providers/SessionProvider'
 import { ScrollToTop } from '@/components/shared/ScrollToTop'
 import { Toaster } from 'sonner'
+import { NextIntlClientProvider } from 'next-intl'
 
 const cairo = Cairo({
   subsets: ['arabic'],
@@ -31,6 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="ar" dir="rtl" className={cairo.variable} suppressHydrationWarning data-scroll-behavior="smooth">
       <body className="bg-white text-[#333] antialiased" style={{ fontFamily: 'var(--font-cairo), sans-serif' }}>
+        <NextIntlClientProvider>         
         <SessionProvider>
           <ConditionalHeader programs={programs} centers={centers} />
           <main className="min-h-screen">{children}</main>
@@ -39,6 +41,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Toaster richColors position="top-center" dir="rtl" />
           <ConditionalChatBot />
         </SessionProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   )

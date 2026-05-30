@@ -1,24 +1,34 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import createIntlMiddleware from 'next-intl/middleware'
+import { routing } from './i18n/routing'
+import { getToken } from 'next-auth/jwt'
 
-export function proxy(request: NextRequest) {
-  // Check for the next-auth session token cookie
-  const sessionToken =
-    request.cookies.get('next-auth.session-token') ??
-    request.cookies.get('__Secure-next-auth.session-token')
+const handleI18nRouting = createIntlMiddleware(routing)
 
-  if (!sessionToken) {
-    // Redirect unauthenticated users to the sign-in page
-    const signInUrl = new URL('/auth/signin', request.url)
-    signInUrl.searchParams.set('callbackUrl', request.nextUrl.pathname)
-    return NextResponse.redirect(signInUrl)
+export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  const isProtectedRoute = /^\/([a-z]{2}\/)?dashboard/.test(pathname)
+
+  if (isProtectedRoute) {
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET
+    })
+
+    if (!token) {
+      const currentLocale = request.cookies.get('NEXT_LOCALE')?.value || routing.defaultLocale
+      const signInUrl = new URL(`/${currentLocale}/auth/signin`, request.url)
+
+      signInUrl.searchParams.set('callbackUrl', request.url)
+      return NextResponse.redirect(signInUrl)
+    }
   }
 
-  return NextResponse.next()
+  return handleI18nRouting(request)
 }
 
-// Only protect dashboard routes — do NOT intercept API routes, static files,
-// auth pages, or the NextAuth callback endpoints.
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 }
