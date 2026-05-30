@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import logo from '@/app/icon.png'
 import type { SiteNavItem } from '@/lib/site-nav'
+import { LanguageSwitcher } from './LanguageSwitcher'
 
 export function NavbarMobile({ navItems = [] }: { navItems?: SiteNavItem[] }) {
   const scrolled = useScrollTop(80)
@@ -38,7 +39,9 @@ export function NavbarMobile({ navItems = [] }: { navItems?: SiteNavItem[] }) {
         </Link>
 
         {/* Mobile Menu */}
-        <Sheet open={open} onOpenChange={setOpen}>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher />
+          <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger
             render={
               <button
@@ -111,6 +114,7 @@ export function NavbarMobile({ navItems = [] }: { navItems?: SiteNavItem[] }) {
             </div>
           </SheetContent>
         </Sheet>
+        </div>
       </div>
     </header>
   )

@@ -11,6 +11,7 @@ import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import logo from '@/app/icon.png'
+import { LanguageSwitcher } from './LanguageSwitcher'
 
 import type { Post } from '@/types/post'
 
@@ -120,6 +121,9 @@ export function Navbar({ programs = [], centers = [] }: { programs?: Post[], cen
           ))}
 
         </nav>
+
+        {/* Language Switcher */}
+        <LanguageSwitcher />
       </div>
     </header>
   )
