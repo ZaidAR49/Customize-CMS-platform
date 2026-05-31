@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Heart } from 'lucide-react'
 import { FaFacebookF, FaLinkedinIn, FaInstagram, FaXTwitter } from 'react-icons/fa6'
 import { formatSiteNumber } from '@/lib/date-format'
+import { useTranslations } from 'next-intl'
 
 interface PostShareBarProps {
   postId: string
@@ -16,6 +17,7 @@ export function PostShareBar({ postId, postUrl, postTitle, initialLikes }: PostS
   const [likes, setLikes] = useState(initialLikes)
   const [liked, setLiked] = useState(false)
   const [pending, setPending] = useState(false)
+  const t = useTranslations('newsPage')
 
   const encodedUrl = encodeURIComponent(postUrl)
   const encodedTitle = encodeURIComponent(postTitle)
@@ -61,7 +63,7 @@ export function PostShareBar({ postId, postUrl, postTitle, initialLikes }: PostS
   return (
     <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-y border-[#e0e0e0] py-5">
       <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-(--fcps-gray-text)">مشاركة</span>
+        <span className="text-sm font-medium text-(--fcps-gray-text)">{t('share')}</span>
         <div className="flex items-center gap-2">
           {shareLinks.map(({ label, href, icon: Icon }) => (
             <a
@@ -83,7 +85,7 @@ export function PostShareBar({ postId, postUrl, postTitle, initialLikes }: PostS
         onClick={handleLike}
         disabled={liked || pending}
         className="flex items-center gap-2 text-sm text-[#0073aa] transition-colors hover:text-[#005580] disabled:opacity-60"
-        aria-label="إعجاب"
+        aria-label={t('like')}
       >
         <Heart className={`h-5 w-5 ${liked ? 'fill-red-500 text-red-500' : 'text-red-400'}`} />
         <span className="font-medium tabular-nums">{formatSiteNumber(likes)}</span>

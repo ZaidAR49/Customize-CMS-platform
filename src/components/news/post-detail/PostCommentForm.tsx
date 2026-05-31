@@ -105,7 +105,7 @@ export function PostCommentForm({ postId }: PostCommentFormProps) {
             required
             rows={6}
             disabled={pending}
-            className="resize-y"
+            className="resize-y min-h-[160px] text-base p-4"
             placeholder={t('commentPlaceholder')}
           />
         </div>
@@ -121,6 +121,7 @@ export function PostCommentForm({ postId }: PostCommentFormProps) {
               onChange={(e) => setName(e.target.value)}
               required
               disabled={pending}
+              className="h-12 text-base px-4"
             />
           </div>
           <div className="grid gap-2">
@@ -135,7 +136,7 @@ export function PostCommentForm({ postId }: PostCommentFormProps) {
               required
               disabled={pending}
               dir="ltr"
-              className="text-left"
+              className="h-12 text-base px-4 text-left"
             />
           </div>
         </div>

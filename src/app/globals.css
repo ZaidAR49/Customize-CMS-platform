@@ -267,7 +267,6 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
   gap: 48px;
-  direction: rtl;
 }
 
 @media (max-width: 768px) {
@@ -285,7 +284,7 @@
 .post-html-content {
   color: #333333;
   line-height: 1.8;
-  text-align: right;
+  text-align: start;
   font-size: 1.125rem;
 }
 
@@ -533,7 +532,6 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  direction: rtl;
 }
 
 .chat-quick-replies-title {

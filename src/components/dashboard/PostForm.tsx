@@ -407,6 +407,90 @@ export function PostForm({
           </div>
         </div>
 
+        <div className="grid gap-2">
+          <Label htmlFor="post-tags-en-input">{t('tagsEn')}</Label>
+          <p className="text-xs text-gray-500">
+            {t('tagsEnDesc')}
+          </p>
+          <div className="flex flex-wrap gap-2 p-2 border rounded-lg bg-gray-50/50 focus-within:bg-white focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-100 transition-all duration-200">
+            {/* English Tag Pills */}
+            {(value.tags_en || []).map((tag, idx) => (
+              <span
+                key={`en-${tag}-${idx}`}
+                className="inline-flex items-center gap-1.5 rounded-md bg-green-50 border border-green-100/60 px-2.5 py-0.5 text-xs font-medium text-green-700 animate-in fade-in zoom-in-95 duration-150 flex-row-reverse"
+              >
+                <span>{tag}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextTags = (value.tags_en || []).filter((_, i) => i !== idx)
+                    onChange('tags_en', nextTags)
+                  }}
+                  disabled={pending}
+                  className="rounded-full p-0.5 hover:bg-green-100/80 text-green-600 hover:text-green-800 transition-colors"
+                  aria-label={t('removeTag', { tag })}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-3 w-3"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                </button>
+              </span>
+            ))}
+
+            {/* English Tag Input */}
+            <input
+              id="post-tags-en-input"
+              type="text"
+              dir="ltr"
+              placeholder={(value.tags_en || []).length === 0 ? t('tagsEnPlaceholder') : t('tagsAdd')}
+              disabled={pending}
+              className="flex-1 min-w-[120px] bg-transparent text-sm outline-none border-none py-0.5 px-1 placeholder:text-gray-400 text-left"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  const target = e.currentTarget
+                  const val = target.value.trim().replace(/[،,]/g, '')
+                  if (val && !(value.tags_en || []).includes(val)) {
+                    onChange('tags_en', [...(value.tags_en || []), val])
+                    target.value = ''
+                  }
+                }
+              }}
+              onInput={(e) => {
+                const target = e.currentTarget
+                const val = target.value
+                if (val.endsWith(',') || val.endsWith('،')) {
+                  const tag = val.slice(0, -1).trim()
+                  if (tag && !(value.tags_en || []).includes(tag)) {
+                    onChange('tags_en', [...(value.tags_en || []), tag])
+                  }
+                  target.value = ''
+                }
+              }}
+              onBlur={(e) => {
+                const target = e.currentTarget
+                const val = target.value.trim().replace(/[،,]/g, '')
+                if (val && !(value.tags_en || []).includes(val)) {
+                  onChange('tags_en', [...(value.tags_en || []), val])
+                  target.value = ''
+                }
+              }}
+            />
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="grid gap-2">
             <Label htmlFor="post-excerpt-ar">{t('excerptAr')}</Label>

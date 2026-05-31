@@ -133,19 +133,27 @@ export function PostContent({
               dangerouslySetInnerHTML={{ __html: postBodyHtml }}
             />
 
-            {post.tags && post.tags.length > 0 && (
-              <div className="mt-8 mb-6 flex flex-wrap gap-2 items-center border-t border-[#f0f0f0] pt-6">
-                <span className={`text-sm font-medium text-gray-500 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{t('breadcrumbs.tags')}</span>
-                {post.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-blue-50/70 border border-blue-100/50 px-3 py-1 text-xs font-medium text-blue-600 transition-all hover:bg-blue-50 hover:border-blue-200"
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            )}
+            {(() => {
+              const tagsAr = post.tags ?? []
+              const tagsEn = post.tags_en ?? []
+              const displayTags =
+                locale === 'ar'
+                  ? tagsAr.length > 0 ? tagsAr : tagsEn
+                  : tagsEn.length > 0 ? tagsEn : tagsAr
+              return displayTags.length > 0 ? (
+                <div className="mt-8 mb-6 flex flex-wrap gap-2 items-center border-t border-[#f0f0f0] pt-6">
+                  <span className={`text-sm font-medium text-gray-500 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{t('breadcrumbs.tags')}</span>
+                  {displayTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-blue-50/70 border border-blue-100/50 px-3 py-1 text-xs font-medium text-blue-600 transition-all hover:bg-blue-50 hover:border-blue-200"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              ) : null
+            })()}
 
             <PostShareBar
               postId={post.id ?? ''}

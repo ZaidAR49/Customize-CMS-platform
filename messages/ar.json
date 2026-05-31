@@ -1,7 +1,8 @@
 {
-  "test": {
-    "title": "مرحبا من العربية",
-    "description": "الوصف من العربية"
+  "notFoundPage": {
+    "title": "الصفحة غير موجودة",
+    "description": "عذراً، الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    "backToHome": "العودة إلى الرئيسية"
   },
   "homePage": {
     "heroSlider": {
@@ -238,6 +239,7 @@
     "inputPlaceholder": "اكتب رسالتك هنا...",
     "close": "إغلاق",
     "suggestedFaq": "الأسئلة الشائعة المقترحة:",
+    "maxLimitReached": "⚠️ لقد وصلت إلى الحد الأقصى من الرسائل (10). يرجى تحديث الصفحة لبدء محادثة جديدة.",
     "faq": {
       "location": "أين يقع مقر الجمعية؟",
       "locationLabel": "📍 أين يقع مقر الجمعية؟",
@@ -514,6 +516,9 @@
       "tagsPlaceholder": "مثال: نشاطات، أيتام، إنجازات...",
       "tagsAdd": "إضافة وسم...",
       "removeTag": "إزالة الوسم {tag}",
+      "tagsEn": "الوسوم الإنجليزية (English Tags)",
+      "tagsEnDesc": "أدخل الوسوم بالإنجليزية. تُستخدم عند عرض الموقع بالإنجليزية.",
+      "tagsEnPlaceholder": "e.g. activities, news, achievements...",
       "excerptAr": "الملخص (بالعربية)",
       "excerptEn": "الملخص (بالإنجليزية)",
       "contentAr": "المحتوى (بالعربية)",
@@ -721,20 +726,6 @@
     "deletingBtn": "جاري الحذف...",
     "finalDeleteBtn": "حذف نهائي",
     "download": "تحميل CSV",
-    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
-  },
-  "dashboardUsers": {
-    "title": "المستخدمون",
-    "addUser": "إضافة مستخدم",
-    "editUser": "تعديل مستخدم",
-    "deleteUser": "حذف مستخدم",
-    "confirmDelete": "هل أنت متأكد من حذف هذا المستخدم؟",
-    "roleAdmin": "مشرف",
-    "roleEditor": "محرر",
-    "roleViewer": "مستعرض",
-    "successCreate": "تم إنشاء المستخدم بنجاح.",
-    "successUpdate": "تم تعديل المستخدم بنجاح.",
-    "successDelete": "تم حذف المستخدم بنجاح.",
     "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
   },
   "dashboardOverview": {

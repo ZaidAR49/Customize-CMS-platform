@@ -71,15 +71,26 @@ export default function N8nChatbot() {
           button.type = "button";
           button.addEventListener("click", () => {
             const textarea = chatInput.querySelector("textarea");
-            const sendBtn = chatInput.querySelector('button[type="submit"]');
-            if (textarea && sendBtn) {
+            if (!textarea) return;
+
+            // Use the native setter so Vue's reactivity picks up the change
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+              HTMLTextAreaElement.prototype,
+              "value"
+            )?.set;
+
+            if (nativeInputValueSetter) {
+              nativeInputValueSetter.call(textarea, item.text);
+            } else {
               textarea.value = item.text;
-              textarea.dispatchEvent(new Event("input", { bubbles: true }));
-              // Small delay to let Vue/React catch the input value change before sending
-              setTimeout(() => {
-                sendBtn.dispatchEvent(new Event("click", { bubbles: true }));
-              }, 50);
             }
+
+            // Dispatch both input and change events for maximum framework compatibility
+            textarea.dispatchEvent(new Event("input", { bubbles: true }));
+            textarea.dispatchEvent(new Event("change", { bubbles: true }));
+
+            // Focus so the user can review then hit Enter/Send themselves
+            textarea.focus();
           });
           list.appendChild(button);
         });
@@ -89,6 +100,72 @@ export default function N8nChatbot() {
 
         // Inject the container right above the input box
         chatInput.parentNode?.insertBefore(container, chatInput);
+
+        // Watch for user messages: hide suggestions on first, enforce limit at 10
+        const MAX_MESSAGES = 10;
+        const limitMsg = t("maxLimitReached");
+
+        const enforceLimitAndHideSuggestions = new MutationObserver(() => {
+          // Lazy lookup — messagesList may not exist when quick-replies are injected
+          const messagesList = targetNode.querySelector(".chat-messages-list");
+          if (!messagesList) return;
+
+          const userMessages = messagesList.querySelectorAll(
+            ".chat-message.chat-message-from-user"
+          );
+
+          // Hide suggestions after the first user message
+          if (userMessages.length > 0 && container.isConnected) {
+            container.remove();
+          }
+
+          // Enforce the max message limit
+          if (userMessages.length >= MAX_MESSAGES) {
+            const textarea = chatInput.querySelector<HTMLTextAreaElement>("textarea");
+            const sendBtn = chatInput.querySelector<HTMLButtonElement>("button");
+
+            if (textarea && !textarea.disabled) {
+              textarea.disabled = true;
+              textarea.placeholder = limitMsg;
+              textarea.style.cursor = "not-allowed";
+              textarea.style.opacity = "0.5";
+            }
+            if (sendBtn && !sendBtn.disabled) {
+              sendBtn.disabled = true;
+              sendBtn.style.opacity = "0.4";
+              sendBtn.style.cursor = "not-allowed";
+            }
+
+            // Show a banner above the input if not already shown
+            const existingBanner = chatInput.parentNode?.querySelector(".chat-limit-banner");
+            if (!existingBanner) {
+              const banner = document.createElement("div");
+              banner.className = "chat-limit-banner";
+              banner.textContent = limitMsg;
+              Object.assign(banner.style, {
+                padding: "10px 14px",
+                margin: "8px 0 4px",
+                background: "#fff3cd",
+                border: "1px solid #ffc107",
+                borderRadius: "8px",
+                color: "#856404",
+                fontSize: "13px",
+                lineHeight: "1.5",
+                textAlign: "center",
+              });
+              chatInput.parentNode?.insertBefore(banner, chatInput);
+            }
+
+            enforceLimitAndHideSuggestions.disconnect();
+          }
+        });
+
+        // Observe the whole targetNode subtree so we catch messages regardless of
+        // when .chat-messages-list appears in the DOM
+        enforceLimitAndHideSuggestions.observe(targetNode, {
+          childList: true,
+          subtree: true,
+        });
       }
     });
 
@@ -97,10 +174,38 @@ export default function N8nChatbot() {
       subtree: true,
     });
 
+    // Close the chat window when the user clicks anywhere outside it.
+    // Guard: only act when the window is actually VISIBLE on screen.
+    // n8n keeps .chat-window in the DOM even when closed (CSS scale/opacity
+    // transition), so we check getBoundingClientRect().height instead of
+    // DOM presence to avoid triggering on an already-closed window.
+    const handleClickOutside = (e: MouseEvent) => {
+      const chatRoot = document.getElementById("n8n-chat");
+      if (!chatRoot) return;
+
+      // Find the chat window and verify it is visually open (has height > 0)
+      const chatWindow = chatRoot.querySelector<HTMLElement>(".chat-window");
+      if (!chatWindow) return;
+      if (chatWindow.getBoundingClientRect().height === 0) return;
+
+      // If the click landed inside the chat widget, do nothing
+      if (chatRoot.contains(e.target as Node)) return;
+
+      // Click was genuinely outside an open chat → close it
+      const toggleBtn = chatRoot.querySelector<HTMLButtonElement>(".chat-window-toggle");
+      if (toggleBtn) {
+        toggleBtn.click();
+      }
+    };
+
+    // Capture phase: fires before the widget's own handlers
+    document.addEventListener("click", handleClickOutside, true);
+
     return () => {
       observer.disconnect();
+      document.removeEventListener("click", handleClickOutside, true);
     };
   }, [greeting, t]);
 
   return <div id="n8n-chat" />;
-}
+}
