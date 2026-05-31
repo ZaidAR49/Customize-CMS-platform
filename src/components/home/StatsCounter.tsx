@@ -4,6 +4,7 @@ import { useCountUp } from '@/hooks/useCountUp'
 import type { OrgStats } from '@/types/organization'
 import { Users, Baby, Heart, Sparkles } from 'lucide-react'
 import { formatSiteNumber } from '@/lib/date-format'
+import { useTranslations } from 'next-intl'
 
 interface StatsCounterProps {
   stats: OrgStats
@@ -28,6 +29,8 @@ function StatItem({ target, label, icon: Icon }: { target: number; label: string
 }
 
 export function StatsCounter({ stats }: StatsCounterProps) {
+  const t = useTranslations('homePage.statsCounter')
+
   return (
     <section className="py-20 bg-gradient-to-l from-[#1b5e20] via-[#2e7d32] to-[#1b5e20] relative overflow-hidden">
       {/* Decorative background */}
@@ -42,15 +45,15 @@ export function StatsCounter({ stats }: StatsCounterProps) {
 
       <div className="container relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">إنجازاتنا بالأرقام</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('title')}</h2>
           <div className="mx-auto h-1 w-20 rounded-full bg-white/40" />
         </div>
 
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          <StatItem target={stats.families} label="أسرة" icon={Users} />
-          <StatItem target={stats.children} label="طفل" icon={Baby} />
-          <StatItem target={stats.women} label="من النساء" icon={Heart} />
-          <StatItem target={stats.activities} label="نشاط" icon={Sparkles} />
+          <StatItem target={stats.families} label={t('families')} icon={Users} />
+          <StatItem target={stats.children} label={t('children')} icon={Baby} />
+          <StatItem target={stats.women} label={t('women')} icon={Heart} />
+          <StatItem target={stats.activities} label={t('activities')} icon={Sparkles} />
         </div>
       </div>
     </section>

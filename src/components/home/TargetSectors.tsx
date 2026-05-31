@@ -1,51 +1,54 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { SectionTitle } from '@/components/shared/SectionTitle'
+import { getTranslations } from 'next-intl/server'
 
-const sectors = [
-  {
-    icon: '👩',
-    title: 'قطاع المرأة',
-    items: [
-      'التمكين الاقتصادي للمرأة',
-      'برامج محو الأمية',
-      'الدعم النفسي والاجتماعي',
-      'التوعية القانونية والحقوقية',
-      'التأهيل المهني والتدريب'
-    ]
-  },
-  {
-    icon: '🧒',
-    title: 'قطاع الطفولة',
-    items: [
-      'حماية الأطفال من العنف والإساءة',
-      'برامج تعليمية وترفيهية',
-      'الرعاية الصحية والنفسية'
-    ]
-  },
-  {
-    icon: '🧑',
-    title: 'قطاع الشباب',
-    items: [
-      'تنمية المهارات القيادية',
-      'برامج التدريب المهني والتقني'
-    ]
-  },
-  {
-    icon: '👴',
-    title: 'قطاع كبار السن',
-    items: [
-      'تقديم الدعم والرعاية الشاملة لكبار السن وتلبية احتياجاتهم الاجتماعية والنفسية والصحية'
-    ]
-  }
-]
+export async function TargetSectors() {
+  const t = await getTranslations('homePage.targetSectors')
 
-export function TargetSectors() {
+  const sectors = [
+    {
+      icon: '👩',
+      title: t('womenSector.title'),
+      items: [
+        t('womenSector.economicEmpowerment'),
+        t('womenSector.literacyPrograms'),
+        t('womenSector.psychoSocialSupport'),
+        t('womenSector.legalAwareness'),
+        t('womenSector.vocationalRehab'),
+      ],
+    },
+    {
+      icon: '🧒',
+      title: t('childhoodSector.title'),
+      items: [
+        t('childhoodSector.protectionFromViolence'),
+        t('childhoodSector.educationalPrograms'),
+        t('childhoodSector.healthCare'),
+      ],
+    },
+    {
+      icon: '🧑',
+      title: t('youthSector.title'),
+      items: [
+        t('youthSector.leadershipSkills'),
+        t('youthSector.vocationalTraining'),
+      ],
+    },
+    {
+      icon: '👴',
+      title: t('elderlySector.title'),
+      items: [
+        t('elderlySector.comprehensiveSupport'),
+      ],
+    },
+  ]
+
   return (
     <section className="py-20 bg-(--fcps-bg-soft)">
       <div className="container">
         <SectionTitle
-          title="القطاعات المستهدفة"
-          subtitle="نعمل على خدمة مختلف شرائح المجتمع من خلال برامج متخصصة"
+          title={t('title')}
+          subtitle={t('subtitle')}
         />
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">

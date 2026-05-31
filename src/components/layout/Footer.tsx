@@ -5,15 +5,20 @@ import { organizationService } from '@/lib/services/organization.service'
 
 import { FaFacebook, FaXTwitter, FaYoutube, FaInstagram } from 'react-icons/fa6'
 
-const quickLinks = [
-  { label: 'الرئيسية', href: '/' },
-  { label: 'عن الجمعية', href: '/about' },
-  { label: 'الأخبار والنشاطات', href: '/news' },
-  { label: 'اتصل بنا', href: '/contact' },
-]
+import { getTranslations, getLocale } from 'next-intl/server'
 
 export async function Footer() {
   const org = await organizationService.getOrganization()
+  const t = await getTranslations('footer')
+  const navT = await getTranslations('nav')
+  const locale = await getLocale()
+
+  const quickLinks = [
+    { label: navT('home'), href: '/' },
+    { label: navT('about'), href: '/about' },
+    { label: navT('news'), href: '/news' },
+    { label: navT('contact'), href: '/contact' },
+  ]
 
   // Safely extract social URLs from JSONB
   const social = (org?.social ?? {}) as Record<string, string>
@@ -28,20 +33,20 @@ export async function Footer() {
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white overflow-hidden border border-(--fcps-bg-soft) shadow-sm">
                 <img src="/images/logo.png" alt="Logo" width={40} height={40} className="object-contain" />
               </div>
-              <h3 className="text-lg font-bold">{org?.name_ar}</h3>
+              <h3 className="text-lg font-bold">{locale === 'ar' ? org?.name_ar : (org?.name_en || org?.name_ar)}</h3>
             </div>
             <p className="mb-3 text-sm text-gray-400">
-              تأسست عام {org?.founded_year}
+              {t('foundedIn')} {org?.founded_year}
             </p>
             <p className="text-sm leading-relaxed text-gray-300">
-              {org?.mission_ar}
+              {locale === 'ar' ? org?.mission_ar : (org?.mission_en || org?.mission_ar)}
             </p>
           </div>
 
           {/* Column 2: Quick Links */}
           <div>
             <h3 className="mb-4 text-lg font-bold text-(--fcps-primary-light)">
-              روابط سريعة
+              {t('quickLinks')}
             </h3>
             <ul className="space-y-2">
               {quickLinks.map((link) => (
@@ -60,7 +65,7 @@ export async function Footer() {
           {/* Column 3: Contact */}
           <div>
             <h3 className="mb-4 text-lg font-bold text-(--fcps-primary-light)">
-              تواصل معنا
+              {t('contactUs')}
             </h3>
             <div className="space-y-3 text-sm text-gray-300">
               <a href={`tel:${org?.phone}`} className="flex items-center gap-2 hover:text-(--fcps-primary-light) transition-colors">
@@ -73,7 +78,9 @@ export async function Footer() {
               </a>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-(--fcps-primary-light)" />
-                {(org?.metadata as Record<string, string>)?.address_ar || 'إربد، المملكة الأردنية الهاشمية'}
+                {(org?.metadata as Record<string, string>)?.[locale === 'ar' ? 'address_ar' : 'address_en'] || 
+                 (org?.metadata as Record<string, string>)?.address_ar || 
+                 (locale === 'ar' ? 'إربد، المملكة الأردنية الهاشمية' : 'Irbid, Hashemite Kingdom of Jordan')}
               </div>
             </div>
 
@@ -131,7 +138,7 @@ export async function Footer() {
 
         {/* Copyright */}
         <div className="text-center text-sm text-gray-500">
-          <p>© {new Date().getFullYear()} {org?.name_ar}. جميع الحقوق محفوظة.</p>
+          <p>© {new Date().getFullYear()} {locale === 'ar' ? org?.name_ar : (org?.name_en || org?.name_ar)}. {t('allRightsReserved')}</p>
         </div>
       </div>
     </footer>

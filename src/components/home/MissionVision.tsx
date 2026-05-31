@@ -1,18 +1,21 @@
 import { Target, Eye } from 'lucide-react'
 import { SectionTitle } from '@/components/shared/SectionTitle'
+import { getTranslations } from 'next-intl/server'
 
 interface MissionVisionProps {
   mission: string
   vision: string
 }
 
-export function MissionVision({ mission, vision }: MissionVisionProps) {
+export async function MissionVision({ mission, vision }: MissionVisionProps) {
+  const t = await getTranslations('homePage.missionVision')
+
   return (
     <section className="py-20 bg-white">
       <div className="container">
         <SectionTitle
-          title="رسالتنا ورؤيتنا"
-          subtitle="نعمل بإخلاص لتحقيق أهدافنا في خدمة المجتمع"
+          title={t('title')}
+          subtitle={t('subtitle')}
         />
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
@@ -22,10 +25,10 @@ export function MissionVision({ mission, vision }: MissionVisionProps) {
               <Target className="h-7 w-7" />
             </div>
             <h3 className="mb-4 text-2xl font-bold text-(--fcps-primary-dark)">
-              رسالتنا
+              {t('mission.title')}
             </h3>
             <p className="text-base leading-relaxed text-(--fcps-gray-text)">
-              {mission}
+              {mission || t('mission.content')}
             </p>
           </div>
 
@@ -35,10 +38,10 @@ export function MissionVision({ mission, vision }: MissionVisionProps) {
               <Eye className="h-7 w-7" />
             </div>
             <h3 className="mb-4 text-2xl font-bold text-(--fcps-primary-dark)">
-              رؤيتنا
+              {t('vision.title')}
             </h3>
             <p className="text-base leading-relaxed text-(--fcps-gray-text)">
-              {vision}
+              {vision || t('vision.content')}
             </p>
           </div>
         </div>
