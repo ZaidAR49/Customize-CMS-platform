@@ -10,7 +10,6 @@ import { dashboardNavItem } from '@/lib/site-nav'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
-import logo from '@/app/icon.png'
 import { LanguageSwitcher } from './LanguageSwitcher'
 
 import type { Post } from '@/types/post'
@@ -69,7 +68,7 @@ export function Navbar({ programs = [], centers = [] }: { programs?: Post[], cen
         {/* Logo + Name */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white transition-transform group-hover:scale-105 overflow-hidden border border-(--fcps-bg-soft) shadow-sm">
-            <Image src={logo} alt="Logo" width={48} height={48} className="object-cover" />
+            <img src="/images/logo.png" alt="Logo" width={48} height={48} className="object-contain" />
           </div>
           <span className="text-lg font-bold text-(--fcps-primary-dark)">
             جمعية حماية الأسرة والطفولة

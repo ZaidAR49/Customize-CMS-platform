@@ -23,6 +23,8 @@ export const metadata: Metadata = {
 
 import { postsService } from '@/lib/services/posts.service'
 
+import { Footer } from '@/components/layout/Footer'
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [programs, centers] = await Promise.all([
     postsService.getPosts('program', true),
@@ -36,7 +38,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <SessionProvider>
           <ConditionalHeader programs={programs} centers={centers} />
           <main className="min-h-screen">{children}</main>
-          <ConditionalFooter />
+          <ConditionalFooter>
+            <Footer />
+          </ConditionalFooter>
           <ScrollToTop />
           <Toaster richColors position="top-center" dir="rtl" />
           <ConditionalChatBot />

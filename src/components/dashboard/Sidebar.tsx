@@ -19,8 +19,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { signOut } from 'next-auth/react'
-import Image from 'next/image'
-import logo from '@/app/icon.png'
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
 
 const sidebarItems = [
   { label: 'لوحة التحكم', href: '/dashboard', icon: LayoutDashboard },
@@ -46,7 +45,7 @@ export function Sidebar() {
           className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-(--fcps-bg-soft) bg-white shadow-sm transition-opacity hover:opacity-90"
           title="الصفحة الرئيسية"
         >
-          <Image src={logo} alt="الشعار — الصفحة الرئيسية" width={40} height={40} className="object-cover" />
+          <img src="/images/logo.png" alt="الشعار — الصفحة الرئيسية" width={40} height={40} className="object-contain" />
         </Link>
         <div>
           <h2 className="text-sm font-bold text-(--fcps-dark)">لوحة التحكم</h2>
@@ -114,7 +113,10 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="border-t p-4">
+      <div className="border-t p-4 flex flex-col gap-3">
+        <div className="flex justify-start mb-20 m">
+          <LanguageSwitcher />
+        </div>
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
           className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-(--fcps-gray-text) transition-colors hover:bg-white hover:text-red-500"

@@ -1,4 +1,5 @@
-import { organization } from '@/data/organization'
+import { organizationService } from '@/lib/services/organization.service'
+import { organizationStatsService } from '@/lib/services/organization-stats.service'
 import { formatSiteNumber } from '@/lib/date-format'
 import { Card, CardContent } from '@/components/ui/card'
 import { SectionTitle } from '@/components/shared/SectionTitle'
@@ -7,7 +8,18 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'عن الجمعية' }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const [org, statsRows] = await Promise.all([
+    organizationService.getOrganization(),
+    organizationStatsService.getAllStats(),
+  ])
+
+  // Extract stats
+  const familiesStat = parseInt(statsRows.find(s => s.key === 'families')?.value || '0', 10)
+  const childrenStat = parseInt(statsRows.find(s => s.key === 'children')?.value || '0', 10)
+  const womenStat = parseInt(statsRows.find(s => s.key === 'women')?.value || '0', 10)
+  const activitiesStat = parseInt(statsRows.find(s => s.key === 'activities')?.value || '0', 10)
+
   return (
     <div>
       {/* Hero Banner */}
@@ -18,7 +30,7 @@ export default function AboutPage() {
         }} />
         <div className="container relative z-10 text-center">
           <h1 className="text-4xl md:text-5xl font-black text-white mb-4">عن الجمعية</h1>
-          <p className="text-lg text-white/80 max-w-2xl mx-auto">{organization.taglineAr}</p>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto">{org?.tagline_ar}</p>
         </div>
       </section>
 
@@ -28,13 +40,13 @@ export default function AboutPage() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 rounded-full bg-(--fcps-bg-soft) px-4 py-2 text-sm text-(--fcps-primary) mb-6">
               <Calendar className="h-4 w-4" />
-              تأسست عام {organization.foundedYear}
+              تأسست عام {org?.founded_year}
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-(--fcps-dark) mb-6">
-              {organization.nameAr}
+              {org?.name_ar}
             </h2>
             <p className="text-lg leading-relaxed text-(--fcps-gray-text)">
-              {organization.aboutAr}
+              {org?.about_ar}
             </p>
           </div>
         </div>
@@ -51,7 +63,7 @@ export default function AboutPage() {
                   <Target className="h-7 w-7" />
                 </div>
                 <h3 className="mb-3 text-xl font-bold text-(--fcps-primary-dark)">رسالتنا</h3>
-                <p className="leading-relaxed text-(--fcps-gray-text)">{organization.missionAr}</p>
+                <p className="leading-relaxed text-(--fcps-gray-text)">{org?.mission_ar}</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-(--fcps-shadow-card)">
@@ -60,7 +72,7 @@ export default function AboutPage() {
                   <Eye className="h-7 w-7" />
                 </div>
                 <h3 className="mb-3 text-xl font-bold text-(--fcps-primary-dark)">رؤيتنا</h3>
-                <p className="leading-relaxed text-(--fcps-gray-text)">{organization.visionAr}</p>
+                <p className="leading-relaxed text-(--fcps-gray-text)">{org?.vision_ar}</p>
               </CardContent>
             </Card>
           </div>
@@ -75,28 +87,28 @@ export default function AboutPage() {
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 transition-transform group-hover:scale-110">
                 <Users className="h-7 w-7 text-white/90" />
               </div>
-              <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(organization.stats.families)}</div>
+              <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(familiesStat)}</div>
               <div className="mt-2 text-white/80">أسرة</div>
             </div>
             <div className="group">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 transition-transform group-hover:scale-110">
                 <Baby className="h-7 w-7 text-white/90" />
               </div>
-              <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(organization.stats.children)}</div>
+              <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(childrenStat)}</div>
               <div className="mt-2 text-white/80">طفل</div>
             </div>
             <div className="group">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 transition-transform group-hover:scale-110">
                 <Heart className="h-7 w-7 text-white/90" />
               </div>
-              <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(organization.stats.women)}</div>
+              <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(womenStat)}</div>
               <div className="mt-2 text-white/80">من النساء</div>
             </div>
             <div className="group">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 transition-transform group-hover:scale-110">
                 <Sparkles className="h-7 w-7 text-white/90" />
               </div>
-              <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(organization.stats.activities)}</div>
+              <div className="text-4xl md:text-5xl font-black">{formatSiteNumber(activitiesStat)}</div>
               <div className="mt-2 text-white/80">نشاط</div>
             </div>
           </div>
@@ -110,15 +122,15 @@ export default function AboutPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-3 rounded-lg bg-(--fcps-bg-soft) p-4">
               <Phone className="h-5 w-5 text-(--fcps-primary)" />
-              <span dir="ltr">{organization.phone}</span>
+              <span dir="ltr">{org?.phone}</span>
             </div>
             <div className="flex items-center gap-3 rounded-lg bg-(--fcps-bg-soft) p-4">
               <Mail className="h-5 w-5 text-(--fcps-primary)" />
-              <span>{organization.email}</span>
+              <span>{org?.email}</span>
             </div>
             <div className="flex items-center gap-3 rounded-lg bg-(--fcps-bg-soft) p-4">
               <MapPin className="h-5 w-5 text-(--fcps-primary)" />
-              <span>{organization.addressAr}</span>
+              <span>{(org?.metadata as Record<string, string>)?.address_ar || 'إربد، المملكة الأردنية الهاشمية'}</span>
             </div>
           </div>
         </div>

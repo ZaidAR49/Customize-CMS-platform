@@ -1,7 +1,6 @@
 'use client'
 
 import { signIn } from 'next-auth/react'
-import { Shield } from 'lucide-react'
 import { useState } from 'react'
 import { FaGoogle } from 'react-icons/fa6'
 import { cn } from '@/lib/utils'
@@ -18,8 +17,8 @@ export default function SignInPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-(--fcps-gray-light) px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg border border-(--fcps-bg-soft) text-center animate-in fade-in zoom-in-95 duration-500">
         <div className="flex justify-center mb-6">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-(--fcps-primary) text-white shadow-md">
-            <Shield className="h-8 w-8" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white overflow-hidden border border-(--fcps-bg-soft) shadow-md">
+            <img src="/images/logo.png" alt="Logo" width={64} height={64} className="object-contain" />
           </div>
         </div>
         

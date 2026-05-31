@@ -1,11 +1,11 @@
 import Link from 'next/link'
-import { Shield, Home } from 'lucide-react'
+import { Home } from 'lucide-react'
 
 export default function NotFound() {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
-      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-(--fcps-bg-soft)">
-        <Shield className="h-10 w-10 text-(--fcps-primary)" />
+      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white overflow-hidden border border-(--fcps-bg-soft) shadow-sm">
+        <img src="/images/logo.png" alt="Logo" width={80} height={80} className="object-contain" />
       </div>
       <h1 className="mb-2 text-6xl font-black text-(--fcps-primary)">404</h1>
       <h2 className="mb-4 text-2xl font-bold text-(--fcps-dark)">الصفحة غير موجودة</h2>

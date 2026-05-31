@@ -7,7 +7,6 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/s
 import { Menu, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
-import logo from '@/app/icon.png'
 import type { SiteNavItem } from '@/lib/site-nav'
 import { LanguageSwitcher } from './LanguageSwitcher'
 
@@ -31,7 +30,7 @@ export function NavbarMobile({ navItems = [] }: { navItems?: SiteNavItem[] }) {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white overflow-hidden border border-(--fcps-bg-soft) shadow-sm">
-            <Image src={logo} alt="Logo" width={36} height={36} className="object-cover" />
+            <img src="/images/logo.png" alt="Logo" width={36} height={36} className="object-cover" />
           </div>
           <span className="text-sm font-bold text-(--fcps-primary-dark)">
             حماية الأسرة والطفولة
@@ -59,7 +58,7 @@ export function NavbarMobile({ navItems = [] }: { navItems?: SiteNavItem[] }) {
               <div className="flex items-center justify-between border-b px-4 py-4">
                 <div className="flex items-center gap-2">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white overflow-hidden border border-(--fcps-bg-soft) shadow-sm">
-                    <Image src={logo} alt="Logo" width={36} height={36} className="object-cover" />
+                    <img src="/images/logo.png" alt="Logo" width={36} height={36} className="object-contain" />
                   </div>
                   <span className="text-sm font-bold text-(--fcps-primary-dark)">القائمة</span>
                 </div>
