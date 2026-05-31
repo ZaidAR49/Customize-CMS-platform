@@ -16,6 +16,7 @@ import {
   HardDriveDownload,
   ShieldCheck,
 } from 'lucide-react'
+import { useTranslations, useLocale } from 'next-intl'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Status = 'idle' | 'loading' | 'success' | 'error'
@@ -27,10 +28,13 @@ interface OpState {
 }
 
 const IDLE: OpState = { status: 'idle', message: '' }
-const CONFIRM_PHRASE = 'أوافق'
 
 // ─── Root component ───────────────────────────────────────────────────────────
 export function DataManagementClient() {
+  const t = useTranslations('dashboardDataManagement')
+  const locale = useLocale()
+  const CONFIRM_PHRASE = t('dialogConfirmPhrase')
+
   const [backup, setBackup] = useState<OpState>(IDLE)
   const [restore, setRestore] = useState<OpState>(IDLE)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -44,12 +48,12 @@ export function DataManagementClient() {
 
   // ── Backup ──────────────────────────────────────────────────────────────────
   async function handleBackup() {
-    setBackup({ status: 'loading', message: 'جارٍ تصدير البيانات…' })
+    setBackup({ status: 'loading', message: t('backupProgress') })
     try {
       const res = await fetch('/api/data-management/backup')
       if (!res.ok) {
         const b = await res.json().catch(() => ({}))
-        throw new Error(b.error || `خطأ ${res.status}`)
+        throw new Error(b.error || `Error ${res.status}`)
       }
       const data = await res.json()
 
@@ -64,9 +68,9 @@ export function DataManagementClient() {
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
 
-      setBackup({ status: 'success', message: 'تم تصدير النسخة الاحتياطية وحفظها بنجاح.' })
+      setBackup({ status: 'success', message: t('backupSuccess') })
     } catch (err: any) {
-      setBackup({ status: 'error', message: err.message || 'فشل في تصدير البيانات.' })
+      setBackup({ status: 'error', message: err.message || t('backupError') })
     }
   }
 
@@ -92,13 +96,13 @@ export function DataManagementClient() {
 
   async function executeRestore(mode: RestoreMode) {
     if (!selectedFile) return
-    setRestore({ status: 'loading', message: 'جارٍ التحقق من الملف واستعادة البيانات…' })
+    setRestore({ status: 'loading', message: t('restoreProgress') })
 
     let parsed: any
     try {
       parsed = JSON.parse(await selectedFile.text())
     } catch {
-      setRestore({ status: 'error', message: 'الملف المرفوع ليس JSON صالحاً.' })
+      setRestore({ status: 'error', message: t('restoreInvalidJson') })
       return
     }
 
@@ -114,18 +118,18 @@ export function DataManagementClient() {
       if (res.status === 207) {
         setRestore({
           status: 'error',
-          message: `اكتملت الاستعادة جزئياً مع أخطاء:\n${(body.details as string[]).join('\n')}`,
+          message: `${t('restorePartial')}\n${(body.details as string[]).join('\n')}`,
         })
         return
       }
 
-      if (!res.ok) throw new Error(body.error || `خطأ ${res.status}`)
+      if (!res.ok) throw new Error(body.error || `Error ${res.status}`)
 
-      setRestore({ status: 'success', message: 'تمت استعادة البيانات بنجاح.' })
+      setRestore({ status: 'success', message: t('restoreSuccess') })
       setSelectedFile(null)
       if (fileInputRef.current) fileInputRef.current.value = ''
     } catch (err: any) {
-      setRestore({ status: 'error', message: err.message || 'فشل في استعادة البيانات.' })
+      setRestore({ status: 'error', message: err.message || t('restoreError') })
     }
   }
 
@@ -135,7 +139,7 @@ export function DataManagementClient() {
       {showWipeDialog && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-          dir="rtl"
+          dir={locale === 'ar' ? 'rtl' : 'ltr'}
         >
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
             {/* Icon + heading */}
@@ -144,19 +148,19 @@ export function DataManagementClient() {
                 <AlertTriangle className="h-5 w-5 text-red-600" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-gray-900">تحذير: سيتم حذف جميع البيانات</h3>
-                <p className="text-xs text-gray-500">هذا الإجراء لا يمكن التراجع عنه</p>
+                <h3 className="text-base font-bold text-gray-900">{t('dialogWarningTitle')}</h3>
+                <p className="text-xs text-gray-500">{t('dialogWarningSubtitle')}</p>
               </div>
             </div>
 
             <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm leading-relaxed text-red-700">
-              سيتم <strong>حذف جميع السجلات الحالية</strong> من قاعدة البيانات (المقالات، التعليقات، التصنيفات،
-              معلومات المنظمة، الإحصاءات) ثم إعادة تعبئتها من ملف النسخة الاحتياطية. لا يمكن التراجع عن هذه
-              العملية.
+              {t('dialogWarningDesc')}
             </p>
 
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              اكتب <span className="font-bold text-red-600">{CONFIRM_PHRASE}</span> للمتابعة
+              {t.rich('dialogConfirmLabel', {
+                 phrase: () => <span className="font-bold text-red-600">{CONFIRM_PHRASE}</span>
+              })}
             </label>
             <input
               type="text"
@@ -174,13 +178,13 @@ export function DataManagementClient() {
                 className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Trash2 className="h-4 w-4" />
-                حذف وإعادة الاستعادة
+                {t('restoreBtnWipe')}
               </button>
               <button
                 onClick={() => setShowWipeDialog(false)}
                 className="flex-1 rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
               >
-                إلغاء
+                {t('dialogCancel')}
               </button>
             </div>
           </div>
@@ -188,24 +192,22 @@ export function DataManagementClient() {
       )}
 
       {/* ── Main layout ── */}
-      <div className="space-y-6" dir="rtl">
+      <div className="space-y-6" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
         {/* Page header */}
         <div className="flex items-center gap-3 border-b border-gray-100 pb-5">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-(--fcps-primary)">
             <DatabaseBackup className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-(--fcps-dark)">إدارة البيانات</h2>
-            <p className="text-xs text-(--fcps-gray-text)">احتياطي البيانات واستعادتها</p>
+            <h2 className="text-xl font-bold text-(--fcps-dark)">{t('title')}</h2>
+            <p className="text-xs text-(--fcps-gray-text)">{t('subtitle')}</p>
           </div>
         </div>
 
         {/* Info strip */}
         <div className="flex items-start gap-2.5 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-xs text-gray-500">
           <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-400" />
-          <span>
-            يشمل الاحتياطي: المستخدمين · التصنيفات · المقالات · التعليقات · معلومات المنظمة · الإحصاءات
-          </span>
+          <span>{t('info')}</span>
         </div>
 
         {/* ── Two-column grid ── */}
@@ -213,12 +215,12 @@ export function DataManagementClient() {
         {/* ── Backup section ── */}
         <Section
           icon={<HardDriveDownload className="h-4 w-4" />}
-          title="تصدير نسخة احتياطية"
-          subtitle="تصدير كامل لقاعدة البيانات كملف JSON"
+          title={t('backupTitle')}
+          subtitle={t('backupSubtitle')}
+          locale={locale}
         >
           <p className="mb-4 text-sm leading-relaxed text-gray-500">
-            انقر على الزر أدناه لتنزيل ملف JSON يحتوي على جميع سجلات قاعدة البيانات. احتفظ بهذا الملف في
-            مكان آمن واستخدمه عند الحاجة لاستعادة البيانات.
+            {t('backupDesc')}
           </p>
 
           <StatusBanner state={backup} />
@@ -234,39 +236,42 @@ export function DataManagementClient() {
             ) : (
               <Download className="h-4 w-4" />
             )}
-            {backup.status === 'loading' ? 'جارٍ التصدير…' : 'تصدير النسخة الاحتياطية'}
+            {backup.status === 'loading' ? t('backupLoading') : t('backupBtn')}
           </button>
         </Section>
 
         {/* ── Restore section ── */}
         <Section
           icon={<RefreshCw className="h-4 w-4" />}
-          title="استعادة البيانات"
-          subtitle="رفع ملف نسخة احتياطية (.json) لإعادة البيانات"
+          title={t('restoreTitle')}
+          subtitle={t('restoreSubtitle')}
+          locale={locale}
         >
           {/* Mode selector */}
           <div className="mb-5">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
-              وضع الاستعادة
+              {t('restoreModeTitle')}
             </p>
             <div className="grid grid-cols-2 gap-3">
               <ModeCard
                 active={restoreMode === 'merge'}
                 onClick={() => setRestoreMode('merge')}
                 icon={<ShieldCheck className="h-4 w-4" />}
-                title="دمج البيانات"
-                description="تجاهل السجلات المكررة وإضافة الجديدة فقط"
+                title={t('mergeTitle')}
+                description={t('mergeDesc')}
                 accentClass="border-(--fcps-primary) bg-(--fcps-primary)/5"
                 iconClass="text-(--fcps-primary)"
+                locale={locale}
               />
               <ModeCard
                 active={restoreMode === 'wipe'}
                 onClick={() => setRestoreMode('wipe')}
                 icon={<Trash2 className="h-4 w-4" />}
-                title="حذف وإعادة الاستعادة"
-                description="حذف جميع البيانات الحالية ثم استعادة الملف"
+                title={t('wipeTitle')}
+                description={t('wipeDesc')}
                 accentClass="border-red-400 bg-red-50"
                 iconClass="text-red-500"
+                locale={locale}
               />
             </div>
           </div>
@@ -275,10 +280,7 @@ export function DataManagementClient() {
           {restoreMode === 'wipe' && (
             <div className="mb-4 flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-600">
               <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-              <span>
-                سيتم حذف جميع السجلات الحالية نهائياً قبل استعادة النسخة الاحتياطية. ستظهر رسالة تأكيد
-                صارمة قبل تنفيذ العملية.
-              </span>
+              <span>{t('wipeWarning')}</span>
             </div>
           )}
 
@@ -298,8 +300,7 @@ export function DataManagementClient() {
               <span className="text-sm font-medium text-(--fcps-primary)">{selectedFile.name}</span>
             ) : (
               <span className="text-sm text-gray-400">
-                انقر لاختيار ملف{' '}
-                <span className="font-mono font-semibold text-gray-500">.json</span>
+                {t('fileInputEmpty')}
               </span>
             )}
             <input
@@ -333,10 +334,10 @@ export function DataManagementClient() {
               <Upload className="h-4 w-4" />
             )}
             {restore.status === 'loading'
-              ? 'جارٍ الاستعادة…'
+              ? t('restoreBtnLoading')
               : restoreMode === 'wipe'
-                ? 'حذف وإعادة الاستعادة'
-                : 'استعادة البيانات'}
+                ? t('restoreBtnWipe')
+                : t('restoreBtn')}
           </button>
         </Section>
         </div>
@@ -352,11 +353,13 @@ function Section({
   title,
   subtitle,
   children,
+  locale
 }: {
   icon: React.ReactNode
   title: string
   subtitle: string
   children: React.ReactNode
+  locale: string
 }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -382,6 +385,7 @@ function ModeCard({
   description,
   accentClass,
   iconClass,
+  locale
 }: {
   active: boolean
   onClick: () => void
@@ -390,12 +394,13 @@ function ModeCard({
   description: string
   accentClass: string
   iconClass: string
+  locale: string
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`flex flex-col items-start gap-1.5 rounded-lg border-2 p-3 text-right transition-all ${
+      className={`flex flex-col items-start gap-1.5 rounded-lg border-2 p-3 ${locale === 'ar' ? 'text-right' : 'text-left'} transition-all ${
         active ? accentClass : 'border-gray-200 bg-gray-50 hover:border-gray-300'
       }`}
     >
@@ -405,7 +410,7 @@ function ModeCard({
       >
         {title}
       </span>
-      <span className="text-left text-xs leading-relaxed text-gray-400">{description}</span>
+      <span className={`text-xs leading-relaxed text-gray-400 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{description}</span>
     </button>
   )
 }
@@ -437,3 +442,4 @@ function StatusBanner({ state }: { state: OpState }) {
     </div>
   )
 }
+

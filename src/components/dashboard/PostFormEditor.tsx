@@ -14,6 +14,7 @@ import {
   type PostFormValue,
 } from '@/lib/posts-form'
 import type { Post } from '@/types/post'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface PostFormEditorProps {
   mode: 'create' | 'edit'
@@ -22,6 +23,8 @@ interface PostFormEditorProps {
 }
 
 export function PostFormEditor({ mode, post, categories }: PostFormEditorProps) {
+  const t = useTranslations('dashboardPosts.form')
+  const locale = useLocale()
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   const [formValue, setFormValue] = useState<PostFormValue>(
@@ -45,35 +48,33 @@ export function PostFormEditor({ mode, post, categories }: PostFormEditorProps) 
           : await createPostAction(payload)
 
       if (!result.success) {
-        toast.error(result.error ?? 'تعذر حفظ المقال')
+        toast.error(result.error ?? t('saveError'))
         return
       }
 
-      toast.success(mode === 'edit' ? 'تم تحديث المقال' : 'تم إنشاء المقال')
-      router.push('/dashboard/posts')
+      toast.success(mode === 'edit' ? t('successUpdate') : t('successCreate'))
+      router.push(`/${locale}/dashboard/posts`)
       router.refresh()
     })
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <Link
-        href="/dashboard/posts"
+        href={`/${locale}/dashboard/posts`}
         className="inline-flex items-center gap-2 text-sm text-(--fcps-gray-text) transition-colors hover:text-(--fcps-primary)"
       >
-        <ArrowRight className="h-4 w-4" />
-        العودة إلى المقالات
+        <ArrowRight className={`h-4 w-4 ${locale === 'ar' ? '' : 'rotate-180'}`} />
+        {t('backToPosts')}
       </Link>
 
       <Card className="border-none shadow-sm">
         <CardHeader>
-          <CardTitle className="text-2xl text-(--fcps-dark)">
-            {mode === 'create' ? 'إضافة مقال جديد' : 'تعديل المقال'}
+          <CardTitle className={`text-2xl text-(--fcps-dark) ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
+            {mode === 'create' ? t('createNewTitle') : t('editTitle')}
           </CardTitle>
-          <CardDescription>
-            {mode === 'create'
-              ? 'أدخل بيانات المقال ثم احفظه كمنشور أو مسودة.'
-              : 'حدّث بيانات المقال ثم احفظ التعديلات.'}
+          <CardDescription className={locale === 'ar' ? 'text-right' : 'text-left'}>
+            {mode === 'create' ? t('createNewDesc') : t('editDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -85,10 +86,11 @@ export function PostFormEditor({ mode, post, categories }: PostFormEditorProps) 
             pending={pending}
             onChange={updateForm}
             onSubmit={submitForm}
-            onCancel={() => router.push('/dashboard/posts')}
+            onCancel={() => router.push(`/${locale}/dashboard/posts`)}
           />
         </CardContent>
       </Card>
     </div>
   )
 }
+

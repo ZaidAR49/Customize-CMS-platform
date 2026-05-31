@@ -1,7 +1,13 @@
 import { DataManagementClient } from '@/components/dashboard/DataManagementClient'
+import { getTranslations } from 'next-intl/server'
 
-export const metadata = { title: 'إدارة البيانات — لوحة التحكم' }
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'dashboardDataManagement' })
+  return { title: t('title') }
+}
 
 export default function DataManagementPage() {
   return <DataManagementClient />
 }
+

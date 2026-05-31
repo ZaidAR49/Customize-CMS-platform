@@ -2,11 +2,23 @@ import { notFound } from 'next/navigation'
 import { ProgramCenterFormEditor } from '@/components/dashboard/ProgramCenterFormEditor'
 import { postsService } from '@/lib/services/posts.service'
 import { requireEditor } from '@/lib/auth'
+import { getTranslations } from 'next-intl/server'
 
-export default async function EditProgramPage({ params }: { params: Promise<{ id: string }> }) {
+interface EditProgramPageProps {
+  params: Promise<{ id: string; locale: string }>
+}
+
+export async function generateMetadata({ params }: EditProgramPageProps) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'dashboardPrograms' })
+  return { title: t('editProgram') }
+}
+
+export default async function EditProgramPage({ params }: EditProgramPageProps) {
   await requireEditor()
-  const { id } = await params
+  const { id, locale } = await params
   const post = await postsService.getPostById(id)
+  const t = await getTranslations({ locale, namespace: 'dashboardPrograms' })
 
   if (!post || post.type !== 'program') {
     notFound()
@@ -17,10 +29,11 @@ export default async function EditProgramPage({ params }: { params: Promise<{ id
       mode="edit" 
       post={post}
       type="program"
-      title="تعديل البرنامج/المشروع"
-      description="تحديث تفاصيل البرنامج أو المشروع."
+      title={t('editProgram')}
+      description={t('editDesc')}
       returnUrl="/dashboard/programs"
-      returnLabel="العودة إلى البرامج والمشاريع"
+      returnLabel={t('returnToPrograms')}
     />
   )
 }
+

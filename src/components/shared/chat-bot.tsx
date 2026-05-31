@@ -2,10 +2,12 @@
 
 import { useEffect } from "react";
 import "@n8n/chat/style.css";
+import { useTranslations } from "next-intl";
 
 export default function N8nChatbot() {
+  const t = useTranslations("chatbot");
   const hour = new Date().getHours();
-  const greeting = hour >= 4 && hour < 12 ? "صباح الخير" : "مساء الخير";
+  const greeting = hour >= 4 && hour < 12 ? t("goodMorning") : t("goodEvening");
 
   useEffect(() => {
     /* Vue feature flags required by @n8n/chat's bundled Vue runtime */
@@ -18,17 +20,17 @@ export default function N8nChatbot() {
         webhookUrl: process.env.NEXT_PUBLIC_WEBHOOKURL,
         showWelcomeScreen: false,
         mode: "window",
-        initialMessages: [`${greeting}\nكيف يمكنني مساعدتك؟`],
+        initialMessages: [`${greeting}\n${t("howCanIHelp")}`],
         chatInputKey: "chatInput",
         chatSessionKey: "sessionId",
         i18n: {
           en: {
-            title: "المحادثة المباشرة",
-            subtitle: "تحدث معنا لأي استفسار",
+            title: t("liveChat"),
+            subtitle: t("subtitle"),
             footer: "",
-            getStarted: "ابدأ المحادثة",
-            inputPlaceholder: "اكتب رسالتك هنا...",
-            closeButtonTooltip: "إغلاق",
+            getStarted: t("startConversation"),
+            inputPlaceholder: t("inputPlaceholder"),
+            closeButtonTooltip: t("close"),
           },
         },
         theme: {
@@ -51,15 +53,15 @@ export default function N8nChatbot() {
 
         const title = document.createElement("div");
         title.className = "chat-quick-replies-title";
-        title.textContent = "الأسئلة الشائعة المقترحة:";
+        title.textContent = t("suggestedFaq");
 
         const list = document.createElement("div");
         list.className = "chat-quick-replies-list";
 
         const suggestions = [
-          { text: "أين يقع مقر الجمعية؟", label: "📍 أين يقع مقر الجمعية؟" },
-          { text: "كيف يمكنني التبرع للجمعية؟", label: "❤️ كيف يمكنني التبرع؟" },
-          { text: "أخبرني عن الجمعية ونشاطاتها", label: "ℹ️ أخبرني عن الجمعية" }
+          { text: t("faq.location"), label: t("faq.locationLabel") },
+          { text: t("faq.donate"), label: t("faq.donateLabel") },
+          { text: t("faq.about"), label: t("faq.aboutLabel") }
         ];
 
         suggestions.forEach((item) => {
@@ -98,7 +100,7 @@ export default function N8nChatbot() {
     return () => {
       observer.disconnect();
     };
-  }, [greeting]);
+  }, [greeting, t]);
 
   return <div id="n8n-chat" />;
 }

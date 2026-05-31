@@ -21,12 +21,15 @@ import { FileText, Layers3, Tags, ChevronDown, Plus } from 'lucide-react'
 import { ClearFiltersButton } from '@/components/shared/ClearFiltersButton'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { cn } from '@/lib/utils'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface PostsOverviewProps {
   posts: Post[]
 }
 
 export function PostsOverview({ posts }: PostsOverviewProps) {
+  const t = useTranslations('dashboardPosts')
+  const locale = useLocale()
   const router = useRouter()
   const [, startTransition] = useTransition()
   const [activeCategory, setActiveCategory] = useState<string>('all')
@@ -47,16 +50,16 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
     }
     return Array.from(categories.entries())
       .map(([key, label]) => ({ key, label }))
-      .sort((a, b) => a.label.localeCompare(b.label, 'ar'))
-  }, [visiblePosts])
+      .sort((a, b) => a.label.localeCompare(b.label, locale === 'ar' ? 'ar' : 'en'))
+  }, [visiblePosts, locale])
 
   const availableTags = useMemo(() => {
     const tags = new Set<string>()
     for (const post of visiblePosts) {
       for (const tag of post.tags ?? []) tags.add(tag)
     }
-    return Array.from(tags).sort((a, b) => a.localeCompare(b, 'ar'))
-  }, [visiblePosts])
+    return Array.from(tags).sort((a, b) => a.localeCompare(b, locale === 'ar' ? 'ar' : 'en'))
+  }, [visiblePosts, locale])
 
   const filteredPosts = useMemo(() => {
     return visiblePosts.filter((post) => {
@@ -82,9 +85,9 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
   }
 
   const stats = [
-    { label: 'إجمالي المقالات', value: visiblePosts.length, icon: FileText, color: 'bg-blue-500' },
-    { label: 'التصنيفات', value: availableCategories.length, icon: Layers3, color: 'bg-(--fcps-primary)' },
-    { label: 'الوسوم', value: availableTags.length, icon: Tags, color: 'bg-amber-500' },
+    { label: t('totalPosts'), value: visiblePosts.length, icon: FileText, color: 'bg-blue-500' },
+    { label: t('categories'), value: availableCategories.length, icon: Layers3, color: 'bg-(--fcps-primary)' },
+    { label: t('tags'), value: availableTags.length, icon: Tags, color: 'bg-amber-500' },
   ]
 
   function deletePost(post: Post) {
@@ -98,12 +101,12 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
     startTransition(async () => {
       const result = await deletePostAction(postToDelete.id as string)
       if (!result.success) {
-        toast.error(result.error ?? 'تعذر حذف المقال')
+        toast.error(result.error ?? t('errorDelete'))
         setPendingDeleteId(null)
         setPostToDelete(null)
         return
       }
-      toast.success('تم حذف المقال')
+      toast.success(t('successDelete'))
       setPendingDeleteId(null)
       setPostToDelete(null)
       router.refresh()
@@ -111,17 +114,17 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-end">
+    <div className="space-y-6" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+      <div className={`flex items-center ${locale === 'ar' ? 'justify-end' : 'justify-start'}`}>
         <Link
-          href="/dashboard/posts/new"
+          href={`/${locale}/dashboard/posts/new`}
           className={cn(
             buttonVariants(),
             'bg-(--fcps-primary) hover:bg-(--fcps-primary-dark) text-white'
           )}
         >
-          <Plus className="h-4 w-4 ml-2" />
-          مقال جديد
+          <Plus className={`h-4 w-4 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`} />
+          {t('newPost')}
         </Link>
       </div>
 
@@ -144,13 +147,13 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
       <Card className="border-none shadow-sm">
         <CardContent className="p-5 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="text-sm font-medium text-(--fcps-dark)">تصفية المقالات</h3>
+            <h3 className="text-sm font-medium text-(--fcps-dark)">{t('filterTitle')}</h3>
             <ClearFiltersButton onClear={clearFilters} disabled={!hasActiveFilters} />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-medium text-(--fcps-dark)">
-                التصفية حسب التصنيف
+                {t('filterByCategory')}
               </label>
               <DropdownMenu>
                 <DropdownMenuTrigger
@@ -160,7 +163,7 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
                   )}
                 >
                   {activeCategory === 'all'
-                    ? 'كل التصنيفات'
+                    ? t('allCategories')
                     : (availableCategories.find((category) => category.key === activeCategory)?.label ?? activeCategory)}
                   <ChevronDown className="h-4 w-4" />
                 </DropdownMenuTrigger>
@@ -169,7 +172,7 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
                     value={activeCategory}
                     onValueChange={setActiveCategory}
                   >
-                    <DropdownMenuRadioItem value="all">كل التصنيفات</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="all">{t('allCategories')}</DropdownMenuRadioItem>
                     {availableCategories.map((category) => (
                       <DropdownMenuRadioItem key={category.key} value={category.key}>
                         {category.label}
@@ -182,7 +185,7 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
 
             <div>
               <label className="mb-2 block text-sm font-medium text-(--fcps-dark)">
-                التصفية حسب الوسم
+                {t('filterByTag')}
               </label>
               <DropdownMenu>
                 <DropdownMenuTrigger
@@ -191,12 +194,12 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
                     'w-full justify-between border-(--fcps-primary)/20 bg-white text-(--fcps-dark) hover:bg-(--fcps-bg-soft)'
                   )}
                 >
-                  {activeTag === 'all' ? 'كل الوسوم' : activeTag}
+                  {activeTag === 'all' ? t('allTags') : activeTag}
                   <ChevronDown className="h-4 w-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" side="bottom" className="w-(--radix-popper-anchor-width)">
                   <DropdownMenuRadioGroup value={activeTag} onValueChange={setActiveTag}>
-                    <DropdownMenuRadioItem value="all">كل الوسوم</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="all">{t('allTags')}</DropdownMenuRadioItem>
                     {availableTags.map((tag) => (
                       <DropdownMenuRadioItem key={tag} value={tag}>
                         {tag}
@@ -210,34 +213,36 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
 
           <div>
             <label className="mb-2 block text-sm font-medium text-(--fcps-dark)">
-              البحث عن المقالات
+              {t('searchLabel')}
             </label>
             <SearchBar
               value={searchQuery}
               onChange={setSearchQuery}
-              placeholder="ابحث بالعنوان أو المحتوى..."
-              aria-label="البحث عن المقالات"
+              placeholder={t('searchPlaceholder')}
+              aria-label={t('searchLabel')}
             />
           </div>
         </CardContent>
       </Card>
 
-      <PostsTable posts={filteredPosts} onDelete={deletePost} pendingDeleteId={pendingDeleteId} />
+      <PostsTable posts={filteredPosts} onDelete={deletePost} pendingDeleteId={pendingDeleteId} editUrlPrefix={`/${locale}/dashboard/posts`} />
 
       <Dialog open={!!postToDelete} onOpenChange={(open) => !open && setPostToDelete(null)}>
-        <DialogContent className="sm:max-w-md" dir="rtl">
+        <DialogContent className="sm:max-w-md" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
           <DialogHeader>
-            <DialogTitle>تأكيد الحذف</DialogTitle>
-            <DialogDescription>
-              هل أنت متأكد من حذف <strong>{postToDelete?.title}</strong>؟ لا يمكن التراجع عن هذا الإجراء.
+            <DialogTitle className={locale === 'ar' ? 'text-right' : 'text-left'}>{t('confirmDeleteTitle')}</DialogTitle>
+            <DialogDescription className={locale === 'ar' ? 'text-right' : 'text-left'}>
+              {t.rich('confirmDeleteDesc', {
+                title: () => <strong>{postToDelete?.title}</strong>
+              })}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:justify-start">
+          <DialogFooter className={`gap-2 sm:justify-start ${locale === 'ar' ? '' : 'sm:justify-end'}`}>
             <Button type="button" variant="outline" onClick={() => setPostToDelete(null)} disabled={pendingDeleteId !== null}>
-              إلغاء
+              {t('cancel')}
             </Button>
             <Button type="button" variant="destructive" onClick={confirmDelete} disabled={pendingDeleteId !== null}>
-              {pendingDeleteId !== null ? 'جاري الحذف...' : 'حذف نهائي'}
+              {pendingDeleteId !== null ? t('deleting') : t('finalDelete')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -245,3 +250,4 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
     </div>
   )
 }
+
