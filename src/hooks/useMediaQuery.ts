@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 
 export function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(false)
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     const mq = window.matchMedia(query)
     setMatches(mq.matches)

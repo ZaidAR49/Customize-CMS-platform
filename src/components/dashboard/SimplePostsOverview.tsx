@@ -84,7 +84,7 @@ export function SimplePostsOverview({ posts, newUrl, newLabel, editUrlPrefix, is
             <DialogTitle>{t('confirmDeleteTitle')}</DialogTitle>
             <DialogDescription>
               {t.rich('confirmDeleteDesc', {
-                 title: locale === 'ar' ? postToDelete?.title : (postToDelete?.title_en || postToDelete?.title),
+                 title: locale === 'ar' ? (postToDelete?.title || '') : (postToDelete?.title_en || postToDelete?.title || ''),
                  strong: (chunks) => <strong>{chunks}</strong>
               })}
             </DialogDescription>

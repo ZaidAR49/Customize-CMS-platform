@@ -735,5 +735,11 @@
     "users": "المستخدمون",
     "pendingDrafts": "مسودات معلقة",
     "latestPosts": "آخر المقالات"
+  },
+  "lightbox": {
+    "viewImage": "عرض الصورة",
+    "close": "إغلاق",
+    "prevImage": "الصورة السابقة",
+    "nextImage": "الصورة التالية"
   }
 }

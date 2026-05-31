@@ -29,6 +29,7 @@ export function PostCommentForm({ postId }: PostCommentFormProps) {
   const [remember, setRemember] = useState(false)
   const [pending, setPending] = useState(false)
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY)

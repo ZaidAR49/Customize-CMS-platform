@@ -131,7 +131,7 @@ export const postsService = {
     const { data: rows, error: listError } = await listQuery
     if (listError) throw listError
 
-    const match = (rows ?? []).find((row) => normalizeSlug(row.slug ?? '') === normalized)
+    const match = (rows ?? []).find((row: any) => normalizeSlug(row.slug ?? '') === normalized)
     return match ? mapPost(match) : null
   },
 

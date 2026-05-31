@@ -735,6 +735,12 @@
     "users": "Users",
     "pendingDrafts": "Pending Drafts",
     "latestPosts": "Latest Posts"
+  },
+  "lightbox": {
+    "viewImage": "View Image",
+    "close": "Close",
+    "prevImage": "Previous Image",
+    "nextImage": "Next Image"
   }
 }
 

@@ -34,7 +34,7 @@ export function DeleteCategoryDialog({
         <DialogHeader>
           <DialogTitle>{t('confirmDeleteTitle')}</DialogTitle>
           <DialogDescription>
-            {t('confirmDeleteDesc', { name: locale === 'ar' ? category?.label_ar : (category?.label_en || category?.label_ar) })}
+            {t('confirmDeleteDesc', { name: locale === 'ar' ? (category?.label_ar || '') : (category?.label_en || category?.label_ar || '') })}
             {category?.key ? (
               <span className="mt-2 block rounded-md border bg-muted/40 px-3 py-2 font-mono text-xs text-foreground/90" dir="ltr">
                 {category.key}

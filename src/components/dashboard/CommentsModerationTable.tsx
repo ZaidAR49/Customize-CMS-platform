@@ -130,7 +130,7 @@ export function CommentsModerationTable({ comments }: Props) {
                     <TableCell className="max-w-[180px] whitespace-normal wrap-break-word">
                       {post ? (
                         <TruncateFullTextPopup
-                          text={locale === 'ar' ? post.title : (post.title_en || post.title)}
+                          text={locale === 'ar' ? post.title : ((post as any).title_en || post.title)}
                           dialogTitle={t('dialogTitlePost')}
                           className="font-medium text-(--fcps-primary)"
                           renderDialogFooter={(close) => (
