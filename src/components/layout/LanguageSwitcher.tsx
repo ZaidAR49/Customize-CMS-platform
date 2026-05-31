@@ -55,6 +55,7 @@ export function LanguageSwitcher() {
     const segments = pathname.split('/')
     segments[1] = newLocale
     router.push(segments.join('/'))
+    router.refresh();
     setOpen(false)
   }
 
