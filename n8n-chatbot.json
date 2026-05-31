@@ -11,10 +11,10 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        0,
-        0
+        272,
+        -80
       ],
-      "id": "5359d6bf-63f9-4beb-a204-30470f0b189a",
+      "id": "121c3ad7-b3c2-4db5-85f0-00354bdfd487",
       "name": "When chat message received",
       "webhookId": "4f583a14-9da5-4b42-a50b-8a07308e3a44"
     },
@@ -29,26 +29,12 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        280,
-        0
+        560,
+        -80
       ],
-      "id": "46f6effc-c5e9-4a68-833f-2a3a9f66c93c",
+      "id": "ff146159-7221-4166-a45e-347dcbdfee03",
       "name": "AI Agent",
       "retryOnFail": true
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1.1,
-      "position": [
-        224,
-        224
-      ],
-      "id": "9f286b20-6b23-4d03-bb9a-309b09c46048",
-      "name": "Google Gemini Chat Model",
-      "credentials": {}
     },
     {
       "parameters": {
@@ -57,10 +43,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.4,
       "position": [
-        352,
-        224
+        624,
+        144
       ],
-      "id": "5d6e0a93-759e-4aee-8399-97f079957db0",
+      "id": "54caeac8-208b-464a-827e-f9cff089622c",
       "name": "Simple Memory"
     },
     {
@@ -71,15 +57,15 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        480,
-        224
+        800,
+        144
       ],
-      "id": "7cf2f794-a13e-4178-b3c9-0ee997ca9c63",
+      "id": "6a1ff505-bba2-40dc-9ee9-abbff3dcbf53",
       "name": "organization data",
       "credentials": {
         "supabaseApi": {
-          "id": "6ihi3KgkVN8rHSw9",
-          "name": "Unnamed credential"
+          "id": "ZgDLPqN9TonB81YQ",
+          "name": "Supabase account"
         }
       }
     },
@@ -111,15 +97,15 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        688,
-        0
+        960,
+        -80
       ],
-      "id": "9fb51bba-5a13-431a-b862-76723d07836c",
+      "id": "e5f24fba-adf7-4149-a7e5-745ddb44fcfe",
       "name": "If"
     },
     {
       "parameters": {
-        "sendTo": "={{ $json.email }}",
+        "sendTo": "=ziedradaideh2003@gmail.com",
         "subject": "Error in workflow",
         "message": "=<!DOCTYPE html> <html lang=\"ar\" dir=\"rtl\"> <head>   <meta charset=\"UTF-8\" />   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>   <title>تنبيه خطأ في سير العمل</title> </head> <body style=\"margin:0;padding:0;background-color:#f4f4f4;font-family:'Segoe UI',Tahoma,Arial,sans-serif;direction:rtl;\">    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#f4f4f4;padding:40px 20px;\">     <tr>       <td align=\"center\">         <table width=\"560\" cellpadding=\"0\" cellspacing=\"0\" style=\"max-width:560px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);\">            <!-- TOP RED BAR -->           <tr>             <td style=\"background-color:#e53935;padding:20px 36px;\">               <p style=\"margin:0;color:#ffffff;font-size:18px;font-weight:bold;\">⚠️ تنبيه: خطأ في سير العمل</p>             </td>           </tr>            <!-- BODY -->           <tr>             <td style=\"padding:32px 36px;\">                <p style=\"margin:0 0 16px;color:#333333;font-size:15px;line-height:1.8;\">                 عزيزي <strong>المسؤول</strong>،               </p>                <p style=\"margin:0 0 24px;color:#555555;font-size:15px;line-height:1.8;\">                 تم رصد خطأ في أحد سير العمل التلقائية. يرجى مراجعة المشكلة في أقرب وقت ممكن لاستعادة عمل النظام بشكل طبيعي.               </p>                <!-- Details Box -->               <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#fff8f8;border:1px solid #ffcccc;border-radius:8px;margin-bottom:24px;\">                 <tr>                   <td style=\"padding:20px;\">                     <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">                       <tr>                         <td style=\"padding:8px 0;border-bottom:1px solid #ffe5e5;\">                           <span style=\"color:#999;font-size:12px;\">اسم سير العمل</span><br/>                           <span style=\"color:#333;font-size:14px;font-weight:bold;margin-top:4px;display:block;\">{{ $workflow.name }}</span>                         </td>                       </tr>                       <tr>                         <td style=\"padding:8px 0;border-bottom:1px solid #ffe5e5;\">                           <span style=\"color:#999;font-size:12px;\">وقت الخطأ</span><br/>                           <span style=\"color:#333;font-size:14px;font-weight:bold;margin-top:4px;display:block;\">{{ $now.format('yyyy-MM-dd-hh-mn') }}</span>                         </td>                       </tr>                       <tr>                         <td style=\"padding:8px 0;\">                           <span style=\"color:#999;font-size:12px;\">رسالة الخطأ</span><br/>                           <span style=\"color:#e53935;font-size:13px;margin-top:4px;display:block;\">{{ $json.output || \"لم يتم إرجاع أي مخرجات من الوكيل\" }}</span>                         </td>                       </tr>                     </table>                   </td>                 </tr>               </table>                <!-- What to do -->               <p style=\"margin:0 0 12px;color:#333;font-size:14px;font-weight:bold;\">ما الذي يجب فعله:</p>               <ul style=\"margin:0 0 28px;padding-right:20px;color:#555555;font-size:14px;line-height:2;\">                 <li>افتح لوحة تحكم n8n وراجع سير العمل المتوقف</li>                 <li>تحقق من صلاحية رمز API الخاص بك وتأكد من عدم انتهاء صلاحيته</li>                 <li>أعد تشغيل سير العمل بعد إصلاح المشكلة</li>               </ul>                <!-- Button -->               <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">                 <tr>                   <td align=\"center\">                     <a href=\"YOUR_N8N_URL\" style=\"display:inline-block;background-color:#e53935;color:#ffffff;text-decoration:none;padding:12px 32px;border-radius:6px;font-size:14px;font-weight:bold;\">                       فتح لوحة تحكم n8n                     </a>                   </td>                 </tr>               </table>              </td>           </tr>            <!-- FOOTER -->           <tr>             <td style=\"background-color:#f9f9f9;padding:16px 36px;border-top:1px solid #eeeeee;\">               <p style=\"margin:0;color:#aaaaaa;font-size:12px;text-align:center;\">                 هذه رسالة تلقائية — يرجى عدم الرد عليها               </p>             </td>           </tr>          </table>       </td>     </tr>   </table>  </body> </html>",
         "options": {}
@@ -127,16 +113,16 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        1360,
-        0
+        1632,
+        -80
       ],
-      "id": "c680a52c-fd3a-42b3-bd40-2566658c1299",
+      "id": "e00986e3-ceee-479c-96a5-9d297a2af611",
       "name": "Send a message",
       "webhookId": "8826ca46-6069-463e-97a9-6e9ecbfb76bc",
       "retryOnFail": true,
       "credentials": {
         "gmailOAuth2": {
-          "id": "hT884AzNbjjHU1Go",
+          "id": "AUgFBf6m6WNcRIcZ",
           "name": "Gmail OAuth2 API"
         }
       }
@@ -159,16 +145,16 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        912,
-        0
+        1184,
+        -80
       ],
-      "id": "104b577c-5023-463c-afbb-0946381abae0",
+      "id": "54c1b4e6-b65e-4219-a46b-8688e8812810",
       "name": "get admin email",
       "retryOnFail": true,
       "credentials": {
         "supabaseApi": {
-          "id": "6ihi3KgkVN8rHSw9",
-          "name": "Unnamed credential"
+          "id": "ZgDLPqN9TonB81YQ",
+          "name": "Supabase account"
         }
       }
     },
@@ -200,11 +186,71 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1136,
-        0
+        1408,
+        -80
       ],
-      "id": "d65fc37c-7325-4397-8cdb-23f2163120dd",
+      "id": "7b950f95-fc60-46ac-b85c-a50796c0b9c7",
       "name": "If1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        128
+      ],
+      "id": "96034faf-67ea-4501-92d9-f14093c847f2",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "VybZy07bMc8HnB2Z",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        768,
+        368
+      ],
+      "id": "4e153455-0c7a-4cbf-be3b-377201ca7c12",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "sendTo": "=ziedradaideh2003@gmail.com",
+        "subject": "Error in workflow",
+        "message": "=<!DOCTYPE html> <html lang=\"ar\" dir=\"rtl\"> <head>   <meta charset=\"UTF-8\" />   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>   <title>تنبيه خطأ في سير العمل</title> </head> <body style=\"margin:0;padding:0;background-color:#f4f4f4;font-family:'Segoe UI',Tahoma,Arial,sans-serif;direction:rtl;\">    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#f4f4f4;padding:40px 20px;\">     <tr>       <td align=\"center\">         <table width=\"560\" cellpadding=\"0\" cellspacing=\"0\" style=\"max-width:560px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);\">            <!-- TOP RED BAR -->           <tr>             <td style=\"background-color:#e53935;padding:20px 36px;\">               <p style=\"margin:0;color:#ffffff;font-size:18px;font-weight:bold;\">⚠️ تنبيه: خطأ في سير العمل</p>             </td>           </tr>            <!-- BODY -->           <tr>             <td style=\"padding:32px 36px;\">                <p style=\"margin:0 0 16px;color:#333333;font-size:15px;line-height:1.8;\">                 عزيزي <strong>المسؤول</strong>،               </p>                <p style=\"margin:0 0 24px;color:#555555;font-size:15px;line-height:1.8;\">                 تم رصد خطأ في أحد سير العمل التلقائية. يرجى مراجعة المشكلة في أقرب وقت ممكن لاستعادة عمل النظام بشكل طبيعي.               </p>                <!-- Details Box -->               <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#fff8f8;border:1px solid #ffcccc;border-radius:8px;margin-bottom:24px;\">                 <tr>                   <td style=\"padding:20px;\">                     <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">                       <tr>                         <td style=\"padding:8px 0;border-bottom:1px solid #ffe5e5;\">                           <span style=\"color:#999;font-size:12px;\">اسم سير العمل</span><br/>                           <span style=\"color:#333;font-size:14px;font-weight:bold;margin-top:4px;display:block;\">{{ $workflow.name }}</span>                         </td>                       </tr>                       <tr>                         <td style=\"padding:8px 0;border-bottom:1px solid #ffe5e5;\">                           <span style=\"color:#999;font-size:12px;\">وقت الخطأ</span><br/>                           <span style=\"color:#333;font-size:14px;font-weight:bold;margin-top:4px;display:block;\">{{ $now.format('yyyy-MM-dd-hh-mn') }}</span>                         </td>                       </tr>                       <tr>                         <td style=\"padding:8px 0;\">                           <span style=\"color:#999;font-size:12px;\">رسالة الخطأ</span><br/>                           <span style=\"color:#e53935;font-size:13px;margin-top:4px;display:block;\">{{ $json.output || \"لم يتم إرجاع أي مخرجات من الوكيل\" }}</span>                         </td>                       </tr>                     </table>                   </td>                 </tr>               </table>                <!-- What to do -->               <p style=\"margin:0 0 12px;color:#333;font-size:14px;font-weight:bold;\">ما الذي يجب فعله:</p>               <ul style=\"margin:0 0 28px;padding-right:20px;color:#555555;font-size:14px;line-height:2;\">                 <li>افتح لوحة تحكم n8n وراجع سير العمل المتوقف</li>                 <li>تحقق من صلاحية رمز API الخاص بك وتأكد من عدم انتهاء صلاحيته</li>                 <li>أعد تشغيل سير العمل بعد إصلاح المشكلة</li>               </ul>                <!-- Button -->               <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">                 <tr>                   <td align=\"center\">                     <a href=\"YOUR_N8N_URL\" style=\"display:inline-block;background-color:#e53935;color:#ffffff;text-decoration:none;padding:12px 32px;border-radius:6px;font-size:14px;font-weight:bold;\">                       فتح لوحة تحكم n8n                     </a>                   </td>                 </tr>               </table>              </td>           </tr>            <!-- FOOTER -->           <tr>             <td style=\"background-color:#f9f9f9;padding:16px 36px;border-top:1px solid #eeeeee;\">               <p style=\"margin:0;color:#aaaaaa;font-size:12px;text-align:center;\">                 هذه رسالة تلقائية — يرجى عدم الرد عليها               </p>             </td>           </tr>          </table>       </td>     </tr>   </table>  </body> </html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        368
+      ],
+      "id": "049a8759-b42b-4104-b3fe-aafc1378a953",
+      "name": "Send a message1",
+      "webhookId": "8826ca46-6069-463e-97a9-6e9ecbfb76bc",
+      "retryOnFail": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "AUgFBf6m6WNcRIcZ",
+          "name": "Gmail OAuth2 API"
+        }
+      }
     }
   ],
   "connections": {
@@ -225,17 +271,6 @@
           {
             "node": "If",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Google Gemini Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -275,11 +310,6 @@
         ]
       ]
     },
-    "Send a message": {
-      "main": [
-        []
-      ]
-    },
     "get admin email": {
       "main": [
         [
@@ -301,11 +331,33 @@
           }
         ]
       ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "pinData": {},
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "a229eca5cf13650efc859e1224c0390899acf3f57995cfd807ce983c7c63f664"
+    "instanceId": "009e7e19f97d271d23a5004794d90472271f6a1abe913e0b558f36eb61d5c940"
   }
 }

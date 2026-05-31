@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { Shield, Phone, Mail, MapPin } from 'lucide-react'
+import { Phone, Mail, MapPin } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
-import { organization } from '@/data/organization'
+import { organizationService } from '@/lib/services/organization.service'
 
 import { FaFacebook, FaXTwitter, FaYoutube, FaInstagram } from 'react-icons/fa6'
 
@@ -12,7 +12,12 @@ const quickLinks = [
   { label: 'اتصل بنا', href: '/contact' },
 ]
 
-export function Footer() {
+export async function Footer() {
+  const org = await organizationService.getOrganization()
+
+  // Safely extract social URLs from JSONB
+  const social = (org?.social ?? {}) as Record<string, string>
+
   return (
     <footer className="mt-16 bg-(--fcps-dark) text-white py-12">
       <div className="container py-12">
@@ -20,16 +25,16 @@ export function Footer() {
           {/* Column 1: About */}
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-(--fcps-primary) text-white">
-                <Shield className="h-5 w-5" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white overflow-hidden border border-(--fcps-bg-soft) shadow-sm">
+                <img src="/images/logo.png" alt="Logo" width={40} height={40} className="object-contain" />
               </div>
-              <h3 className="text-lg font-bold">{organization.nameAr}</h3>
+              <h3 className="text-lg font-bold">{org?.name_ar}</h3>
             </div>
             <p className="mb-3 text-sm text-gray-400">
-              تأسست عام {organization.foundedYear}
+              تأسست عام {org?.founded_year}
             </p>
             <p className="text-sm leading-relaxed text-gray-300">
-              {organization.missionAr}
+              {org?.mission_ar}
             </p>
           </div>
 
@@ -58,52 +63,58 @@ export function Footer() {
               تواصل معنا
             </h3>
             <div className="space-y-3 text-sm text-gray-300">
-              <a href={`tel:${organization.phone}`} className="flex items-center gap-2 hover:text-(--fcps-primary-light) transition-colors">
+              <a href={`tel:${org?.phone}`} className="flex items-center gap-2 hover:text-(--fcps-primary-light) transition-colors">
                 <Phone className="h-4 w-4 text-(--fcps-primary-light)" />
-                <span dir="ltr">{organization.phone}</span>
+                <span dir="ltr">{org?.phone}</span>
               </a>
-              <a href={`mailto:${organization.email}`} className="flex items-center gap-2 hover:text-(--fcps-primary-light) transition-colors">
+              <a href={`mailto:${org?.email}`} className="flex items-center gap-2 hover:text-(--fcps-primary-light) transition-colors">
                 <Mail className="h-4 w-4 text-(--fcps-primary-light)" />
-                {organization.email}
+                {org?.email}
               </a>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-(--fcps-primary-light)" />
-                {organization.addressAr}
+                {(org?.metadata as Record<string, string>)?.address_ar || 'إربد، المملكة الأردنية الهاشمية'}
               </div>
             </div>
 
             {/* Social Links */}
             <div className="mt-4 flex gap-3">
-              <a
-                href={organization.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-all hover:bg-(--fcps-primary) hover:scale-110"
-                aria-label="Facebook"
-              >
-                <FaFacebook className="h-4 w-4" />
-              </a>
-              <a
-                href={organization.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-all hover:bg-(--fcps-primary) hover:scale-110"
-                aria-label="Twitter"
-              >
-                <FaXTwitter className="h-4 w-4" />
-              </a>
-              <a
-                href={organization.youtube}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-all hover:bg-(--fcps-primary) hover:scale-110"
-                aria-label="YouTube"
-              >
-                <FaYoutube className="h-4 w-4" />
-              </a>
-              {organization.instagram && (
+              {social.facebook && (
                 <a
-                  href={organization.instagram}
+                  href={social.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-all hover:bg-(--fcps-primary) hover:scale-110"
+                  aria-label="Facebook"
+                >
+                  <FaFacebook className="h-4 w-4" />
+                </a>
+              )}
+              {social.twitter && (
+                <a
+                  href={social.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-all hover:bg-(--fcps-primary) hover:scale-110"
+                  aria-label="Twitter"
+                >
+                  <FaXTwitter className="h-4 w-4" />
+                </a>
+              )}
+              {social.youtube && (
+                <a
+                  href={social.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-all hover:bg-(--fcps-primary) hover:scale-110"
+                  aria-label="YouTube"
+                >
+                  <FaYoutube className="h-4 w-4" />
+                </a>
+              )}
+              {social.instagram && (
+                <a
+                  href={social.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-all hover:bg-(--fcps-primary) hover:scale-110"
@@ -120,7 +131,7 @@ export function Footer() {
 
         {/* Copyright */}
         <div className="text-center text-sm text-gray-500">
-          <p>© {new Date().getFullYear()} {organization.nameAr}. جميع الحقوق محفوظة.</p>
+          <p>© {new Date().getFullYear()} {org?.name_ar}. جميع الحقوق محفوظة.</p>
         </div>
       </div>
     </footer>

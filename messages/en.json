@@ -1,4 +1,8 @@
 {
+  "test":{
+    "title":"hellow from en",
+    "description":"description from en"
+  },
   "homePage": {
     "heroSlider": {
       "slide1Title": "Snippets of Our Activities",

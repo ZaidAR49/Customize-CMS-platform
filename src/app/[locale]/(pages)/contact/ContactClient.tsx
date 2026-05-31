@@ -8,11 +8,11 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
-import { organization } from '@/data/organization'
 import { Phone, Mail, MapPin, Send, CheckCircle } from 'lucide-react'
 import { useState } from 'react'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { submitContactFormAction } from '@/actions/malis.actions'
+import type { OrganizationRow } from '@/types/organization'
 
 const contactSchema = z.object({
   name: z.string().min(2, 'الاسم مطلوب'),
@@ -23,7 +23,11 @@ const contactSchema = z.object({
 
 type ContactForm = z.infer<typeof contactSchema>
 
-export default function ContactPage() {
+interface ContactClientProps {
+  org: OrganizationRow | null;
+}
+
+export default function ContactClient({ org }: ContactClientProps) {
   const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [showConfirmClear, setShowConfirmClear] = useState(false)
@@ -47,6 +51,8 @@ export default function ContactPage() {
     reset()
     setTimeout(() => setSubmitted(false), 4000)
   }
+
+  const address = (org?.metadata as Record<string, string>)?.address_ar || 'إربد، المملكة الأردنية الهاشمية';
 
   return (
     <div>
@@ -80,7 +86,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-sm text-(--fcps-gray-text)">الهاتف</p>
-                      <p className="font-medium" dir="ltr">{organization.phone}</p>
+                      <p className="font-medium" dir="ltr">{org?.phone}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -92,7 +98,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-sm text-(--fcps-gray-text)">البريد الإلكتروني</p>
-                      <p className="font-medium">{organization.email}</p>
+                      <p className="font-medium">{org?.email}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -104,7 +110,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-sm text-(--fcps-gray-text)">العنوان</p>
-                      <p className="font-medium">{organization.addressAr}</p>
+                      <p className="font-medium">{address}</p>
                     </div>
                   </CardContent>
                 </Card>

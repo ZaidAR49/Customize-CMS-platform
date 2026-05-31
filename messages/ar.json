@@ -1,4 +1,8 @@
 {
+  "test": {
+    "title": "مرحبا من العربية",
+    "description": "الوصف من العربية"
+  },
   "homePage": {
     "heroSlider": {
       "slide1Title": "مقتطفات من نشاطاتنا",
