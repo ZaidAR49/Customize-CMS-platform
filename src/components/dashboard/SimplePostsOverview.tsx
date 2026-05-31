@@ -11,6 +11,7 @@ import { deletePostAction } from '@/actions/posts.actions'
 import type { Post } from '@/types/post'
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface SimplePostsOverviewProps {
   posts: Post[]
@@ -21,6 +22,8 @@ interface SimplePostsOverviewProps {
 }
 
 export function SimplePostsOverview({ posts, newUrl, newLabel, editUrlPrefix, isEditor = false }: SimplePostsOverviewProps) {
+  const t = useTranslations('dashboardPosts')
+  const locale = useLocale()
   const router = useRouter()
   const [, startTransition] = useTransition()
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
@@ -37,12 +40,12 @@ export function SimplePostsOverview({ posts, newUrl, newLabel, editUrlPrefix, is
     startTransition(async () => {
       const result = await deletePostAction(postToDelete.id as string)
       if (!result.success) {
-        toast.error(result.error ?? 'تعذر الحذف')
+        toast.error(result.error ?? t('errorDelete'))
         setPendingDeleteId(null)
         setPostToDelete(null)
         return
       }
-      toast.success('تم الحذف')
+      toast.success(t('successDelete'))
       setPendingDeleteId(null)
       setPostToDelete(null)
       router.refresh()
@@ -52,7 +55,7 @@ export function SimplePostsOverview({ posts, newUrl, newLabel, editUrlPrefix, is
   return (
     <div className="space-y-6">
       {isEditor && (
-        <div className="flex items-center justify-end">
+        <div className={`flex items-center ${locale === 'ar' ? 'justify-end' : 'justify-start'}`}>
           <Link
             href={newUrl}
             className={cn(
@@ -60,7 +63,7 @@ export function SimplePostsOverview({ posts, newUrl, newLabel, editUrlPrefix, is
               'bg-(--fcps-primary) hover:bg-(--fcps-primary-dark) text-white'
             )}
           >
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className={`h-4 w-4 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`} />
             {newLabel}
           </Link>
         </div>
@@ -76,19 +79,22 @@ export function SimplePostsOverview({ posts, newUrl, newLabel, editUrlPrefix, is
       />
 
       <Dialog open={!!postToDelete} onOpenChange={(open) => !open && setPostToDelete(null)}>
-        <DialogContent className="sm:max-w-md" dir="rtl">
+        <DialogContent className="sm:max-w-md" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
           <DialogHeader>
-            <DialogTitle>تأكيد الحذف</DialogTitle>
+            <DialogTitle>{t('confirmDeleteTitle')}</DialogTitle>
             <DialogDescription>
-              هل أنت متأكد من حذف <strong>{postToDelete?.title}</strong>؟ لا يمكن التراجع عن هذا الإجراء.
+              {t.rich('confirmDeleteDesc', {
+                 title: locale === 'ar' ? (postToDelete?.title || '') : (postToDelete?.title_en || postToDelete?.title || ''),
+                 strong: (chunks) => <strong>{chunks}</strong>
+              })}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:justify-start">
+          <DialogFooter className={`gap-2 sm:justify-start ${locale === 'ar' ? '' : 'sm:justify-end'}`}>
             <Button type="button" variant="outline" onClick={() => setPostToDelete(null)} disabled={pendingDeleteId !== null}>
-              إلغاء
+              {t('cancel')}
             </Button>
             <Button type="button" variant="destructive" onClick={confirmDelete} disabled={pendingDeleteId !== null}>
-              {pendingDeleteId !== null ? 'جاري الحذف...' : 'حذف نهائي'}
+              {pendingDeleteId !== null ? t('deleting') : t('finalDelete')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -96,3 +102,4 @@ export function SimplePostsOverview({ posts, newUrl, newLabel, editUrlPrefix, is
     </div>
   )
 }
+

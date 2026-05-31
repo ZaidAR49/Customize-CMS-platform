@@ -6,10 +6,14 @@ import { LatestNews } from '@/components/home/LatestNews'
 import { organizationService } from '@/lib/services/organization.service'
 import { organizationStatsService } from '@/lib/services/organization-stats.service'
 import { postsService } from '@/lib/services/posts.service'
+import { getLocale } from 'next-intl/server'
 
-function parseHeroSlides(metadata: unknown): string[] {
+function parseHeroSlides(metadata: unknown, locale: string): string[] {
   if (!metadata || typeof metadata !== 'object') return []
-  const raw = (metadata as Record<string, unknown>)['hero_slides']
+  
+  const record = metadata as Record<string, unknown>
+  const raw = record[`hero_slides_${locale}`] || record['hero_slides']
+  
   if (typeof raw === 'string') {
     try {
       const parsed = JSON.parse(raw)
@@ -23,13 +27,14 @@ function parseHeroSlides(metadata: unknown): string[] {
 }
 
 export default async function HomePage() {
+  const locale = await getLocale()
   const [org, statsRows, allPosts] = await Promise.all([
     organizationService.getOrganization(),
     organizationStatsService.getAllStats(),
     postsService.getPosts(undefined, true),
   ])
 
-  const heroSlides = parseHeroSlides(org?.metadata)
+  const heroSlides = parseHeroSlides(org?.metadata, locale)
   const latestPosts = allPosts.slice(0, 3)
 
   const stats = {
@@ -39,11 +44,14 @@ export default async function HomePage() {
     activities: parseInt(statsRows.find(s => s.key === 'activities')?.value || '0', 10),
   }
 
+  const orgMission = locale === 'ar' ? org?.mission_ar : org?.mission_en
+  const orgVision = locale === 'ar' ? org?.vision_ar : org?.vision_en
+
   return (
     <>
       <HeroSlider slides={heroSlides} />
       <TargetSectors />
-      <MissionVision mission={org?.mission_ar || ''} vision={org?.vision_ar || ''} />
+      <MissionVision mission={orgMission || ''} vision={orgVision || ''} />
       <StatsCounter stats={stats} />
       <LatestNews posts={latestPosts} />
     </>

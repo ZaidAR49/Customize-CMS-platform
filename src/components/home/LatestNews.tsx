@@ -3,18 +3,21 @@ import type { Post } from '@/types/post'
 import { PostCard } from '@/components/news/PostCard'
 import { SectionTitle } from '@/components/shared/SectionTitle'
 import { ArrowLeft } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
 interface LatestNewsProps {
   posts: Post[]
 }
 
-export function LatestNews({ posts }: LatestNewsProps) {
+export async function LatestNews({ posts }: LatestNewsProps) {
+  const t = await getTranslations('homePage.latestNews')
+
   return (
     <section className="py-20 bg-(--fcps-gray-light)">
       <div className="container">
         <SectionTitle
-          title="آخر الأخبار والنشاطات"
-          subtitle="تابع أحدث أخبارنا ونشاطاتنا في خدمة المجتمع"
+          title={t('title')}
+          subtitle={t('subtitle')}
         />
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -28,7 +31,7 @@ export function LatestNews({ posts }: LatestNewsProps) {
             href="/news"
             className="inline-flex items-center gap-2 rounded-lg bg-(--fcps-primary) px-6 py-3 text-sm font-bold text-white transition-all hover:bg-(--fcps-primary-dark) hover:scale-105 shadow-lg"
           >
-            عرض جميع الأخبار
+            {t('viewAllNews')}
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </div>

@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { createPostAction, updatePostAction } from '@/actions/posts.actions'
 import type { Post } from '@/types/post'
 import { SimplePostForm, type SimplePostFormValue, emptySimplePostFormValue } from './SimplePostForm'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface ProgramCenterFormEditorProps {
   mode: 'create' | 'edit'
@@ -29,6 +30,8 @@ export function ProgramCenterFormEditor({
   returnUrl,
   returnLabel
 }: ProgramCenterFormEditorProps) {
+  const t = useTranslations(type === 'program' ? 'dashboardPrograms' : 'dashboardCenters')
+  const locale = useLocale()
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   const [formValue, setFormValue] = useState<SimplePostFormValue>(
@@ -61,30 +64,30 @@ export function ProgramCenterFormEditor({
           : await createPostAction(payload)
 
       if (!result.success) {
-        toast.error(result.error ?? 'تعذر الحفظ')
+        toast.error(result.error ?? t('error'))
         return
       }
 
-      toast.success(mode === 'edit' ? 'تم التحديث بنجاح' : 'تم الإنشاء بنجاح')
-      router.push(returnUrl)
+      toast.success(mode === 'edit' ? t('successUpdate') : t('successCreate'))
+      router.push(`/${locale}${returnUrl}`)
       router.refresh()
     })
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <Link
-        href={returnUrl}
+        href={`/${locale}${returnUrl}`}
         className="inline-flex items-center gap-2 text-sm text-(--fcps-gray-text) transition-colors hover:text-(--fcps-primary)"
       >
-        <ArrowRight className="h-4 w-4" />
+        <ArrowRight className={`h-4 w-4 ${locale === 'ar' ? '' : 'rotate-180'}`} />
         {returnLabel}
       </Link>
 
       <Card className="border-none shadow-sm">
         <CardHeader>
-          <CardTitle className="text-2xl text-(--fcps-dark)">{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
+          <CardTitle className={`text-2xl text-(--fcps-dark) ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{title}</CardTitle>
+          <CardDescription className={locale === 'ar' ? 'text-right' : 'text-left'}>{description}</CardDescription>
         </CardHeader>
         <CardContent>
           <SimplePostForm
@@ -93,10 +96,11 @@ export function ProgramCenterFormEditor({
             pending={pending}
             onChange={updateForm}
             onSubmit={submitForm}
-            onCancel={() => router.push(returnUrl)}
+            onCancel={() => router.push(`/${locale}${returnUrl}`)}
           />
         </CardContent>
       </Card>
     </div>
   )
 }
+

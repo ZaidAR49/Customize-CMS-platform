@@ -11,13 +11,7 @@ import { Pencil, Trash2 } from 'lucide-react'
 import type { Post } from '@/types/post'
 import { formatSiteDate, formatSiteNumber } from '@/lib/date-format'
 import { TruncateFullTextPopup } from '@/components/ui/truncate-full-text'
-
-const typeLabels: Record<string, string> = {
-  news: 'أخبار',
-  activity: 'نشاطات',
-  program: 'برامج',
-  center: 'مراكز',
-}
+import { useTranslations, useLocale } from 'next-intl'
 
 interface PostsTableProps {
   posts: Post[]
@@ -29,28 +23,38 @@ interface PostsTableProps {
 }
 
 export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '/dashboard/posts', isEditor = true, hideStats = false }: PostsTableProps) {
+  const t = useTranslations('dashboardPosts')
+  const locale = useLocale()
+
+  const typeLabels: Record<string, string> = {
+    news: t('types.news'),
+    activity: t('types.activity'),
+    program: t('types.program'),
+    center: t('types.center'),
+  }
+
   return (
     <div className="rounded-lg border bg-white">
       <Table className="table-fixed">
         <TableHeader>
           <TableRow className="bg-(--fcps-bg-soft)">
-            <TableHead className="text-right font-bold">العنوان</TableHead>
-            <TableHead className="text-right font-bold">النوع</TableHead>
-            <TableHead className="text-right font-bold">التاريخ</TableHead>
+            <TableHead className={`font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t('tableHeaders.title')}</TableHead>
+            <TableHead className={`font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t('tableHeaders.type')}</TableHead>
+            <TableHead className={`font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t('tableHeaders.date')}</TableHead>
             {!hideStats && (
               <>
-                <TableHead className="text-right font-bold">الإعجابات</TableHead>
-                <TableHead className="text-right font-bold">الحالة</TableHead>
+                <TableHead className={`font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t('tableHeaders.likes')}</TableHead>
+                <TableHead className={`font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t('tableHeaders.status')}</TableHead>
               </>
             )}
-            <TableHead className="text-right font-bold">الإجراءات</TableHead>
+            <TableHead className={`font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t('tableHeaders.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {posts.map((post) => (
             <TableRow key={post.id} className="hover:bg-(--fcps-bg-soft)/50">
               <TableCell className="max-w-[min(280px,40vw)] font-medium">
-                <TruncateFullTextPopup text={post.title} dialogTitle="العنوان" />
+                <TruncateFullTextPopup text={locale === 'ar' ? post.title : (post.title_en || post.title)} dialogTitle={t('tableHeaders.title')} />
               </TableCell>
               <TableCell>
                 <Badge variant="secondary" className="text-xs">
@@ -66,11 +70,11 @@ export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '
                   <TableCell>
                     {post.published ? (
                       <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-none text-xs">
-                         منشور
+                         {t('statusPublished')}
                       </Badge>
                     ) : (
                       <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-none text-xs">
-                        مسودة
+                        {t('statusDraft')}
                       </Badge>
                     )}
                   </TableCell>
@@ -109,3 +113,4 @@ export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '
     </div>
   )
 }
+

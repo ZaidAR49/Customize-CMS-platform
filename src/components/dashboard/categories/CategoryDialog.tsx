@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import type { CategoryRow } from '@/types/category';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface CategoryDialogProps {
   open: boolean;
@@ -23,6 +24,8 @@ interface CategoryDialogProps {
 }
 
 export function CategoryDialog({ open, onOpenChange, category, onSave, pending }: CategoryDialogProps) {
+  const t = useTranslations('dashboardCategories');
+  const locale = useLocale();
   const [formData, setFormData] = useState<Partial<CategoryRow>>({});
   const [showConfirmClear, setShowConfirmClear] = useState(false);
 
@@ -66,39 +69,39 @@ export function CategoryDialog({ open, onOpenChange, category, onSave, pending }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg" dir="rtl">
+      <DialogContent className="sm:max-w-lg" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
         <DialogHeader>
-          <DialogTitle>{category ? 'تعديل تصنيف' : 'إضافة تصنيف'}</DialogTitle>
+          <DialogTitle>{category ? t('form.titleEdit') : t('form.titleAdd')}</DialogTitle>
         </DialogHeader>
         <form id="category-form" onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="cat-key">المفتاح (باللغة الإنجليزية، فريد)</Label>
+            <Label htmlFor="cat-key">{t('form.keyLabel')}</Label>
             <Input
               id="cat-key"
               value={formData.key || ''}
               onChange={(e) => handleChange('key', e.target.value)}
               disabled={pending}
               dir="ltr"
-              className="text-left"
-              placeholder="e.g. education, health"
+              className={`text-left ${locale === 'ar' ? 'text-left' : ''}`}
+              placeholder={t('form.keyPlaceholder')}
               required
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="cat-label-ar">الاسم (بالعربية)</Label>
+            <Label htmlFor="cat-label-ar">{t('form.nameArLabel')}</Label>
             <Input
               id="cat-label-ar"
               value={formData.label_ar || ''}
               onChange={(e) => handleChange('label_ar', e.target.value)}
               disabled={pending}
               required
-              placeholder="مثال: التعليم، الصحة"
+              placeholder={t('form.nameArPlaceholder')}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="cat-label-en">الاسم (بالإنجليزية)</Label>
+            <Label htmlFor="cat-label-en">{t('form.nameEnLabel')}</Label>
             <Input
               id="cat-label-en"
               value={formData.label_en || ''}
@@ -106,13 +109,13 @@ export function CategoryDialog({ open, onOpenChange, category, onSave, pending }
               disabled={pending}
               required
               dir="ltr"
-              className="text-left"
-              placeholder="e.g. Education, Health"
+              className={`text-left ${locale === 'ar' ? 'text-left' : ''}`}
+              placeholder={t('form.nameEnPlaceholder')}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="cat-order">الترتيب</Label>
+            <Label htmlFor="cat-order">{t('form.orderLabel')}</Label>
             <Input
               id="cat-order"
               type="number"
@@ -125,7 +128,7 @@ export function CategoryDialog({ open, onOpenChange, category, onSave, pending }
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="cat-desc-ar">وصف إضافي (عربي) - اختياري</Label>
+              <Label htmlFor="cat-desc-ar">{t('form.descArLabel')}</Label>
               <Input
                 id="cat-desc-ar"
                 value={formData.description_ar || ''}
@@ -134,21 +137,21 @@ export function CategoryDialog({ open, onOpenChange, category, onSave, pending }
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="cat-desc-en">وصف إضافي (إنجليزي) - اختياري</Label>
+              <Label htmlFor="cat-desc-en">{t('form.descEnLabel')}</Label>
               <Input
                 id="cat-desc-en"
                 value={formData.description_en || ''}
                 onChange={(e) => handleChange('description_en', e.target.value)}
                 disabled={pending}
                 dir="ltr"
-                className="text-left"
+                className={`text-left ${locale === 'ar' ? 'text-left' : ''}`}
               />
             </div>
           </div>
         </form>
-        <DialogFooter className="gap-2 sm:justify-start">
+        <DialogFooter className={`gap-2 sm:justify-start ${locale === 'ar' ? '' : 'sm:justify-end'}`}>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
-            إلغاء
+            {t('cancel')}
           </Button>
           <Button
             type="button"
@@ -157,10 +160,10 @@ export function CategoryDialog({ open, onOpenChange, category, onSave, pending }
             disabled={pending}
             className="text-red-500 border-red-200 hover:bg-red-50"
           >
-            مسح
+            {t('clear')}
           </Button>
           <Button type="submit" form="category-form" disabled={pending || !formData.key || !formData.label_ar || !formData.label_en}>
-            {pending ? 'جاري الحفظ...' : 'حفظ'}
+            {pending ? t('saving') : t('save')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -168,11 +171,12 @@ export function CategoryDialog({ open, onOpenChange, category, onSave, pending }
       <ConfirmDialog
         open={showConfirmClear}
         onOpenChange={setShowConfirmClear}
-        title="تأكيد مسح البيانات"
-        description="هل أنت متأكد من مسح الحقول؟ لا يمكن التراجع عن هذا الإجراء."
-        confirmText="مسح"
+        title={t('form.clearConfirmTitle')}
+        description={t('form.clearConfirmDesc')}
+        confirmText={t('clear')}
         onConfirm={executeClear}
       />
     </Dialog>
   );
 }
+

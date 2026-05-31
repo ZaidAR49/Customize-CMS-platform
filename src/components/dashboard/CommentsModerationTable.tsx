@@ -19,6 +19,7 @@ import { moderateCommentAction } from '@/actions/comments.actions'
 import type { CommentStatus, PostCommentWithPost } from '@/types/comment'
 import { formatSiteDateTime } from '@/lib/date-format'
 import { TruncateFullTextPopup } from '@/components/ui/truncate-full-text'
+import { useTranslations, useLocale } from 'next-intl'
 
 function postEmbed(posts: PostCommentWithPost['posts']) {
   if (!posts) return null
@@ -35,12 +36,6 @@ function publicPostPath(type: string, slug: string) {
   return `${base[type] ?? '/news'}/${slug}`
 }
 
-const statusLabels: Record<CommentStatus, string> = {
-  pending: 'قيد المراجعة',
-  approved: 'مقبول',
-  rejected: 'مرفوض',
-}
-
 const statusVariant: Record<
   CommentStatus,
   'default' | 'secondary' | 'destructive' | 'outline'
@@ -55,9 +50,17 @@ interface Props {
 }
 
 export function CommentsModerationTable({ comments }: Props) {
+  const t = useTranslations('dashboardComments')
+  const locale = useLocale()
   const router = useRouter()
   const [filter, setFilter] = useState<'all' | CommentStatus>('all')
   const [pending, startTransition] = useTransition()
+
+  const statusLabels: Record<CommentStatus, string> = {
+    pending: t('filterPending'),
+    approved: t('filterApproved'),
+    rejected: t('filterRejected'),
+  }
 
   const rows = useMemo(() => {
     if (filter === 'all') return comments
@@ -68,10 +71,10 @@ export function CommentsModerationTable({ comments }: Props) {
     startTransition(async () => {
       const res = await moderateCommentAction({ id, status })
       if (res.success) {
-        toast.success(status === 'approved' ? 'تم قبول التعليق' : 'تم رفض التعليق')
+        toast.success(status === 'approved' ? t('successApprove') : t('successReject'))
         router.refresh()
       } else {
-        toast.error(res.error ?? 'فشل التحديث')
+        toast.error(res.error ?? t('errorUpdate'))
       }
     })
   }
@@ -80,7 +83,7 @@ export function CommentsModerationTable({ comments }: Props) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm text-(--fcps-gray-text)">عرض:</span>
+          <span className="text-sm text-(--fcps-gray-text)">{t('filterLabel')}</span>
           {(['all', 'pending', 'approved', 'rejected'] as const).map((key) => (
             <Button
               key={key}
@@ -90,7 +93,7 @@ export function CommentsModerationTable({ comments }: Props) {
               onClick={() => setFilter(key)}
             >
               {key === 'all'
-                ? 'الكل'
+                ? t('filterAll')
                 : statusLabels[key as CommentStatus]}
             </Button>
           ))}
@@ -98,23 +101,23 @@ export function CommentsModerationTable({ comments }: Props) {
         <ClearFiltersButton onClear={() => setFilter('all')} disabled={filter === 'all'} />
       </div>
 
-      <div className="rounded-lg border bg-white">
-        <Table className="table-fixed">
+      <div className="rounded-lg border bg-white overflow-hidden">
+        <Table className="table-fixed" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
           <TableHeader>
             <TableRow className="bg-(--fcps-bg-soft)">
-              <TableHead className="text-right font-bold">المقال</TableHead>
-              <TableHead className="text-right font-bold">المشارك</TableHead>
-              <TableHead className="text-right font-bold">التعليق</TableHead>
-              <TableHead className="text-right font-bold">الحالة</TableHead>
-              <TableHead className="text-right font-bold">التاريخ</TableHead>
-              <TableHead className="text-right font-bold">إجراءات</TableHead>
+              <TableHead className={`font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t('tableHeaders.post')}</TableHead>
+              <TableHead className={`font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t('tableHeaders.author')}</TableHead>
+              <TableHead className={`font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t('tableHeaders.comment')}</TableHead>
+              <TableHead className={`font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t('tableHeaders.status')}</TableHead>
+              <TableHead className={`font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t('tableHeaders.date')}</TableHead>
+              <TableHead className={`font-bold ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t('tableHeaders.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="py-10 text-center text-(--fcps-gray-text)">
-                  لا توجد تعليقات ضمن هذا الفلتر.
+                  {t('emptyState')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -127,13 +130,13 @@ export function CommentsModerationTable({ comments }: Props) {
                     <TableCell className="max-w-[180px] whitespace-normal wrap-break-word">
                       {post ? (
                         <TruncateFullTextPopup
-                          text={post.title}
-                          dialogTitle="عنوان المقال"
+                          text={locale === 'ar' ? post.title : ((post as any).title_en || post.title)}
+                          dialogTitle={t('dialogTitlePost')}
                           className="font-medium text-(--fcps-primary)"
                           renderDialogFooter={(close) => (
                             <>
                               <Button type="button" variant="outline" onClick={close}>
-                                إغلاق
+                                {t('close')}
                               </Button>
                               <Link
                                 href={href}
@@ -142,7 +145,7 @@ export function CommentsModerationTable({ comments }: Props) {
                                 onClick={close}
                                 className="inline-flex h-8 items-center justify-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                               >
-                                فتح المقال
+                                {t('openPost')}
                               </Link>
                             </>
                           )}
@@ -153,18 +156,18 @@ export function CommentsModerationTable({ comments }: Props) {
                     </TableCell>
                     <TableCell className="max-w-[140px] whitespace-normal wrap-break-word">
                       <div className="font-medium">
-                        <TruncateFullTextPopup text={c.author_name} dialogTitle="اسم المشارك" />
+                        <TruncateFullTextPopup text={c.author_name} dialogTitle={t('dialogTitleAuthor')} />
                       </div>
                       {c.author_email ? (
                         <div className="text-xs text-(--fcps-gray-text) break-all" dir="ltr">
-                          <TruncateFullTextPopup text={c.author_email} dialogTitle="البريد الإلكتروني" />
+                          <TruncateFullTextPopup text={c.author_email} dialogTitle={t('dialogTitleEmail')} />
                         </div>
                       ) : null}
                     </TableCell>
                     <TableCell className="max-w-md text-sm">
                       <TruncateFullTextPopup
                         text={c.body}
-                        dialogTitle="نص التعليق"
+                        dialogTitle={t('dialogTitleComment')}
                         className="whitespace-pre-line"
                       />
                     </TableCell>
@@ -186,7 +189,7 @@ export function CommentsModerationTable({ comments }: Props) {
                           disabled={pending || c.status === 'approved'}
                           onClick={() => act(c.id, 'approved')}
                         >
-                          قبول
+                          {t('approve')}
                         </Button>
                         <Button
                           type="button"
@@ -196,7 +199,7 @@ export function CommentsModerationTable({ comments }: Props) {
                           disabled={pending || c.status === 'rejected'}
                           onClick={() => act(c.id, 'rejected')}
                         >
-                          رفض
+                          {t('reject')}
                         </Button>
                       </div>
                     </TableCell>
@@ -209,12 +212,15 @@ export function CommentsModerationTable({ comments }: Props) {
       </div>
 
       <p className="text-xs text-(--fcps-gray-text)">
-        إرسال تعليقات جديدة من الواجهة العامة عبر{' '}
-        <code className="rounded bg-(--fcps-bg-soft) px-1" dir="ltr">
-          POST /api/comments
-        </code>{' '}
-        (تُخزَّن كـ «قيد المراجعة» حتى يعتمدها مسؤول هنا).
+        {t.rich('apiNote', {
+           api: () => (
+             <code className="rounded bg-(--fcps-bg-soft) px-1" dir="ltr">
+               POST /api/comments
+             </code>
+           )
+        })}
       </p>
     </div>
   )
 }
+

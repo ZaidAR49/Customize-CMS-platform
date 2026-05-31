@@ -9,11 +9,13 @@ import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import type { SiteNavItem } from '@/lib/site-nav'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { useTranslations } from 'next-intl'
 
 export function NavbarMobile({ navItems = [] }: { navItems?: SiteNavItem[] }) {
   const scrolled = useScrollTop(80)
   const [open, setOpen] = useState(false)
   const [expandedSection, setExpandedSection] = useState<string | null>(null)
+  const t = useTranslations('nav')
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section)
@@ -26,14 +28,14 @@ export function NavbarMobile({ navItems = [] }: { navItems?: SiteNavItem[] }) {
         scrolled ? 'shadow-md' : 'shadow-sm'
       )}
     >
-      <div className="container flex h-14 items-center justify-between">
+      <div className="w-full px-4 md:px-8 flex h-14 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white overflow-hidden border border-(--fcps-bg-soft) shadow-sm">
             <img src="/images/logo.png" alt="Logo" width={36} height={36} className="object-cover" />
           </div>
-          <span className="text-sm font-bold text-(--fcps-primary-dark)">
-            حماية الأسرة والطفولة
+          <span className="text-sm font-bold text-(--fcps-primary-dark) whitespace-nowrap">
+            {t('societyNameShort')}
           </span>
         </Link>
 
@@ -45,14 +47,14 @@ export function NavbarMobile({ navItems = [] }: { navItems?: SiteNavItem[] }) {
             render={
               <button
                 className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-(--fcps-bg-soft)"
-                aria-label="القائمة"
+                aria-label={t('menu')}
               />
             }
           >
             <Menu className="h-5 w-5 text-(--fcps-text)" />
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px] p-0">
-            <SheetTitle className="sr-only">القائمة الرئيسية</SheetTitle>
+            <SheetTitle className="sr-only">{t('mainMenu')}</SheetTitle>
             <div className="flex h-full flex-col">
               {/* Header */}
               <div className="flex items-center justify-between border-b px-4 py-4">
@@ -60,7 +62,7 @@ export function NavbarMobile({ navItems = [] }: { navItems?: SiteNavItem[] }) {
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white overflow-hidden border border-(--fcps-bg-soft) shadow-sm">
                     <img src="/images/logo.png" alt="Logo" width={36} height={36} className="object-contain" />
                   </div>
-                  <span className="text-sm font-bold text-(--fcps-primary-dark)">القائمة</span>
+                  <span className="text-sm font-bold text-(--fcps-primary-dark)">{t('menu')}</span>
                 </div>
               </div>
 

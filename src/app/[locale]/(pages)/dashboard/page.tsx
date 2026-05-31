@@ -2,20 +2,22 @@ import { Card, CardContent } from '@/components/ui/card'
 import { PostsTable } from '@/components/dashboard/PostsTable'
 import { postsService } from '@/lib/services/posts.service'
 import { FileText, Heart, Users, Clock } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
 export default async function DashboardPage() {
+  const t = await getTranslations('dashboardOverview')
   const allPosts = await postsService.getPosts()
   const posts = allPosts.filter((post) => post.type !== 'center' && post.type !== 'program')
   const stats = [
-    { label: 'إجمالي المقالات', value: posts.length, icon: FileText, color: 'bg-blue-500' },
-    { label: 'إجمالي الإعجابات', value: posts.reduce((sum, p) => sum + p.likes, 0), icon: Heart, color: 'bg-red-500' },
-    { label: 'المستخدمون', value: 3, icon: Users, color: 'bg-(--fcps-primary)' },
-    { label: 'مسودات معلقة', value: 0, icon: Clock, color: 'bg-amber-500' },
+    { label: t('totalPosts'), value: posts.length, icon: FileText, color: 'bg-blue-500' },
+    { label: t('totalLikes'), value: posts.reduce((sum, p) => sum + p.likes, 0), icon: Heart, color: 'bg-red-500' },
+    { label: t('users'), value: 3, icon: Users, color: 'bg-(--fcps-primary)' },
+    { label: t('pendingDrafts'), value: 0, icon: Clock, color: 'bg-amber-500' },
   ]
 
   return (
     <div>
-      <h2 className="mb-6 text-2xl font-bold text-(--fcps-dark)">نظرة عامة</h2>
+      <h2 className="mb-6 text-2xl font-bold text-(--fcps-dark)">{t('title')}</h2>
 
       {/* Stat Cards */}
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -36,9 +38,10 @@ export default async function DashboardPage() {
 
       {/* Recent Posts */}
       <div>
-        <h3 className="mb-4 text-lg font-bold text-(--fcps-dark)">آخر المقالات</h3>
+        <h3 className="mb-4 text-lg font-bold text-(--fcps-dark)">{t('latestPosts')}</h3>
         <PostsTable posts={posts.slice(0, 5)} />
       </div>
     </div>
   )
 }
+

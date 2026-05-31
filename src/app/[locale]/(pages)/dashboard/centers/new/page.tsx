@@ -1,17 +1,20 @@
 import { ProgramCenterFormEditor } from '@/components/dashboard/ProgramCenterFormEditor'
 import { requireEditor } from '@/lib/auth'
+import { getTranslations } from 'next-intl/server'
 
 export default async function NewCenterPage() {
   await requireEditor()
+  const t = await getTranslations('dashboardCenters')
 
   return (
     <ProgramCenterFormEditor 
       mode="create" 
       type="center"
-      title="إضافة مركز جديد"
-      description="أدخل تفاصيل مركز الجمعية."
+      title={t('addNewCenter')}
+      description={t('newDescription')}
       returnUrl="/dashboard/centers"
-      returnLabel="العودة إلى مراكز الجمعية"
+      returnLabel={t('returnToCenters')}
     />
   )
 }
+

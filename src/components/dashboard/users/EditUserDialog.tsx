@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label'
 import type { AppUser, UserRole } from '@/types/user'
 import { UserAvatarPicker } from './UserAvatarPicker'
 import { UserRoleSelect } from './UserRoleSelect'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface EditUserDialogProps {
   open: boolean
@@ -54,15 +55,18 @@ export function EditUserDialog({
   onSave,
   onCancel,
 }: EditUserDialogProps) {
+  const t = useTranslations('dashboardUsers')
+  const locale = useLocale()
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg" dir="rtl">
-        <DialogHeader>
-          <DialogTitle>تعديل المستخدم</DialogTitle>
+      <DialogContent className="sm:max-w-lg" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+        <DialogHeader className={locale === 'ar' ? 'text-right' : 'text-left'}>
+          <DialogTitle>{t('editTitle')}</DialogTitle>
           <DialogDescription>
             {editUser && editUser.id === currentUserId ? (
               <span className="mt-2 block text-amber-900">
-                عند تغيير بريدك قد تحتاج لتسجيل الدخول مرة أخرى بالبريد الجديد في Google.
+                {t('editSelfWarning')}
               </span>
             ) : null}
           </DialogDescription>
@@ -76,17 +80,18 @@ export function EditUserDialog({
             onFileSelected={onAvatarFile}
           />
           <div className="grid gap-2">
-            <Label htmlFor="edit-name">الاسم</Label>
+            <Label className={locale === 'ar' ? 'text-right' : 'text-left'} htmlFor="edit-name">{t('nameField')}</Label>
             <Input
               id="edit-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               disabled={pending}
               dir="auto"
+              className={locale === 'ar' ? '' : 'text-left'}
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="edit-email">البريد الإلكتروني</Label>
+            <Label className={locale === 'ar' ? 'text-right' : 'text-left'} htmlFor="edit-email">{t('emailField')}</Label>
             <Input
               id="edit-email"
               type="email"
@@ -103,15 +108,15 @@ export function EditUserDialog({
             onChange={setRole}
             disabled={pending}
             locked={lockSelfRole}
-            lockHint="لا يمكن تغيير دورك طالما أنت المسؤول الوحيد. أضف مسؤولاً آخر أولاً."
+            lockHint={t('lockHint')}
           />
         </div>
-        <DialogFooter className="gap-2 sm:justify-start">
+        <DialogFooter className={`gap-2 ${locale === 'ar' ? 'sm:justify-start' : 'sm:justify-end'}`}>
           <Button type="button" variant="outline" onClick={onCancel} disabled={pending}>
-            إلغاء
+            {t('cancelBtn')}
           </Button>
           <Button type="button" onClick={onSave} disabled={pending || !name.trim() || !email.trim()}>
-            {pending ? 'جاري الحفظ...' : 'حفظ'}
+            {pending ? t('savingBtn') : t('saveBtn')}
           </Button>
         </DialogFooter>
       </DialogContent>

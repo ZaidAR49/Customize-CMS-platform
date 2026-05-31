@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { formatSiteDate } from '@/lib/date-format'
 import type { PostApprovedComment } from '@/components/news/post-detail/PostCommentsSection'
+import { useTranslations } from 'next-intl'
 
 const PAGE_SIZE = 5
 
@@ -11,13 +12,14 @@ interface PostApprovedCommentsListProps {
 }
 
 export function PostApprovedCommentsList({ comments }: PostApprovedCommentsListProps) {
+  const t = useTranslations('newsPage.comments')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   const visible = comments.slice(0, visibleCount)
   const hasMore = visibleCount < comments.length
 
   if (comments.length === 0) {
-    return <p className="mb-8 text-sm text-[#777777]">كن أول من يعلق</p>
+    return <p className="mb-8 text-sm text-[#777777]">{t('beFirst')}</p>
   }
 
   return (
@@ -45,7 +47,7 @@ export function PostApprovedCommentsList({ comments }: PostApprovedCommentsListP
             onClick={() => setVisibleCount((n) => Math.min(n + PAGE_SIZE, comments.length))}
             className="text-sm font-medium text-[#0073aa] hover:text-[#005580]"
           >
-            عرض المزيد
+            {t('showMore')}
           </button>
         </div>
       )}

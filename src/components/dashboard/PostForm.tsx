@@ -15,6 +15,7 @@ import { importFacebookPost } from '@/actions/apify.action'
 import { toast } from 'sonner'
 import { DownloadCloud, Loader2 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { useTranslations, useLocale } from 'next-intl'
 
 const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
@@ -43,6 +44,8 @@ export function PostForm({
   onSubmit,
   onCancel,
 }: PostFormProps) {
+  const t = useTranslations('dashboardPosts.form')
+  const locale = useLocale()
   const [slugTouched, setSlugTouched] = useState(mode === 'edit')
   const [slugEnTouched, setSlugEnTouched] = useState(mode === 'edit')
   const [isHtml, setIsHtml] = useState(false)
@@ -58,7 +61,7 @@ export function PostForm({
     Object.entries(emptyPostFormValue).forEach(([key, val]) => {
       onChange(key as keyof PostFormValue, val)
     })
-    toast.success('تم تفريغ الحقول بنجاح')
+    toast.success(t('clearSuccess'))
   }
 
   useEffect(() => {
@@ -101,7 +104,7 @@ export function PostForm({
     try {
       parsedUrl = new URL(url)
     } catch (e) {
-      toast.error('يرجى إدخال رابط صحيح (URL)')
+      toast.error(t('fbImportErrorUrl'))
       return
     }
 
@@ -109,7 +112,7 @@ export function PostForm({
     const hostname = parsedUrl.hostname.toLowerCase()
     const isFacebook = hostname.includes('facebook.com') || hostname.includes('fb.com') || hostname.includes('fb.watch')
     if (!isFacebook) {
-      toast.error('يرجى إدخال رابط منشور فيسبوك صالح')
+      toast.error(t('fbImportErrorDomain'))
       return
     }
 
@@ -178,14 +181,14 @@ export function PostForm({
           onChange('published', post.published)
         }
 
-        toast.success('تم استيراد بيانات المنشور بنجاح!')
+        toast.success(t('fbImportSuccess'))
         setFacebookUrl('')
       } else {
-        toast.error(result.error || 'فشل استيراد المنشور. يرجى التحقق من الرابط.')
+        toast.error(result.error || t('fbImportErrorFail'))
       }
     } catch (err) {
       console.error(err)
-      toast.error('حدث خطأ أثناء الاتصال بـ Apify')
+      toast.error(t('fbImportErrorNetwork'))
     } finally {
       setIsImporting(false)
     }
@@ -193,7 +196,7 @@ export function PostForm({
 
   return (
     <form
-      dir="rtl"
+      dir={locale === 'ar' ? 'rtl' : 'ltr'}
       className="space-y-6"
       onSubmit={(e) => {
         e.preventDefault()
@@ -207,18 +210,19 @@ export function PostForm({
             <FacebookIcon className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">الاستيراد من فيسبوك</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">أدخل رابط منشور فيسبوك لاستخراج المحتوى والصورة تلقائياً</p>
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">{t('fbImportTitle')}</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{t('fbImportDesc')}</p>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
           <Input
             type="url"
-            placeholder="https://www.facebook.com/username/posts/123456789"
+            placeholder={t('fbImportPlaceholder')}
             value={facebookUrl}
             onChange={(e) => setFacebookUrl(e.target.value)}
             disabled={isImporting || pending}
-            className="flex-1 border-slate-200 focus-visible:ring-blue-500"
+            className="flex-1 border-slate-200 focus-visible:ring-blue-500 text-left"
+            dir="ltr"
           />
           <Button
             type="button"
@@ -229,12 +233,12 @@ export function PostForm({
             {isImporting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                جاري الاستيراد...
+                {t('fbImportingBtn')}
               </>
             ) : (
               <>
                 <DownloadCloud className="h-4 w-4" />
-                استيراد المحتوى
+                {t('fbImportBtn')}
               </>
             )}
           </Button>
@@ -242,22 +246,23 @@ export function PostForm({
       </div>
       <div className="grid gap-4">
         {mode === 'edit' && authorName ? (
-          <ReadOnlyField id="post-author" label="الكاتب" value={authorName} />
+          <ReadOnlyField id="post-author" label={t('author')} value={authorName} />
         ) : null}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="post-title-ar">العنوان (بالعربية)</Label>
+            <Label htmlFor="post-title-ar">{t('titleAr')}</Label>
             <Input
               id="post-title-ar"
               value={value.title}
               onChange={(e) => handleTitleChange(e.target.value)}
               disabled={pending}
               dir="auto"
+              className={locale === 'ar' ? '' : 'text-right'}
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="post-title-en">العنوان (بالإنجليزية)</Label>
+            <Label htmlFor="post-title-en">{t('titleEn')}</Label>
             <Input
               id="post-title-en"
               value={value.title_en || ''}
@@ -271,7 +276,7 @@ export function PostForm({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="post-slug">الرابط بالعربية (Slug AR)</Label>
+            <Label htmlFor="post-slug">{t('slugAr')}</Label>
             <Input
               id="post-slug"
               value={value.slug}
@@ -285,7 +290,7 @@ export function PostForm({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="post-slug-en">الرابط بالإنجليزية (Slug EN)</Label>
+            <Label htmlFor="post-slug-en">{t('slugEn')}</Label>
             <Input
               id="post-slug-en"
               value={value.slug_en || ''}
@@ -301,7 +306,7 @@ export function PostForm({
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="post-category">التصنيف</Label>
+          <Label htmlFor="post-category">{t('category')}</Label>
           <select
             id="post-category"
             value={value.category_id}
@@ -309,7 +314,7 @@ export function PostForm({
             disabled={pending}
             className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring"
           >
-            <option value="">بدون تصنيف</option>
+            <option value="">{t('noCategory')}</option>
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.label}
@@ -320,16 +325,16 @@ export function PostForm({
 
 
         <div className="grid gap-2">
-          <Label htmlFor="post-tags-input">الوسوم (Tags)</Label>
+          <Label htmlFor="post-tags-input">{t('tags')}</Label>
           <p className="text-xs text-gray-500">
-            أدخل الوسوم للمقال. اضغط على زر Enter أو أضف فاصلة (، أو ,) لإضافة الوسم.
+            {t('tagsDesc')}
           </p>
           <div className="flex flex-wrap gap-2 p-2 border rounded-lg bg-gray-50/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all duration-200">
             {/* Tag Pills */}
             {(value.tags || []).map((tag, idx) => (
               <span
                 key={`${tag}-${idx}`}
-                className="inline-flex items-center gap-1.5 rounded-md bg-blue-50 border border-blue-100/60 px-2.5 py-0.5 text-xs font-medium text-blue-600 animate-in fade-in zoom-in-95 duration-150"
+                className={`inline-flex items-center gap-1.5 rounded-md bg-blue-50 border border-blue-100/60 px-2.5 py-0.5 text-xs font-medium text-blue-600 animate-in fade-in zoom-in-95 duration-150 ${locale === 'ar' ? 'flex-row' : 'flex-row-reverse'}`}
               >
                 <span>{tag}</span>
                 <button
@@ -340,7 +345,7 @@ export function PostForm({
                   }}
                   disabled={pending}
                   className="rounded-full p-0.5 hover:bg-blue-100/80 text-blue-500 hover:text-blue-700 transition-colors"
-                  aria-label={`إزالة الوسم ${tag}`}
+                  aria-label={t('removeTag', { tag })}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -365,7 +370,7 @@ export function PostForm({
             <input
               id="post-tags-input"
               type="text"
-              placeholder={(value.tags || []).length === 0 ? "مثال: نشاطات، أيتام، إنجازات..." : "إضافة وسم..."}
+              placeholder={(value.tags || []).length === 0 ? t('tagsPlaceholder') : t('tagsAdd')}
               disabled={pending}
               className="flex-1 min-w-[120px] bg-transparent text-sm outline-none border-none py-0.5 px-1 placeholder:text-gray-400"
               onKeyDown={(e) => {
@@ -402,19 +407,105 @@ export function PostForm({
           </div>
         </div>
 
+        <div className="grid gap-2">
+          <Label htmlFor="post-tags-en-input">{t('tagsEn')}</Label>
+          <p className="text-xs text-gray-500">
+            {t('tagsEnDesc')}
+          </p>
+          <div className="flex flex-wrap gap-2 p-2 border rounded-lg bg-gray-50/50 focus-within:bg-white focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-100 transition-all duration-200">
+            {/* English Tag Pills */}
+            {(value.tags_en || []).map((tag, idx) => (
+              <span
+                key={`en-${tag}-${idx}`}
+                className="inline-flex items-center gap-1.5 rounded-md bg-green-50 border border-green-100/60 px-2.5 py-0.5 text-xs font-medium text-green-700 animate-in fade-in zoom-in-95 duration-150 flex-row-reverse"
+              >
+                <span>{tag}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextTags = (value.tags_en || []).filter((_, i) => i !== idx)
+                    onChange('tags_en', nextTags)
+                  }}
+                  disabled={pending}
+                  className="rounded-full p-0.5 hover:bg-green-100/80 text-green-600 hover:text-green-800 transition-colors"
+                  aria-label={t('removeTag', { tag })}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-3 w-3"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                </button>
+              </span>
+            ))}
+
+            {/* English Tag Input */}
+            <input
+              id="post-tags-en-input"
+              type="text"
+              dir="ltr"
+              placeholder={(value.tags_en || []).length === 0 ? t('tagsEnPlaceholder') : t('tagsAdd')}
+              disabled={pending}
+              className="flex-1 min-w-[120px] bg-transparent text-sm outline-none border-none py-0.5 px-1 placeholder:text-gray-400 text-left"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  const target = e.currentTarget
+                  const val = target.value.trim().replace(/[،,]/g, '')
+                  if (val && !(value.tags_en || []).includes(val)) {
+                    onChange('tags_en', [...(value.tags_en || []), val])
+                    target.value = ''
+                  }
+                }
+              }}
+              onInput={(e) => {
+                const target = e.currentTarget
+                const val = target.value
+                if (val.endsWith(',') || val.endsWith('،')) {
+                  const tag = val.slice(0, -1).trim()
+                  if (tag && !(value.tags_en || []).includes(tag)) {
+                    onChange('tags_en', [...(value.tags_en || []), tag])
+                  }
+                  target.value = ''
+                }
+              }}
+              onBlur={(e) => {
+                const target = e.currentTarget
+                const val = target.value.trim().replace(/[،,]/g, '')
+                if (val && !(value.tags_en || []).includes(val)) {
+                  onChange('tags_en', [...(value.tags_en || []), val])
+                  target.value = ''
+                }
+              }}
+            />
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="post-excerpt-ar">الملخص (بالعربية)</Label>
+            <Label htmlFor="post-excerpt-ar">{t('excerptAr')}</Label>
             <Textarea
               id="post-excerpt-ar"
               value={value.excerpt}
               onChange={(e) => onChange('excerpt', e.target.value)}
               disabled={pending}
               rows={4}
+              dir="rtl"
+              className={locale === 'ar' ? '' : 'text-right'}
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="post-excerpt-en">الملخص (بالإنجليزية)</Label>
+            <Label htmlFor="post-excerpt-en">{t('excerptEn')}</Label>
             <Textarea
               id="post-excerpt-en"
               value={value.excerpt_en || ''}
@@ -428,22 +519,18 @@ export function PostForm({
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="post-descripcion">المحتوى (بالعربية)</Label>
-          <p className="text-xs text-[#777777]">
-            يدعم HTML مثل <code className="rounded bg-[#f0f0f0] px-1">&lt;h2&gt;عنوان&lt;/h2&gt;</code>{' '}
-            أو Markdown مثل <code className="rounded bg-[#f0f0f0] px-1">## عنوان</code>
-          </p>
+          <Label htmlFor="post-descripcion">{t('contentAr')}</Label>
+          <p className="text-xs text-[#777777]" dangerouslySetInnerHTML={{ __html: t.raw('contentDescHtml') }} />
           {/* toggel */}
-          <div className="flex items-center space-x-3 pb-2 flex-row-reverse">
+          <div className={`flex items-center space-x-3 pb-2 ${locale === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
             <Switch
               id="theme-mode-ar"
               checked={isHtml}
               onCheckedChange={setIsHtml}
-              // This matches the blue color from your image
-              className="data-[state=checked]:bg-blue-500 mr-3"
+              className={`data-[state=checked]:bg-blue-500 ${locale === 'ar' ? 'mr-3' : 'ml-3'}`}
             />
             <Label htmlFor="theme-mode-ar" className="font-medium text-gray-700">
-              {isHtml ? "HTML" : "نص"}
+              {isHtml ? t('modeHtml') : t('modeText')}
             </Label>
           </div>
 
@@ -456,7 +543,7 @@ export function PostForm({
               rows={20}
               language="html"
               className="min-h-[320px] font-mono text-sm leading-relaxed"
-              placeholder="Please enter HTML code."
+              placeholder={t('contentHtmlPlaceholder')}
               dir="ltr"
               style={{
                 direction: 'ltr',
@@ -476,7 +563,7 @@ export function PostForm({
               disabled={pending}
               rows={16}
               className="min-h-[320px] text-base leading-relaxed p-4"
-              placeholder="أدخل المحتوى..."
+              placeholder={t('contentTextPlaceholder')}
               dir="rtl"
             />
           )}
@@ -485,7 +572,7 @@ export function PostForm({
         <div className="grid gap-2">
           <div className="flex items-center justify-between pb-2">
             <div>
-              <Label htmlFor="post-descripcion-en">المحتوى (بالإنجليزية)</Label>
+              <Label htmlFor="post-descripcion-en">{t('contentEn')}</Label>
             </div>
           </div>
 
@@ -498,7 +585,7 @@ export function PostForm({
               rows={20}
               language="html"
               className="min-h-[320px] font-mono text-sm leading-relaxed rounded-md border"
-              placeholder="Enter HTML code..."
+              placeholder={t('contentHtmlPlaceholder')}
               dir="ltr"
               style={{
                 direction: 'ltr',
@@ -518,14 +605,14 @@ export function PostForm({
               disabled={pending}
               rows={16}
               className="min-h-[320px] text-base leading-relaxed p-4 text-left"
-              placeholder="Enter content..."
+              placeholder={t('contentTextPlaceholder')}
               dir="ltr"
             />
           )}
         </div>
 
         <div className="grid gap-2 border-t pt-6 mt-4">
-          <Label className="text-base font-bold text-slate-800">صور المقال ومعرض الوسائط (الحد الأقصى 20 صورة)</Label>
+          <Label className="text-base font-bold text-slate-800">{t('imagesTitle')}</Label>
           <PostImageGallery
             coverImage={value.cover_image}
             gallery={value.gallery || []}
@@ -541,7 +628,7 @@ export function PostForm({
             onChange={(e) => onChange('published', e.target.checked)}
             disabled={pending}
           />
-          <span>نشر المقال</span>
+          <span>{t('publishLabel')}</span>
         </label>
       </div>
 
@@ -551,7 +638,7 @@ export function PostForm({
           className="bg-(--fcps-primary) hover:bg-(--fcps-primary-dark) text-white"
           disabled={pending || !value.title.trim() || !value.slug.trim()}
         >
-          {pending ? 'جاري الحفظ...' : mode === 'create' ? 'إنشاء المقال' : 'حفظ التعديلات'}
+          {pending ? t('savingBtn') : mode === 'create' ? t('createBtn') : t('saveChangesBtn')}
         </Button>
         <Button
           type="button"
@@ -560,21 +647,22 @@ export function PostForm({
           disabled={pending}
           className="text-red-500 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/20"
         >
-          مسح البيانات
+          {t('clearBtn')}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel} disabled={pending}>
-          إلغاء
+          {t('cancelBtn')}
         </Button>
       </div>
 
       <ConfirmDialog
         open={showConfirmClear}
         onOpenChange={setShowConfirmClear}
-        title="تأكيد مسح البيانات"
-        description="هل أنت متأكد من مسح جميع الحقول؟ لا يمكن التراجع عن هذا الإجراء."
-        confirmText="مسح الكل"
+        title={t('confirmClearTitle')}
+        description={t('confirmClearDesc')}
+        confirmText={t('confirmClearBtn')}
         onConfirm={executeClear}
       />
     </form>
   )
 }
+

@@ -70,6 +70,7 @@ function mapPost(row: RawPost): Post {
     category: category?.key ?? metadata.category ?? undefined,
     categoryLabel: catAr.label ?? catEn.label ?? category?.key ?? metadata.category ?? undefined,
     tags: Array.isArray(row.tags) ? row.tags : [],
+    tags_en: Array.isArray(row.tags_en) ? row.tags_en : [],
     gallery: parseGallery(metadata),
     likes: parseLikes(metadata),
     published: row.published ?? false,
@@ -130,12 +131,12 @@ export const postsService = {
     const { data: rows, error: listError } = await listQuery
     if (listError) throw listError
 
-    const match = (rows ?? []).find((row) => normalizeSlug(row.slug ?? '') === normalized)
+    const match = (rows ?? []).find((row: any) => normalizeSlug(row.slug ?? '') === normalized)
     return match ? mapPost(match) : null
   },
 
   async createPost(postData: any): Promise<Post> {
-    const { title, title_en, slug, slug_en, descripcion, descripcion_en, excerpt, excerpt_en, cover_image, gallery, type, published, author_id, category_id, tags } = postData;
+    const { title, title_en, slug, slug_en, descripcion, descripcion_en, excerpt, excerpt_en, cover_image, gallery, type, published, author_id, category_id, tags, tags_en } = postData;
     const metadata: Record<string, unknown> = { likes: 0 };
     if (cover_image !== undefined) metadata.cover_image = cover_image ?? null;
     if (gallery !== undefined) metadata.gallery = Array.isArray(gallery) ? gallery : [];
@@ -152,6 +153,7 @@ export const postsService = {
         published: published ?? false,
         author_id,
         tags: Array.isArray(tags) ? tags : [],
+        tags_en: Array.isArray(tags_en) ? tags_en : [],
       })
       .select('id')
       .single();
@@ -192,12 +194,13 @@ export const postsService = {
   },
 
   async updatePost(id: string, postData: any): Promise<Post> {
-    const { slug, slug_en, title, title_en, descripcion, descripcion_en, excerpt, excerpt_en, cover_image, gallery, type, category_id, tags, ...rest } = postData;
+    const { slug, slug_en, title, title_en, descripcion, descripcion_en, excerpt, excerpt_en, cover_image, gallery, type, category_id, tags, tags_en, ...rest } = postData;
     const payload: Record<string, any> = { ...rest };
 
     if (type !== undefined) payload.type = toDatabasePostType(type);
     if (category_id !== undefined) payload.category_id = category_id || null;
     if (tags !== undefined) payload.tags = Array.isArray(tags) ? tags : [];
+    if (tags_en !== undefined) payload.tags_en = Array.isArray(tags_en) ? tags_en : [];
 
     if (cover_image !== undefined || gallery !== undefined) {
       const { data: existingPost, error: existingError } = await supabase

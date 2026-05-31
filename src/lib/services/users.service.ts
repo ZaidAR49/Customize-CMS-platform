@@ -38,7 +38,7 @@ export const usersService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return (data ?? []).map((row) => mapUserRow(row as Record<string, unknown>));
+    return (data ?? []).map((row: any) => mapUserRow(row as Record<string, unknown>));
   },
 
   async getUserById(id: string): Promise<User | null> {

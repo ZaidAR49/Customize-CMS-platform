@@ -7,7 +7,7 @@ import { deleteUserAction, updateUserProfileAction, createUserAction } from '@/a
 import { sendRoleAssignmentEmailAction } from '@/actions/malis.actions'
 import { signOut } from 'next-auth/react'
 import type { AppUser, UserRole } from '@/types/user'
-import { NOT_ALLOWED_AR } from './users/users-table.constants'
+import { useTranslations } from 'next-intl'
 import { UsersTableToolbar } from './users/UsersTableToolbar'
 import { UsersTableRows } from './users/UsersTableRows'
 import { EditUserDialog } from './users/EditUserDialog'
@@ -25,6 +25,7 @@ interface UsersTableProps {
 }
 
 export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
+  const t = useTranslations('dashboardUsers')
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   const [emailPending, startEmailTransition] = useTransition()
@@ -82,7 +83,7 @@ export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
 
   function guardOr(fn: () => void) {
     if (!isAdmin) {
-      toast.error(NOT_ALLOWED_AR, { duration: 5000 })
+      toast.error(t('notAllowed'), { duration: 5000 })
       return
     }
     fn()
@@ -109,7 +110,7 @@ export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
       }
       const res = await createUserAction(fd)
       if (res.success && res.data) {
-        toast.success('تم إضافة المستخدم')
+        toast.success(t('successAdd'))
         setAddOpen(false)
         setNewAvatarFile(null)
         setRoleEmailPrompt({
@@ -119,7 +120,7 @@ export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
         })
         router.refresh()
       } else {
-        toast.error(res.error ?? 'تعذّر إضافة المستخدم')
+        toast.error(res.error ?? t('errorAdd'))
       }
     })
   }
@@ -152,7 +153,7 @@ export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
       const roleChanged = editRole !== editUser.role
       const res = await updateUserProfileAction(fd)
       if (res.success) {
-        toast.success('تم تحديث بيانات المستخدم')
+        toast.success(t('successEdit'))
         setEditUser(null)
         setEditAvatarFile(null)
         if (roleChanged) {
@@ -164,7 +165,7 @@ export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
         }
         router.refresh()
       } else {
-        toast.error(res.error ?? 'تعذّر تحديث المستخدم')
+        toast.error(res.error ?? t('errorEdit'))
       }
     })
   }
@@ -179,10 +180,10 @@ export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
           await signOut({ callbackUrl: '/' })
           return
         }
-        toast.success('تم حذف المستخدم')
+        toast.success(t('successDelete'))
         router.refresh()
       } else {
-        toast.error(res.error ?? 'تعذّر حذف المستخدم')
+        toast.error(res.error ?? t('errorDelete'))
       }
     })
   }
@@ -201,10 +202,10 @@ export function UsersTable({ users, isAdmin, currentUserId }: UsersTableProps) {
     startEmailTransition(async () => {
       const res = await sendRoleAssignmentEmailAction(roleEmailPrompt)
       if (res.success) {
-        toast.success('تم إرسال البريد الإلكتروني إلى المستخدم')
+        toast.success(t('successEmail'))
         dismissRoleEmailPrompt()
       } else {
-        toast.error(res.error ?? 'تعذّر إرسال البريد الإلكتروني')
+        toast.error(res.error ?? t('errorEmail'))
       }
     })
   }

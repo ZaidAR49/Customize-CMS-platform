@@ -9,6 +9,7 @@ import { SearchBar } from '@/components/shared/SearchBar'
 import { formatSiteDate } from '@/lib/date-format'
 import { getSearchPostsAction } from '@/actions/posts.actions'
 import { Calendar, Loader2, Newspaper } from 'lucide-react'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface SidebarCategory {
   key: string
@@ -22,6 +23,9 @@ interface PostSidebarProps {
 
 export function PostSidebar({ latestPosts, categories }: PostSidebarProps) {
   const router = useRouter()
+  const t = useTranslations('newsPage.sidebar')
+  const tPage = useTranslations('newsPage')
+  const locale = useLocale()
   const [search, setSearch] = useState('')
   const [allSearchPosts, setAllSearchPosts] = useState<any[] | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -61,9 +65,11 @@ export function PostSidebar({ latestPosts, categories }: PostSidebarProps) {
   const matchingPosts =
     query && allSearchPosts
       ? allSearchPosts.filter(
-          (post) =>
-            post.title.toLowerCase().includes(query) ||
+          (post) => {
+            const title = locale === 'ar' ? post.title : (post.title_en || post.title)
+            return title.toLowerCase().includes(query) ||
             post.slug.toLowerCase().includes(query)
+          }
         )
       : []
 
@@ -83,8 +89,8 @@ export function PostSidebar({ latestPosts, categories }: PostSidebarProps) {
             if (trimmed) router.push(`/news?q=${encodeURIComponent(trimmed)}`)
             else router.push('/news')
           }}
-          placeholder="بحث عن مقال أو منشور..."
-          aria-label="بحث في الأخبار"
+          placeholder={tPage('searchPlaceholder')}
+          aria-label={tPage('searchAria')}
           onFocus={handleFocus}
         />
 
@@ -93,11 +99,11 @@ export function PostSidebar({ latestPosts, categories }: PostSidebarProps) {
             {isLoading ? (
               <div className="flex items-center justify-center py-8 text-[#777777] gap-2">
                 <Loader2 className="h-5 w-5 animate-spin text-(--fcps-primary)" />
-                <span className="text-sm font-medium">جاري البحث...</span>
+                <span className="text-sm font-medium">{t('searching')}</span>
               </div>
             ) : matchingPosts.length === 0 ? (
               <div className="py-8 text-center text-sm text-[#777777]">
-                <p>لا توجد نتائج مطابقة لـ "{search}"</p>
+                <p>{t('noSearchMatches', { search })}</p>
               </div>
             ) : (
               <div className="space-y-1">
@@ -130,13 +136,13 @@ export function PostSidebar({ latestPosts, categories }: PostSidebarProps) {
                         )}
                       </div>
                     )}
-                    <div className="min-w-0 flex-1 text-right">
+                    <div className={`min-w-0 flex-1 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
                       <h4 className="text-sm font-medium text-gray-800 line-clamp-2 leading-snug transition-colors group-hover:text-[#0073aa] group-focus:text-[#0073aa]">
-                        {post.title}
+                        {locale === 'ar' ? post.title : (post.title_en || post.title)}
                       </h4>
                       <div className="mt-1 flex items-center gap-1.5 text-[11px] text-gray-400">
                         <span className="rounded bg-[#f0f9ff] px-1.5 py-0.5 font-medium text-[#0073aa]">
-                          {post.type === 'activity' ? 'نشاط' : 'خبر'}
+                          {post.type === 'activity' ? t('activityBadge') : t('newsBadge')}
                         </span>
                         <span>•</span>
                         <span>{formatSiteDate(post.publishedAt)}</span>
@@ -151,13 +157,13 @@ export function PostSidebar({ latestPosts, categories }: PostSidebarProps) {
       </div>
 
       <div className="rounded-lg bg-[#f9f9f9] p-5">
-        <h3 className="mb-4 text-lg font-bold text-[#1a1a1a]">احدث المنشورات</h3>
+        <h3 className="mb-4 text-lg font-bold text-[#1a1a1a]">{t('latestPosts')}</h3>
         <ol className="space-y-3 text-sm">
           {latestPosts.map((post) => (
             <li key={post.id} className="leading-relaxed text-[#333333]">
               <span className="text-[#777777]">{post.commentCount ?? 0} · </span>
               <Link href={`/news/${post.slug}`} className="font-medium text-[#0073aa] hover:text-[#005580]">
-                {post.title}
+                {locale === 'ar' ? post.title : (post.title_en || post.title)}
               </Link>
               <span className="text-[#777777]"> · {formatSiteDate(post.publishedAt)}</span>
             </li>
@@ -166,8 +172,8 @@ export function PostSidebar({ latestPosts, categories }: PostSidebarProps) {
       </div>
 
       <div className="rounded-lg bg-[#f9f9f9] p-5">
-        <h3 className="mb-4 text-lg font-bold text-[#1a1a1a]">التصنيفات</h3>
-        <ul className="list-disc space-y-2 pr-5 text-sm text-[#0073aa]">
+        <h3 className="mb-4 text-lg font-bold text-[#1a1a1a]">{t('categories')}</h3>
+        <ul className={`list-disc space-y-2 text-sm text-[#0073aa] ${locale === 'ar' ? 'pr-5' : 'pl-5'}`}>
           {categories.map((cat) => (
             <li key={cat.key}>
               <Link href={`/news?category=${encodeURIComponent(cat.key)}`} className="hover:text-[#005580]">

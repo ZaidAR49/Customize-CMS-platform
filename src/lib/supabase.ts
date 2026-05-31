@@ -13,4 +13,5 @@ try {
   console.error('Error creating Supabase client:', error)
 }
 
-export default supabase
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default supabase as any

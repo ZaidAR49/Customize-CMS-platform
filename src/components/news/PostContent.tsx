@@ -11,11 +11,7 @@ import { getPublicPostUrl } from '@/lib/post-url'
 import type { Post } from '@/types/post'
 import { formatSiteDate } from '@/lib/date-format'
 import { preparePostHtml } from '@/lib/post-html'
-
-const typeBreadcrumbLabels: Record<string, string> = {
-  news: 'أخبار الجمعية',
-  activity: 'نشاطات الجمعية',
-}
+import { useTranslations, useLocale } from 'next-intl'
 
 interface SidebarCategory {
   key: string
@@ -67,11 +63,23 @@ export function PostContent({
   categories,
   approvedComments,
 }: PostContentProps) {
+  const t = useTranslations('newsPage')
+  const locale = useLocale()
+
+  const typeBreadcrumbLabels: Record<string, string> = {
+    news: t('breadcrumbs.news'),
+    activity: t('breadcrumbs.news'),
+  }
+
+  const title = locale === 'ar' ? post.title : (post.title_en || post.title)
+  const description = locale === 'ar' ? post.descripcion : (post.descripcion_en || post.descripcion)
+  const excerpt = locale === 'ar' ? post.excerpt : (post.excerpt_en || post.excerpt)
+
   const postUrl = getPublicPostUrl(post.slug)
   const categoryLabel =
-    post.categoryLabel ?? typeBreadcrumbLabels[post.type] ?? 'أخبار الجمعية'
+    post.categoryLabel ?? typeBreadcrumbLabels[post.type] ?? t('breadcrumbs.news')
   const postBodyHtml =
-    preparePostHtml(post.descripcion) || (post.excerpt ? `<p>${post.excerpt}</p>` : '')
+    preparePostHtml(description) || (excerpt ? `<p>${excerpt}</p>` : '')
 
   return (
     <div className="bg-white">
@@ -81,16 +89,16 @@ export function PostContent({
       >
         <div className="page-layout-shell flex flex-wrap items-center gap-2">
           <Link href="/" className="hover:text-[#0073aa]">
-            الرئيسية
+            {t('breadcrumbs.home')}
           </Link>
           <span aria-hidden="true">/</span>
           <Link href="/news" className="hover:text-[#0073aa]">
-            نشاطات وأخبار الجمعية
+            {t('breadcrumbs.news')}
           </Link>
           <span aria-hidden="true">/</span>
           <span className="text-[#777777]">{categoryLabel}</span>
           <span aria-hidden="true">/</span>
-          <span className="text-[#333333]">{post.title}</span>
+          <span className="text-[#333333]">{title}</span>
         </div>
       </nav>
 
@@ -98,7 +106,7 @@ export function PostContent({
         <div className="page-layout-shell page-layout">
           <article className="min-w-0">
             <h1 className="mb-4 text-3xl font-bold leading-tight text-[#1a1a1a] md:text-4xl">
-              {post.title}
+              {title}
             </h1>
 
             {previousPost && (
@@ -106,10 +114,10 @@ export function PostContent({
                 href={`/news/${previousPost.slug}`}
                 className="mb-6 flex items-start gap-2 text-sm text-[#0073aa] hover:text-[#005580]"
               >
-                <ChevronRight className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                <ChevronRight className={`mt-0.5 h-4 w-4 shrink-0 ${locale === 'en' ? 'rotate-180' : ''}`} aria-hidden />
                 <span>
                   <span className="block text-[#777777]">{formatSiteDate(previousPost.publishedAt)}</span>
-                  <span className="font-medium">{previousPost.title}</span>
+                  <span className="font-medium">{locale === 'ar' ? previousPost.title : (previousPost.title_en || previousPost.title)}</span>
                 </span>
               </Link>
             )}
@@ -117,7 +125,7 @@ export function PostContent({
             <PostMediaGallery
               coverImage={post.coverImage}
               gallery={post.gallery}
-              title={post.title}
+              title={title}
             />
 
             <div
@@ -125,24 +133,32 @@ export function PostContent({
               dangerouslySetInnerHTML={{ __html: postBodyHtml }}
             />
 
-            {post.tags && post.tags.length > 0 && (
-              <div className="mt-8 mb-6 flex flex-wrap gap-2 items-center border-t border-[#f0f0f0] pt-6" dir="rtl">
-                <span className="text-sm font-medium text-gray-500 ml-2">الوسوم:</span>
-                {post.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-blue-50/70 border border-blue-100/50 px-3 py-1 text-xs font-medium text-blue-600 transition-all hover:bg-blue-50 hover:border-blue-200"
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            )}
+            {(() => {
+              const tagsAr = post.tags ?? []
+              const tagsEn = post.tags_en ?? []
+              const displayTags =
+                locale === 'ar'
+                  ? tagsAr.length > 0 ? tagsAr : tagsEn
+                  : tagsEn.length > 0 ? tagsEn : tagsAr
+              return displayTags.length > 0 ? (
+                <div className="mt-8 mb-6 flex flex-wrap gap-2 items-center border-t border-[#f0f0f0] pt-6">
+                  <span className={`text-sm font-medium text-gray-500 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}>{t('breadcrumbs.tags')}</span>
+                  {displayTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-blue-50/70 border border-blue-100/50 px-3 py-1 text-xs font-medium text-blue-600 transition-all hover:bg-blue-50 hover:border-blue-200"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              ) : null
+            })()}
 
             <PostShareBar
               postId={post.id ?? ''}
               postUrl={postUrl}
-              postTitle={post.title}
+              postTitle={title}
               initialLikes={post.likes}
             />
 
@@ -159,3 +175,4 @@ export function PostContent({
     </div>
   )
 }
+

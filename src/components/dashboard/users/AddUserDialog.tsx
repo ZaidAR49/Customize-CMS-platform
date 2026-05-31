@@ -13,7 +13,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { UserRole } from '@/types/user'
 import { UserAvatarPicker } from './UserAvatarPicker'
-import { roleLabels, roleSelectClassName } from './users-table.constants'
+import { roleSelectClassName } from './users-table.constants'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface AddUserDialogProps {
   open: boolean
@@ -46,15 +47,16 @@ export function AddUserDialog({
   pending,
   onSubmit,
 }: AddUserDialogProps) {
+  const t = useTranslations('dashboardUsers')
+  const locale = useLocale()
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg" dir="rtl">
-        <DialogHeader>
-          <DialogTitle>إضافة مستخدم</DialogTitle>
+      <DialogContent className="sm:max-w-lg" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+        <DialogHeader className={locale === 'ar' ? 'text-right' : 'text-left'}>
+          <DialogTitle>{t('addTitle')}</DialogTitle>
           <DialogDescription>
-
-            يجب أن يكون بريد المستخدم
-            مطابقاً لحساب Google.
+            {t('addDesc')}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-2">
@@ -64,21 +66,22 @@ export function AddUserDialog({
             isBlobPreview={avatarIsBlobPreview}
             disabled={pending}
             onFileSelected={onAvatarFile}
-            footerHint="اضغط أيقونة الكاميرا لاختيار صورة (حتى 4 ميغابايت). اضغط إضافة لرفع الصورة وإنشاء المستخدم."
+            footerHint={t('avatarHint')}
           />
           <div className="grid gap-2">
-            <Label htmlFor="add-name">الاسم</Label>
+            <Label className={locale === 'ar' ? 'text-right' : 'text-left'} htmlFor="add-name">{t('nameField')}</Label>
             <Input
               id="add-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               autoComplete="name"
               disabled={pending}
-              dir="rtl"
+              dir="auto"
+              className={locale === 'ar' ? '' : 'text-left'}
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="add-email">البريد الإلكتروني</Label>
+            <Label className={locale === 'ar' ? 'text-right' : 'text-left'} htmlFor="add-email">{t('emailField')}</Label>
             <Input
               id="add-email"
               type="email"
@@ -91,7 +94,7 @@ export function AddUserDialog({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="add-role">الدور</Label>
+            <Label className={locale === 'ar' ? 'text-right' : 'text-left'} htmlFor="add-role">{t('roleField')}</Label>
             <select
               id="add-role"
               className={roleSelectClassName}
@@ -99,20 +102,18 @@ export function AddUserDialog({
               onChange={(e) => setRole(e.target.value as UserRole)}
               disabled={pending}
             >
-              {(Object.keys(roleLabels) as UserRole[]).map((r) => (
-                <option key={r} value={r}>
-                  {roleLabels[r]}
-                </option>
-              ))}
+              <option value="admin">{t('roleAdmin')}</option>
+              <option value="editor">{t('roleEditor')}</option>
+              <option value="viewer">{t('roleViewer')}</option>
             </select>
           </div>
         </div>
-        <DialogFooter className="gap-2 sm:justify-start">
+        <DialogFooter className={`gap-2 ${locale === 'ar' ? 'sm:justify-start' : 'sm:justify-end'}`}>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
-            إلغاء
+            {t('cancelBtn')}
           </Button>
           <Button type="button" onClick={onSubmit} disabled={pending || !name.trim() || !email.trim()}>
-            {pending ? 'جاري الإضافة...' : 'إضافة'}
+            {pending ? t('addingBtn') : t('addBtn')}
           </Button>
         </DialogFooter>
       </DialogContent>

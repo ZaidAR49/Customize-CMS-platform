@@ -30,6 +30,7 @@ import type { OrganizationRow, SocialPlatformKey } from '@/types/organization'
 import { SOCIAL_PLATFORM_KEYS } from '@/types/organization'
 import { ReadOnlyField } from '@/components/dashboard/ReadOnlyField'
 import { HeroSliderImagesField } from '@/components/dashboard/HeroSliderImagesField'
+import { useTranslations, useLocale } from 'next-intl'
 
 function empty(v: string | null | undefined) {
   return v ?? ''
@@ -176,6 +177,8 @@ export function OrganizationSettingsForm({
 }: {
   organization: OrganizationRow | null
 }) {
+  const t = useTranslations('dashboardSettings.form')
+  const locale = useLocale()
   const router = useRouter()
   const isCreate = organization == null
   const [form, setForm] = useState<FormState>(() => buildInitial(organization))
@@ -323,10 +326,10 @@ export function OrganizationSettingsForm({
         const result = await createOrganizationAction(payload)
         if (result.success && result.data) {
           setErrors({})
-          toast.success('تم إنشاء سجل المنظمة')
+          toast.success(t('successCreate'))
           router.refresh()
         } else {
-          toast.error(result.error ?? 'تعذر الإنشاء')
+          toast.error(result.error ?? t('errorCreate'))
           if ('fieldErrors' in result && result.fieldErrors) setErrors(result.fieldErrors)
         }
         return
@@ -335,10 +338,10 @@ export function OrganizationSettingsForm({
       const result = await updateOrganizationAction(organization.id, payload)
       if (result.success && result.data) {
         setErrors({})
-        toast.success('تم حفظ معلومات المنظمة')
+        toast.success(t('successUpdate'))
         setForm(buildInitial(result.data as OrganizationRow))
       } else {
-        toast.error(result.error ?? 'تعذر الحفظ')
+        toast.error(result.error ?? t('errorUpdate'))
         if ('fieldErrors' in result && result.fieldErrors) setErrors(result.fieldErrors)
       }
     })
@@ -350,37 +353,37 @@ export function OrganizationSettingsForm({
     organization?.updatedByName?.trim() || (organization?.updated_by ? 'مستخدم محذوف' : '')
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       {!isCreate && lastUpdatedBy ? (
-        <ReadOnlyField id="org-updated-by" label="آخر تحديث بواسطة" value={lastUpdatedBy} />
+        <ReadOnlyField id="org-updated-by" label={t('lastUpdatedBy')} value={lastUpdatedBy} />
       ) : null}
 
       <Card className="border-none shadow-sm">
-        <CardHeader className="text-right">
-          <CardTitle>الهوية والظهور</CardTitle>
-          <CardDescription>الاسم، الشعارات، وسنة التأسيس</CardDescription>
+        <CardHeader className={locale === 'ar' ? 'text-right' : 'text-left'}>
+          <CardTitle>{t('identityTitle')}</CardTitle>
+          <CardDescription>{t('identityDesc')}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-1">
-            <Label htmlFor="name_ar">الاسم بالعربية</Label>
+            <Label htmlFor="name_ar">{t('nameAr')}</Label>
             <Input
               id="name_ar"
               value={form.name_ar}
               onChange={(ev) => update('name_ar', ev.target.value)}
-              placeholder="مثال: جمعية حماية الأسرة والطفولة"
-              dir="rtl"
+              placeholder={t('placeholderNameAr')}
+              dir="auto"
               aria-invalid={!!e.name_ar}
-              className={cn(e.name_ar && 'border-destructive')}
+              className={cn(locale === 'ar' ? '' : 'text-right', e.name_ar && 'border-destructive')}
             />
             <FieldError message={e.name_ar} />
           </div>
           <div className="space-y-2 sm:col-span-1">
-            <Label htmlFor="name_en">الاسم بالإنجليزية</Label>
+            <Label htmlFor="name_en">{t('nameEn')}</Label>
             <Input
               id="name_en"
               value={form.name_en}
               onChange={(ev) => update('name_en', ev.target.value)}
-              placeholder="Example: Family and Childhood Protection Society"
+              placeholder={t('placeholderNameEn')}
               dir="ltr"
               aria-invalid={!!e.name_en}
               className={cn('text-left', e.name_en && 'border-destructive')}
@@ -388,14 +391,14 @@ export function OrganizationSettingsForm({
             <FieldError message={e.name_en} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="founded_year">سنة التأسيس</Label>
+            <Label htmlFor="founded_year">{t('foundedYear')}</Label>
             <Input
               id="founded_year"
               type="text"
               inputMode="numeric"
               value={form.founded_year}
               onChange={(ev) => update('founded_year', ev.target.value)}
-              placeholder="مثال: 1990"
+              placeholder={t('placeholderYear')}
               dir="ltr"
               className={cn('text-left', e.founded_year && 'border-destructive')}
               aria-invalid={!!e.founded_year}
@@ -403,25 +406,25 @@ export function OrganizationSettingsForm({
             <FieldError message={e.founded_year} />
           </div>
           <div className="space-y-2 sm:col-span-1">
-            <Label htmlFor="tagline_ar">الشعار بالعربية</Label>
+            <Label htmlFor="tagline_ar">{t('taglineAr')}</Label>
             <Input
               id="tagline_ar"
               value={form.tagline_ar}
               onChange={(ev) => update('tagline_ar', ev.target.value)}
-              placeholder="عبارة ترويجية أو شعار قصير..."
-              dir="rtl"
+              placeholder={t('placeholderTaglineAr')}
+              dir="auto"
               aria-invalid={!!e.tagline_ar}
-              className={cn(e.tagline_ar && 'border-destructive')}
+              className={cn(locale === 'ar' ? '' : 'text-right', e.tagline_ar && 'border-destructive')}
             />
             <FieldError message={e.tagline_ar} />
           </div>
           <div className="space-y-2 sm:col-span-1">
-            <Label htmlFor="tagline_en">الشعار بالإنجليزية</Label>
+            <Label htmlFor="tagline_en">{t('taglineEn')}</Label>
             <Input
               id="tagline_en"
               value={form.tagline_en}
               onChange={(ev) => update('tagline_en', ev.target.value)}
-              placeholder="Short tagline or promotional phrase..."
+              placeholder={t('placeholderTaglineEn')}
               dir="ltr"
               aria-invalid={!!e.tagline_en}
               className={cn('text-left', e.tagline_en && 'border-destructive')}
@@ -432,33 +435,33 @@ export function OrganizationSettingsForm({
       </Card>
 
       <Card className="border-none shadow-sm">
-        <CardHeader className="text-right">
-          <CardTitle>المحتوى</CardTitle>
-          <CardDescription>نبذة، الرسالة، والرؤية</CardDescription>
+        <CardHeader className={locale === 'ar' ? 'text-right' : 'text-left'}>
+          <CardTitle>{t('contentTitle')}</CardTitle>
+          <CardDescription>{t('contentDesc')}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="about_ar">عن المنظمة (بالعربية)</Label>
+              <Label htmlFor="about_ar">{t('aboutAr')}</Label>
               <Textarea
                 id="about_ar"
                 value={form.about_ar}
                 onChange={(ev) => update('about_ar', ev.target.value)}
-                placeholder="نبذة تعريفية شاملة عن المنظمة، أهدافها، وتاريخها..."
+                placeholder={t('placeholderAboutAr')}
                 rows={5}
                 dir="rtl"
                 aria-invalid={!!e.about_ar}
-                className={cn(e.about_ar && 'border-destructive')}
+                className={cn(locale === 'ar' ? '' : 'text-right', e.about_ar && 'border-destructive')}
               />
               <FieldError message={e.about_ar} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="about_en">عن المنظمة (بالإنجليزية)</Label>
+              <Label htmlFor="about_en">{t('aboutEn')}</Label>
               <Textarea
                 id="about_en"
                 value={form.about_en}
                 onChange={(ev) => update('about_en', ev.target.value)}
-                placeholder="Comprehensive overview of the organization, its goals, and history..."
+                placeholder={t('placeholderAboutEn')}
                 rows={5}
                 dir="ltr"
                 aria-invalid={!!e.about_en}
@@ -469,26 +472,26 @@ export function OrganizationSettingsForm({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="mission_ar">الرسالة (بالعربية)</Label>
+              <Label htmlFor="mission_ar">{t('missionAr')}</Label>
               <Textarea
                 id="mission_ar"
                 value={form.mission_ar}
                 onChange={(ev) => update('mission_ar', ev.target.value)}
-                placeholder="رسالة المنظمة التي تسعى لتحقيقها في المجتمع..."
+                placeholder={t('placeholderMissionAr')}
                 rows={4}
                 dir="rtl"
                 aria-invalid={!!e.mission_ar}
-                className={cn(e.mission_ar && 'border-destructive')}
+                className={cn(locale === 'ar' ? '' : 'text-right', e.mission_ar && 'border-destructive')}
               />
               <FieldError message={e.mission_ar} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="mission_en">الرسالة (بالإنجليزية)</Label>
+              <Label htmlFor="mission_en">{t('missionEn')}</Label>
               <Textarea
                 id="mission_en"
                 value={form.mission_en}
                 onChange={(ev) => update('mission_en', ev.target.value)}
-                placeholder="The organization's mission in society..."
+                placeholder={t('placeholderMissionEn')}
                 rows={4}
                 dir="ltr"
                 aria-invalid={!!e.mission_en}
@@ -499,26 +502,26 @@ export function OrganizationSettingsForm({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="vision_ar">الرؤية (بالعربية)</Label>
+              <Label htmlFor="vision_ar">{t('visionAr')}</Label>
               <Textarea
                 id="vision_ar"
                 value={form.vision_ar}
                 onChange={(ev) => update('vision_ar', ev.target.value)}
-                placeholder="الرؤية المستقبلية والغاية الكبرى للمنظمة..."
+                placeholder={t('placeholderVisionAr')}
                 rows={3}
                 dir="rtl"
                 aria-invalid={!!e.vision_ar}
-                className={cn(e.vision_ar && 'border-destructive')}
+                className={cn(locale === 'ar' ? '' : 'text-right', e.vision_ar && 'border-destructive')}
               />
               <FieldError message={e.vision_ar} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="vision_en">الرؤية (بالإنجليزية)</Label>
+              <Label htmlFor="vision_en">{t('visionEn')}</Label>
               <Textarea
                 id="vision_en"
                 value={form.vision_en}
                 onChange={(ev) => update('vision_en', ev.target.value)}
-                placeholder="The future vision and ultimate goal of the organization..."
+                placeholder={t('placeholderVisionEn')}
                 rows={3}
                 dir="ltr"
                 aria-invalid={!!e.vision_en}
@@ -531,31 +534,31 @@ export function OrganizationSettingsForm({
       </Card>
 
       <Card className="border-none shadow-sm">
-        <CardHeader className="text-right">
-          <CardTitle>التواصل</CardTitle>
+        <CardHeader className={locale === 'ar' ? 'text-right' : 'text-left'}>
+          <CardTitle>{t('contactTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="phone">الهاتف</Label>
+            <Label htmlFor="phone">{t('phone')}</Label>
             <Input
               id="phone"
               value={form.phone}
               onChange={(ev) => update('phone', ev.target.value)}
-              placeholder="مثال: +962790000000"
-              dir="rtl"
+              placeholder={t('placeholderPhone')}
+              dir="ltr"
               className={cn('text-left', e.phone && 'border-destructive')}
               aria-invalid={!!e.phone}
             />
             <FieldError message={e.phone} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">البريد الإلكتروني</Label>
+            <Label htmlFor="email">{t('email')}</Label>
             <Input
               id="email"
               type="email"
               value={form.email}
               onChange={(ev) => update('email', ev.target.value)}
-              placeholder="مثال: info@example.com"
+              placeholder={t('placeholderEmail')}
               dir="ltr"
               className={cn('text-left', e.email && 'border-destructive')}
               aria-invalid={!!e.email}
@@ -566,12 +569,12 @@ export function OrganizationSettingsForm({
       </Card>
 
       <Card className="border-none shadow-sm">
-        <CardHeader className="text-right">
-          <CardTitle>وسائل التواصل الاجتماعي</CardTitle>
-          <CardDescription>اختر المنصات التي تريد عرضها ثم أدخل الرابط لكل منها</CardDescription>
+        <CardHeader className={locale === 'ar' ? 'text-right' : 'text-left'}>
+          <CardTitle>{t('socialTitle')}</CardTitle>
+          <CardDescription>{t('socialDesc')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex flex-wrap justify-end gap-2">
+          <div className={`flex flex-wrap gap-2 ${locale === 'ar' ? 'justify-end' : 'justify-start'}`}>
             {SOCIAL_PLATFORM_KEYS.map((key) => {
               const active = form.socialEnabled[key]
               return (
@@ -620,8 +623,8 @@ export function OrganizationSettingsForm({
               )
             })}
             {SOCIAL_PLATFORM_KEYS.every((k) => !form.socialEnabled[k]) && (
-              <p className="text-right text-sm text-muted-foreground">
-                لم يتم اختيار أي منصة. اضغط على أيقونة أعلاه لإظهار حقل الرابط.
+              <p className={`text-sm text-muted-foreground ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
+                {t('noSocialSelected')}
               </p>
             )}
           </div>
@@ -630,16 +633,16 @@ export function OrganizationSettingsForm({
 
       {/* ── Hero Slider Images ──────────────────────────────────────────── */}
       <Card className="border-none shadow-sm">
-        <CardHeader className="text-right">
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className={locale === 'ar' ? 'text-right' : 'text-left'}>
+          <CardTitle className={`flex items-center gap-2 ${locale === 'ar' ? '' : 'flex-row-reverse justify-end'}`}>
             <Images className="size-5 text-muted-foreground" />
-            صور الشريط الترحيبي
+            {t('heroTitle')}
           </CardTitle>
           <CardDescription>
-            أضف حتى 5 صور تُعرض في الشريط الدوّار على الصفحة الرئيسية.
+            {t('heroDesc')}
             <br />
             <span className="inline-block mt-1 text-xs font-medium text-amber-600 dark:text-amber-400">
-              💡 الأبعاد الموصى بها للصور: 1920×1080 بكسل (نسبة 16:9) للحصول على أفضل جودة
+              {t('heroHint')}
             </span>
           </CardDescription>
         </CardHeader>
@@ -653,19 +656,19 @@ export function OrganizationSettingsForm({
       </Card>
 
       <Card className="border-none shadow-sm">
-        <CardHeader className="flex flex-col gap-2 text-right sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader className={`flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
           <div>
-            <CardTitle>البيانات الوصفية (Metadata)</CardTitle>
-            <CardDescription>أزواج مفتاح وقيمة تُخزَّن في حقل JSONB</CardDescription>
+            <CardTitle>{t('metadataTitle')}</CardTitle>
+            <CardDescription>{t('metadataDesc')}</CardDescription>
           </div>
-          <Button type="button" variant="outline" size="sm" className="gap-1 self-end sm:self-auto" onClick={addMetadataRow}>
+          <Button type="button" variant="outline" size="sm" className={`gap-1 self-end sm:self-auto ${locale === 'ar' ? '' : 'flex-row-reverse'}`} onClick={addMetadataRow}>
             <Plus className="size-4" />
-            إضافة حقل
+            {t('metadataAdd')}
           </Button>
         </CardHeader>
         <CardContent className="space-y-3">
           {form.metadataRows.length === 0 ? (
-            <p className="text-right text-sm text-muted-foreground">لا توجد حقول. استخدم «إضافة حقل».</p>
+            <p className={`text-sm text-muted-foreground ${locale === 'ar' ? 'text-right' : 'text-left'}`}>{t('metadataEmpty')}</p>
           ) : (
             form.metadataRows.map((row) => {
               const errKey = e[`metadata.${row.clientId}.key`]
@@ -676,11 +679,11 @@ export function OrganizationSettingsForm({
                   className="grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
                 >
                   <div className="space-y-2 sm:col-span-1">
-                    <Label className="text-right">المفتاح</Label>
+                    <Label className={locale === 'ar' ? 'text-right' : 'text-left'}>{t('metadataKey')}</Label>
                     <Input
                       value={row.key}
                       onChange={(ev) => updateMetadataRow(row.clientId, { key: ev.target.value })}
-                      placeholder="مثال: tax_number (لغة إنجليزية فقط)"
+                      placeholder={t('placeholderMetaKey')}
                       dir="ltr"
                       className={cn('text-left font-mono text-sm', errKey && 'border-destructive')}
                       aria-invalid={!!errKey}
@@ -688,11 +691,11 @@ export function OrganizationSettingsForm({
                     <FieldError message={errKey} />
                   </div>
                   <div className="space-y-2 sm:col-span-1">
-                    <Label className="text-right">القيمة</Label>
+                    <Label className={locale === 'ar' ? 'text-right' : 'text-left'}>{t('metadataValue')}</Label>
                     <Input
                       value={row.value}
                       onChange={(ev) => updateMetadataRow(row.clientId, { value: ev.target.value })}
-                      placeholder='نص عادي أو كود JSON مثل: ["أ", "ب"]'
+                      placeholder={t('placeholderMetaVal')}
                       dir="ltr"
                       className={cn('text-left', errVal && 'border-destructive')}
                       aria-invalid={!!errVal}
@@ -705,7 +708,7 @@ export function OrganizationSettingsForm({
                     size="icon"
                     className="text-destructive hover:text-destructive"
                     onClick={() => removeMetadataRow(row.clientId)}
-                    aria-label="حذف الحقل"
+                    aria-label={t('metadataDelete')}
                   >
                     <Trash2 className="size-4" />
                   </Button>
@@ -716,7 +719,7 @@ export function OrganizationSettingsForm({
         </CardContent>
       </Card>
 
-      <div className="flex justify-end gap-3">
+      <div className={`flex gap-3 ${locale === 'ar' ? 'justify-end' : 'justify-start'}`}>
         <Button
           type="button"
           variant="outline"
@@ -726,10 +729,10 @@ export function OrganizationSettingsForm({
             setErrors({})
           }}
         >
-          إلغاء التعديلات
+          {t('cancel')}
         </Button>
         <Button type="submit" disabled={pending || (!isCreate && !changed)} className="min-w-[120px]">
-          {pending ? 'جاري الحفظ...' : isCreate ? 'إنشاء السجل' : 'حفظ'}
+          {pending ? t('saving') : isCreate ? t('createBtn') : t('saveBtn')}
         </Button>
       </div>
     </form>

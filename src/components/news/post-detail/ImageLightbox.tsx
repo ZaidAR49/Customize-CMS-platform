@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface ImageLightboxProps {
   images: string[]
@@ -12,8 +13,10 @@ interface ImageLightboxProps {
 }
 
 export function ImageLightbox({ images, initialIndex = 0, open, onClose }: ImageLightboxProps) {
+  const t = useTranslations('lightbox')
   const [index, setIndex] = useState(initialIndex)
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (open) setIndex(initialIndex)
   }, [open, initialIndex])
@@ -50,14 +53,14 @@ export function ImageLightbox({ images, initialIndex = 0, open, onClose }: Image
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
       role="dialog"
       aria-modal="true"
-      aria-label="عرض الصورة"
+      aria-label={t('viewImage')}
       onClick={onClose}
     >
       <button
         type="button"
         onClick={onClose}
         className="absolute top-4 left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
-        aria-label="إغلاق"
+        aria-label={t('close')}
       >
         <X className="h-6 w-6" />
       </button>
@@ -71,7 +74,7 @@ export function ImageLightbox({ images, initialIndex = 0, open, onClose }: Image
               goPrev()
             }}
             className="absolute right-4 top-1/2 z-10 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
-            aria-label="الصورة السابقة"
+            aria-label={t('prevImage')}
           >
             <ChevronRight className="h-7 w-7" />
           </button>
@@ -82,7 +85,7 @@ export function ImageLightbox({ images, initialIndex = 0, open, onClose }: Image
               goNext()
             }}
             className="absolute left-4 top-1/2 z-10 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
-            aria-label="الصورة التالية"
+            aria-label={t('nextImage')}
           >
             <ChevronLeft className="h-7 w-7" />
           </button>

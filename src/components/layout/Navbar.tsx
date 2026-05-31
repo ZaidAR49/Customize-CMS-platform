@@ -6,11 +6,11 @@ import { useSession } from 'next-auth/react'
 import { useScrollTop } from '@/hooks/useScrollTop'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { NavbarMobile } from './NavbarMobile'
-import { dashboardNavItem } from '@/lib/site-nav'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { useTranslations, useLocale } from 'next-intl'
 
 import type { Post } from '@/types/post'
 
@@ -20,27 +20,29 @@ export function Navbar({ programs = [], centers = [] }: { programs?: Post[], cen
   const { data: session } = useSession()
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const navRef = useRef<HTMLElement>(null)
+  const t = useTranslations('nav')
+  const locale = useLocale()
 
   const dynamicSiteNavItems = useMemo(() => [
-    { label: 'الرئيسية', href: '/' },
+    { label: t('home'), href: '/' },
     {
-      label: 'مراكز الجمعية',
+      label: t('centers'),
       href: '#',
-      children: centers.map((c) => ({ label: c.title, href: `/centers/${c.slug}` })),
+      children: centers.map((c) => ({ label: locale === 'ar' ? c.title : (c.title_en || c.title), href: `/centers/${c.slug}` })),
     },
     {
-      label: 'البرامج والمشاريع',
+      label: t('programs'),
       href: '#',
-      children: programs.map((p) => ({ label: p.title, href: `/programs/${p.slug}` })),
+      children: programs.map((p) => ({ label: locale === 'ar' ? p.title : (p.title_en || p.title), href: `/programs/${p.slug}` })),
     },
-    { label: 'نشاطات وأخبار', href: '/news' },
-    { label: 'عن الجمعية', href: '/about' },
-    { label: 'اتصل بنا', href: '/contact' },
-  ], [programs, centers])
+    { label: t('news'), href: '/news' },
+    { label: t('about'), href: '/about' },
+    { label: t('contact'), href: '/contact' },
+  ], [programs, centers, t, locale])
 
   const navItems = useMemo(
-    () => (session?.user ? [...dynamicSiteNavItems, dashboardNavItem] : dynamicSiteNavItems),
-    [session?.user, dynamicSiteNavItems]
+    () => (session?.user ? [...dynamicSiteNavItems, { label: t('dashboard'), href: '/dashboard' }] : dynamicSiteNavItems),
+    [session?.user, dynamicSiteNavItems, t]
   )
 
   useEffect(() => {
@@ -64,19 +66,21 @@ export function Navbar({ programs = [], centers = [] }: { programs?: Post[], cen
         scrolled ? 'shadow-md' : 'shadow-sm'
       )}
     >
-      <div className="container flex h-16 items-center justify-between">
+      <div className="w-full px-4 md:px-8 lg:px-12 xl:px-16 flex h-16 items-center justify-between">
         {/* Logo + Name */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" className="flex items-center gap-3 group ">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white transition-transform group-hover:scale-105 overflow-hidden border border-(--fcps-bg-soft) shadow-sm">
             <img src="/images/logo.png" alt="Logo" width={48} height={48} className="object-contain" />
           </div>
-          <span className="text-lg font-bold text-(--fcps-primary-dark)">
-            جمعية حماية الأسرة والطفولة
+          <span className="  text-lg xl:text-xl font-bold text-(--fcps-primary-dark) whitespace-nowrap">
+            {t('societyName')}
           </span>
         </Link>
 
-        {/* Nav Links */}
-        <nav ref={navRef} className="flex items-center gap-1">
+        {/* Right Side: Nav Links + Language Switcher */}
+        <div className="flex items-center gap-4 lg:gap-8">
+          {/* Nav Links */}
+          <nav ref={navRef} className="flex items-center gap-2 lg:gap-4">
           {navItems.map((item) => (
             <div
               key={item.label}
@@ -85,7 +89,7 @@ export function Navbar({ programs = [], centers = [] }: { programs?: Post[], cen
               <Link
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                  'flex items-center gap-1 rounded-md px-2 lg:px-3 py-2 text-base font-medium transition-colors whitespace-nowrap',
                   'text-(--fcps-text) hover:text-(--fcps-primary) hover:bg-(--fcps-bg-soft)'
                 )}
                 onClick={(e) => {
@@ -119,10 +123,11 @@ export function Navbar({ programs = [], centers = [] }: { programs?: Post[], cen
             </div>
           ))}
 
-        </nav>
-
-        {/* Language Switcher */}
-        <LanguageSwitcher />
+          </nav>
+  
+          {/* Language Switcher */}
+          <LanguageSwitcher />
+        </div>
       </div>
     </header>
   )

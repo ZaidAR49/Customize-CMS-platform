@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface DeleteGalleryImagesDialogProps {
   open: boolean
@@ -22,8 +23,6 @@ interface DeleteGalleryImagesDialogProps {
   onConfirm: () => void
 }
 
-const CONFIRM_WORD = 'DELETE'
-
 export function DeleteGalleryImagesDialog({
   open,
   count,
@@ -31,6 +30,9 @@ export function DeleteGalleryImagesDialog({
   onOpenChange,
   onConfirm,
 }: DeleteGalleryImagesDialogProps) {
+  const t = useTranslations('dashboardGallery')
+  const locale = useLocale()
+  const CONFIRM_WORD = t('confirmWord')
   const [confirmText, setConfirmText] = useState('')
 
   useEffect(() => {
@@ -41,27 +43,24 @@ export function DeleteGalleryImagesDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg" dir="rtl">
+      <DialogContent className="sm:max-w-lg" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-destructive">
+          <DialogTitle className={`flex items-center gap-2 text-destructive ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
             <AlertTriangle className="size-5 shrink-0" />
-            تأكيد حذف {count} صورة
+            {t('confirmTitle', { count })}
           </DialogTitle>
-          <div className="rounded-lg border border-amber-200/80 bg-amber-50 px-3 py-3 text-sm leading-relaxed text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100">
-            <strong className="font-semibold">⚠ هذا الإجراء لا يمكن التراجع عنه.</strong> قد تكون هذه
-            الصور مستخدمة حالياً في مقال أو صفحة أو محتوى آخر في تطبيقك. حذفها من Cloudinary سيكسر
-            فوراً أي محتوى يعتمد عليها — بما في ذلك الصفحات المنشورة والمباشرة. يرجى التأكد من أن أي
-            من هذه الصور غير مستخدمة قبل المتابعة.
+          <div className={`rounded-lg border border-amber-200/80 bg-amber-50 px-3 py-3 text-sm leading-relaxed text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
+            <strong className="font-semibold">{t('warningMsg1')}</strong> {t('warningMsg2')}
           </div>
-          <DialogDescription>
-            للمتابعة، اكتب{' '}
-            <span className="font-mono font-semibold text-foreground">{CONFIRM_WORD}</span> في الحقل
-            أدناه.
+          <DialogDescription className={locale === 'ar' ? 'text-right' : 'text-left'}>
+            {t.rich('typeToConfirm', {
+               word: () => <span className="font-mono font-semibold text-foreground">{CONFIRM_WORD}</span>
+            })}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-2">
-          <Label htmlFor="delete-confirm">تأكيد الحذف</Label>
+          <Label htmlFor="delete-confirm" className={locale === 'ar' ? 'text-right block' : 'text-left block'}>{t('confirmLabel')}</Label>
           <Input
             id="delete-confirm"
             value={confirmText}
@@ -74,14 +73,14 @@ export function DeleteGalleryImagesDialog({
           />
         </div>
 
-        <DialogFooter className="gap-2 sm:justify-start">
+        <DialogFooter className={`gap-2 sm:justify-start ${locale === 'ar' ? '' : 'sm:justify-end'}`}>
           <Button
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={pending}
           >
-            إلغاء
+            {t('cancel')}
           </Button>
           <Button
             type="button"
@@ -89,10 +88,11 @@ export function DeleteGalleryImagesDialog({
             onClick={onConfirm}
             disabled={!canConfirm || pending}
           >
-            {pending ? 'جاري الحذف...' : `حذف ${count} صورة`}
+            {pending ? t('deleting') : t('deleteBtn', { count })}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   )
 }
+

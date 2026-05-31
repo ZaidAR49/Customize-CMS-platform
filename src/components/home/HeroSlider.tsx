@@ -3,27 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-const FALLBACK_SLIDES = [
-  {
-    id: 1,
-    title: 'مقتطفات من نشاطاتنا',
-    subtitle: 'جمعية حماية الأسرة والطفولة تعمل على حماية ودعم الأسر والأطفال في إربد',
-    gradient: 'from-[#1b5e20] via-[#2e7d32] to-[#00695c]',
-  },
-  {
-    id: 2,
-    title: 'نحو طفولة آمنة',
-    subtitle: 'نسعى لتوفير بيئة آمنة ومحفزة لنمو الأطفال وحمايتهم من جميع أشكال العنف',
-    gradient: 'from-[#00695c] via-[#00838f] to-[#0277bd]',
-  },
-  {
-    id: 3,
-    title: 'معاً من أجل مجتمع أفضل',
-    subtitle: 'نؤمن بأن التعاون المجتمعي هو الأساس لبناء مستقبل مشرق لأطفالنا وأسرنا',
-    gradient: 'from-[#0277bd] via-[#1565c0] to-[#2e7d32]',
-  },
-]
+import { useTranslations } from 'next-intl'
 
 /** Height bounds so the slider never gets too short or too tall */
 const MIN_HEIGHT = 360
@@ -36,8 +16,31 @@ interface HeroSliderProps {
 }
 
 export function HeroSlider({ slides = [] }: HeroSliderProps) {
+  const t = useTranslations('homePage.heroSlider')
+
+  const fallbackSlides = [
+    {
+      id: 1,
+      title: t('slide1Title'),
+      subtitle: t('slide1Subtitle'),
+      gradient: 'from-[#1b5e20] via-[#2e7d32] to-[#00695c]',
+    },
+    {
+      id: 2,
+      title: t('slide2Title'),
+      subtitle: t('slide2Subtitle'),
+      gradient: 'from-[#00695c] via-[#00838f] to-[#0277bd]',
+    },
+    {
+      id: 3,
+      title: t('slide3Title'),
+      subtitle: t('slide3Subtitle'),
+      gradient: 'from-[#0277bd] via-[#1565c0] to-[#2e7d32]',
+    },
+  ]
+
   const hasImages = slides.length > 0
-  const count = hasImages ? slides.length : FALLBACK_SLIDES.length
+  const count = hasImages ? slides.length : fallbackSlides.length
 
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
@@ -129,7 +132,7 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
               {/* Background image — object-cover, adapts via container height */}
               <img
                 src={url}
-                alt={`شريحة ${index + 1}`}
+                alt={`${t('sliderTitle')} ${index + 1}`}
                 className="absolute inset-0 w-full h-full object-cover"
                 loading={index === 0 ? 'eager' : 'lazy'}
               />
@@ -142,27 +145,27 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
           <div className="absolute inset-0 z-10 flex h-full items-center justify-center">
             <div className="text-center px-4 max-w-3xl mx-auto">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
-                مقتطفات من نشاطاتنا
+                {t('sliderTitle')}
               </h1>
               <div className="flex gap-4 justify-center">
                 <a
                   href="/about"
                   className="rounded-lg bg-white px-6 py-3 text-sm font-bold text-(--fcps-primary-dark) transition-all hover:bg-white/90 hover:scale-105 shadow-lg"
                 >
-                  تعرف علينا
+                  {t('learnAboutUs')}
                 </a>
                 <a
                   href="/contact"
                   className="rounded-lg border-2 border-white px-6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:scale-105"
                 >
-                  تواصل معنا
+                  {t('contactUs')}
                 </a>
               </div>
             </div>
           </div>
         </>
       ) : ( /* ── Gradient fallback slides ────────────────────────────────── */
-          FALLBACK_SLIDES.map((slide, index) => (
+          fallbackSlides.map((slide, index) => (
             <div
               key={slide.id}
               className={cn(
@@ -222,13 +225,13 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
                     href="/about"
                     className="rounded-lg bg-white px-6 py-3 text-sm font-bold text-(--fcps-primary-dark) transition-all hover:bg-white/90 hover:scale-105 shadow-lg"
                   >
-                    تعرف علينا
+                    {t('learnAboutUs')}
                   </a>
                   <a
                     href="/contact"
                     className="rounded-lg border-2 border-white px-6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:scale-105"
                   >
-                    تواصل معنا
+                    {t('contactUs')}
                   </a>
                 </div>
               </div>
@@ -239,14 +242,14 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
       <button
         onClick={prevSlide}
         className="absolute right-4 top-1/2 z-20 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition-all hover:bg-white/25 hover:scale-110"
-        aria-label="الشريحة السابقة"
+        aria-label="previous slide"
       >
         <ChevronRight className="h-6 w-6" />
       </button>
       <button
         onClick={nextSlide}
         className="absolute left-4 top-1/2 z-20 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition-all hover:bg-white/25 hover:scale-110"
-        aria-label="الشريحة التالية"
+        aria-label="next slide"
       >
         <ChevronLeft className="h-6 w-6" />
       </button>
@@ -261,11 +264,10 @@ export function HeroSlider({ slides = [] }: HeroSliderProps) {
               'h-2.5 rounded-full transition-all duration-300',
               index === currentSlide ? 'w-8 bg-white' : 'w-2.5 bg-white/40 hover:bg-white/60',
             )}
-            aria-label={`الشريحة ${index + 1}`}
+            aria-label={`slide ${index + 1}`}
           />
         ))}
       </div>
     </section>
   )
 }
-

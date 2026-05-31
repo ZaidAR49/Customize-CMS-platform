@@ -14,6 +14,7 @@ export interface PostFormValue {
   type: Post['type']
   published: boolean
   tags: string[]
+  tags_en: string[]
   gallery: string[]
 }
 
@@ -34,6 +35,7 @@ export function postToFormValue(post: Post): PostFormValue {
     type: post.type,
     published: post.published,
     tags: Array.isArray(post.tags) ? post.tags : [],
+    tags_en: Array.isArray(post.tags_en) ? post.tags_en : [],
     gallery: Array.isArray(post.gallery) ? post.gallery : [],
   }
 }
@@ -52,5 +54,6 @@ export const emptyPostFormValue: PostFormValue = {
   type: 'news',
   published: false,
   tags: [],
+  tags_en: [],
   gallery: [],
 }

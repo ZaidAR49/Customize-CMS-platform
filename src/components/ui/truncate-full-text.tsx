@@ -41,10 +41,12 @@ export function TruncateFullTextPopup({
   const hoverOpenTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const hoverCloseTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setMounted(true)
   }, [])
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (dialogOpen) setHoverOpen(false)
   }, [dialogOpen])

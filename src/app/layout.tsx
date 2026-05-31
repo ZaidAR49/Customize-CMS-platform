@@ -25,14 +25,19 @@ import { postsService } from '@/lib/services/posts.service'
 
 import { Footer } from '@/components/layout/Footer'
 
+import { getLocale } from 'next-intl/server'
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [programs, centers] = await Promise.all([
     postsService.getPosts('program', true),
     postsService.getPosts('center', true)
   ])
+  
+  const locale = await getLocale()
+  const direction = locale === 'ar' ? 'rtl' : 'ltr'
 
   return (
-    <html lang="ar" dir="rtl" className={cairo.variable} suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang={locale} dir={direction} className={cairo.variable} suppressHydrationWarning data-scroll-behavior="smooth">
       <body className="bg-white text-[#333] antialiased" style={{ fontFamily: 'var(--font-cairo), sans-serif' }}>
         <NextIntlClientProvider>         
         <SessionProvider>
@@ -42,7 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Footer />
           </ConditionalFooter>
           <ScrollToTop />
-          <Toaster richColors position="top-center" dir="rtl" />
+          <Toaster richColors position="top-center" dir={direction} />
           <ConditionalChatBot />
         </SessionProvider>
         </NextIntlClientProvider>
