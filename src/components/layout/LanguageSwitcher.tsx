@@ -37,7 +37,7 @@ function Flag({ src, alt }: { src: string; alt: string }) {
 
 type Locale = (typeof languages)[number]['code']
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ placement = 'bottom' }: { placement?: 'top' | 'bottom' }) {
   const router = useRouter()
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
@@ -102,7 +102,8 @@ export function LanguageSwitcher() {
           role="listbox"
           aria-label="اختر اللغة / Select Language"
           className={cn(
-            'absolute top-full mt-1.5 z-50',
+            'absolute z-50',
+            placement === 'top' ? 'bottom-full mb-1.5' : 'top-full mt-1.5',
             'min-w-[160px] rounded-lg border border-(--fcps-bg-soft)',
             'bg-white p-1 shadow-lg',
             'animate-fade-in',

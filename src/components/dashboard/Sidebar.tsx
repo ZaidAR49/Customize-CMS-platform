@@ -54,7 +54,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 p-4">
+      <nav className="flex-1 space-y-1 p-4 overflow-y-auto min-h-0">
         {sidebarItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
           return (
@@ -114,8 +114,8 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="border-t p-4 flex flex-col gap-3">
-        <div className="flex justify-start mb-20 m">
-          <LanguageSwitcher />
+        <div className="flex justify-start">
+          <LanguageSwitcher placement="top" />
         </div>
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
