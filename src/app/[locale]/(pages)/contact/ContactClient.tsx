@@ -13,21 +13,25 @@ import { useState } from 'react'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { submitContactFormAction } from '@/actions/malis.actions'
 import type { OrganizationRow } from '@/types/organization'
-
-const contactSchema = z.object({
-  name: z.string().min(2, 'الاسم مطلوب'),
-  email: z.string().email('البريد الإلكتروني غير صالح'),
-  subject: z.string().min(3, 'الموضوع مطلوب'),
-  message: z.string().min(10, 'الرسالة يجب أن تكون 10 أحرف على الأقل'),
-})
-
-type ContactForm = z.infer<typeof contactSchema>
+import { useTranslations, useLocale } from 'next-intl'
 
 interface ContactClientProps {
   org: OrganizationRow | null;
 }
 
 export default function ContactClient({ org }: ContactClientProps) {
+  const t = useTranslations('contactPage')
+  const locale = useLocale()
+
+  const contactSchema = z.object({
+    name: z.string().min(2, t('validation.nameRequired')),
+    email: z.string().email(t('validation.emailInvalid')),
+    subject: z.string().min(3, t('validation.subjectRequired')),
+    message: z.string().min(10, t('validation.messageMinLength')),
+  })
+
+  type ContactForm = z.infer<typeof contactSchema>
+
   const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [showConfirmClear, setShowConfirmClear] = useState(false)
@@ -44,7 +48,7 @@ export default function ContactClient({ org }: ContactClientProps) {
     setSubmitError(null)
     const result = await submitContactFormAction(data)
     if (!result.success) {
-      setSubmitError(result.error ?? 'تعذّر إرسال الرسالة. يُرجى المحاولة لاحقاً.')
+      setSubmitError(result.error ?? t('form.error'))
       return
     }
     setSubmitted(true)
@@ -52,7 +56,10 @@ export default function ContactClient({ org }: ContactClientProps) {
     setTimeout(() => setSubmitted(false), 4000)
   }
 
-  const address = (org?.metadata as Record<string, string>)?.address_ar || 'إربد، المملكة الأردنية الهاشمية';
+  const defaultAddress = locale === 'ar' ? 'إربد، المملكة الأردنية الهاشمية' : 'Irbid, Hashemite Kingdom of Jordan'
+  const address = locale === 'ar' 
+    ? ((org?.metadata as Record<string, string>)?.address_ar || defaultAddress)
+    : ((org?.metadata as Record<string, string>)?.address_en || defaultAddress)
 
   return (
     <div>
@@ -63,8 +70,8 @@ export default function ContactClient({ org }: ContactClientProps) {
           backgroundSize: '30px 30px'
         }} />
         <div className="container relative z-10 text-center">
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-4">اتصل بنا</h1>
-          <p className="text-lg text-white/80">نسعد بتواصلكم معنا</p>
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-4">{t('hero.title')}</h1>
+          <p className="text-lg text-white/80">{t('hero.subtitle')}</p>
         </div>
       </section>
 
@@ -73,9 +80,9 @@ export default function ContactClient({ org }: ContactClientProps) {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 max-w-5xl mx-auto">
             {/* Contact Info */}
             <div>
-              <h2 className="text-2xl font-bold text-(--fcps-primary-dark) mb-6">معلومات التواصل</h2>
+              <h2 className="text-2xl font-bold text-(--fcps-primary-dark) mb-6">{t('info.title')}</h2>
               <p className="mb-8 text-(--fcps-gray-text) leading-relaxed">
-                يمكنكم التواصل معنا عبر أي من الوسائل التالية أو من خلال تعبئة نموذج التواصل.
+                {t('info.description')}
               </p>
 
               <div className="space-y-4">
@@ -85,7 +92,7 @@ export default function ContactClient({ org }: ContactClientProps) {
                       <Phone className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm text-(--fcps-gray-text)">الهاتف</p>
+                      <p className="text-sm text-(--fcps-gray-text)">{t('info.phone')}</p>
                       <p className="font-medium" dir="ltr">{org?.phone}</p>
                     </div>
                   </CardContent>
@@ -97,7 +104,7 @@ export default function ContactClient({ org }: ContactClientProps) {
                       <Mail className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm text-(--fcps-gray-text)">البريد الإلكتروني</p>
+                      <p className="text-sm text-(--fcps-gray-text)">{t('info.email')}</p>
                       <p className="font-medium">{org?.email}</p>
                     </div>
                   </CardContent>
@@ -109,7 +116,7 @@ export default function ContactClient({ org }: ContactClientProps) {
                       <MapPin className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm text-(--fcps-gray-text)">العنوان</p>
+                      <p className="text-sm text-(--fcps-gray-text)">{t('info.address')}</p>
                       <p className="font-medium">{address}</p>
                     </div>
                   </CardContent>
@@ -121,7 +128,7 @@ export default function ContactClient({ org }: ContactClientProps) {
             <div>
               <Card className="border-none shadow-lg">
                 <CardContent className="p-8">
-                  <h2 className="text-2xl font-bold text-(--fcps-primary-dark) mb-6">أرسل رسالة</h2>
+                  <h2 className="text-2xl font-bold text-(--fcps-primary-dark) mb-6">{t('form.title')}</h2>
 
                   {submitError ? (
                     <div className="mb-6 rounded-lg bg-red-50 p-4 text-sm text-red-700">
@@ -132,16 +139,16 @@ export default function ContactClient({ org }: ContactClientProps) {
                   {submitted ? (
                     <div className="mb-6 flex items-center gap-3 rounded-lg bg-emerald-50 p-4 text-emerald-700">
                       <CheckCircle className="h-5 w-5" />
-                      <p className="text-sm font-medium">تم إرسال رسالتك بنجاح. سنتواصل معك قريباً.</p>
+                      <p className="text-sm font-medium">{t('form.success')}</p>
                     </div>
                   ) : null}
 
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                     <div>
-                      <Label htmlFor="name" className="mb-2 block text-sm font-medium">الاسم</Label>
+                      <Label htmlFor="name" className="mb-2 block text-sm font-medium">{t('form.nameLabel')}</Label>
                       <Input
                         id="name"
-                        placeholder="أدخل اسمك الكامل"
+                        placeholder={t('form.namePlaceholder')}
                         {...register('name')}
                         className="bg-(--fcps-bg-soft) border-none"
                       />
@@ -149,11 +156,11 @@ export default function ContactClient({ org }: ContactClientProps) {
                     </div>
 
                     <div>
-                      <Label htmlFor="email" className="mb-2 block text-sm font-medium">البريد الإلكتروني</Label>
+                      <Label htmlFor="email" className="mb-2 block text-sm font-medium">{t('form.emailLabel')}</Label>
                       <Input
                         id="email"
                         type="email"
-                        placeholder="example@email.com"
+                        placeholder={t('form.emailPlaceholder')}
                         dir="ltr"
                         {...register('email')}
                         className="bg-(--fcps-bg-soft) border-none text-left"
@@ -162,10 +169,10 @@ export default function ContactClient({ org }: ContactClientProps) {
                     </div>
 
                     <div>
-                      <Label htmlFor="subject" className="mb-2 block text-sm font-medium">الموضوع</Label>
+                      <Label htmlFor="subject" className="mb-2 block text-sm font-medium">{t('form.subjectLabel')}</Label>
                       <Input
                         id="subject"
-                        placeholder="موضوع الرسالة"
+                        placeholder={t('form.subjectPlaceholder')}
                         {...register('subject')}
                         className="bg-(--fcps-bg-soft) border-none"
                       />
@@ -173,10 +180,10 @@ export default function ContactClient({ org }: ContactClientProps) {
                     </div>
 
                     <div>
-                      <Label htmlFor="message" className="mb-2 block text-sm font-medium">الرسالة</Label>
+                      <Label htmlFor="message" className="mb-2 block text-sm font-medium">{t('form.messageLabel')}</Label>
                       <Textarea
                         id="message"
-                        placeholder="اكتب رسالتك هنا..."
+                        placeholder={t('form.messagePlaceholder')}
                         rows={5}
                         {...register('message')}
                         className="bg-(--fcps-bg-soft) border-none resize-none"
@@ -193,12 +200,12 @@ export default function ContactClient({ org }: ContactClientProps) {
                         {isSubmitting ? (
                           <span className="flex items-center gap-2 justify-center">
                             <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                            جاري الإرسال...
+                            {t('form.sending')}
                           </span>
                         ) : (
                           <span className="flex items-center gap-2 justify-center">
                             <Send className="h-4 w-4" />
-                            إرسال الرسالة
+                            {t('form.sendMessage')}
                           </span>
                         )}
                       </Button>
@@ -209,7 +216,7 @@ export default function ContactClient({ org }: ContactClientProps) {
                         disabled={isSubmitting}
                         className="text-red-500 border-red-200 hover:bg-red-50"
                       >
-                        مسح
+                        {t('form.clear')}
                       </Button>
                     </div>
                   </form>
@@ -217,9 +224,9 @@ export default function ContactClient({ org }: ContactClientProps) {
                   <ConfirmDialog
                     open={showConfirmClear}
                     onOpenChange={setShowConfirmClear}
-                    title="تأكيد مسح البيانات"
-                    description="هل أنت متأكد من مسح جميع الحقول؟ لا يمكن التراجع عن هذا الإجراء."
-                    confirmText="مسح الكل"
+                    title={t('confirmDialog.title')}
+                    description={t('confirmDialog.description')}
+                    confirmText={t('confirmDialog.confirm')}
                     onConfirm={reset}
                   />
                 </CardContent>

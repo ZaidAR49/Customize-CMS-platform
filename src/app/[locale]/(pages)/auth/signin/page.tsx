@@ -4,9 +4,11 @@ import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { FaGoogle } from 'react-icons/fa6'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false)
+  const t = useTranslations('authPage')
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
@@ -23,10 +25,10 @@ export default function SignInPage() {
         </div>
         
         <h1 className="text-2xl font-bold text-(--fcps-dark) mb-2">
-          مرحباً بك مجدداً
+          {t('welcomeBack')}
         </h1>
         <p className="text-(--fcps-gray-text) mb-8">
-          الرجاء تسجيل الدخول للوصول إلى لوحة التحكم
+          {t('signInPrompt')}
         </p>
 
         <button
@@ -43,15 +45,16 @@ export default function SignInPage() {
           ) : (
             <>
               <FaGoogle className="h-5 w-5 text-red-500" />
-              <span>المتابعة باستخدام Google</span>
+              <span>{t('continueWithGoogle')}</span>
             </>
           )}
         </button>
         
         <div className="mt-8 text-xs text-gray-400">
-          هذه الصفحة مخصصة فقط للمشرفين والمحررين في الجمعية
+          {t('adminsOnly')}
         </div>
       </div>
     </div>
   )
 }
+

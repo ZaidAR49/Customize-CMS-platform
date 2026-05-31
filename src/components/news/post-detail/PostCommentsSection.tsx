@@ -1,5 +1,6 @@
 import { PostApprovedCommentsList } from '@/components/news/post-detail/PostApprovedCommentsList'
 import { PostCommentForm } from '@/components/news/post-detail/PostCommentForm'
+import { useTranslations } from 'next-intl'
 
 export interface PostApprovedComment {
   id: string
@@ -14,9 +15,10 @@ interface PostCommentsSectionProps {
 }
 
 export function PostCommentsSection({ postId, comments }: PostCommentsSectionProps) {
+  const t = useTranslations('newsPage.comments')
   return (
     <section className="mb-10 border-t border-[#e0e0e0] pt-10" id="comments">
-      <h2 className="mb-6 text-2xl font-bold text-[#1a1a1a]">التعليقات</h2>
+      <h2 className="mb-6 text-2xl font-bold text-[#1a1a1a]">{t('title')}</h2>
 
       <PostApprovedCommentsList comments={comments} />
 

@@ -5,14 +5,8 @@ import { ClearFiltersButton } from '@/components/shared/ClearFiltersButton'
 import { SearchBar } from '@/components/shared/SearchBar'
 import type { PostType } from '@/types/post'
 import { cn } from '@/lib/utils'
-
-const filters: { label: string; value: PostType | 'all' }[] = [
-  { label: 'الكل', value: 'all' },
-  { label: 'أخبار', value: 'news' },
-  { label: 'نشاطات', value: 'activity' },
-  { label: 'برامج', value: 'program' },
-  { label: 'مراكز', value: 'center' },
-]
+import { useTranslations } from 'next-intl'
+import { useMemo } from 'react'
 
 interface PostFilterProps {
   activeFilter: PostType | 'all'
@@ -37,6 +31,17 @@ export function PostFilter({
   hasActiveFilters,
   categories,
 }: PostFilterProps) {
+  const t = useTranslations('newsPage')
+  const tNav = useTranslations('nav')
+
+  const filters = useMemo<{ label: string; value: PostType | 'all' }[]>(() => [
+    { label: t('allCategories'), value: 'all' },
+    { label: t('sidebar.newsBadge'), value: 'news' },
+    { label: t('sidebar.activityBadge'), value: 'activity' },
+    { label: tNav('programs'), value: 'program' },
+    { label: tNav('centers'), value: 'center' },
+  ], [t, tNav])
+
   return (
     <div className="mb-8 space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -44,13 +49,17 @@ export function PostFilter({
           <SearchBar
             value={searchQuery}
             onChange={onSearchChange}
-            placeholder="ابحث بالـ slug (مثل: news-2026)"
-            aria-label="بحث بالـ slug"
+            placeholder={t('searchBySlugPlaceholder')}
+            aria-label={t('searchBySlugAria')}
             dir="ltr"
             inputClassName="text-left"
           />
         </div>
-        <ClearFiltersButton onClear={onClearFilters} disabled={!hasActiveFilters} />
+        <ClearFiltersButton 
+          onClear={onClearFilters} 
+          disabled={!hasActiveFilters} 
+          label={t('clearFilters')} 
+        />
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -78,7 +87,7 @@ export function PostFilter({
           onChange={(e) => onCategoryChange(e.target.value)}
           className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring"
         >
-          <option value="all">كل التصنيفات</option>
+          <option value="all">{t('allCategories')}</option>
           {categories.map((category) => (
             <option key={category.key} value={category.key}>
               {category.label}

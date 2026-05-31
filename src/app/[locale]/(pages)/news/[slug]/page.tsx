@@ -6,6 +6,7 @@ import { normalizeSlug } from '@/lib/slug'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import type { Post } from '@/types/post'
+import { getLocale } from 'next-intl/server'
 
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
@@ -29,8 +30,12 @@ export async function generateMetadata({
   const { slug: rawSlug } = await params
   const slug = normalizeSlug(rawSlug)
   const post = await postsService.getPostBySlug(slug)
-  if (!post) return { title: 'غير موجود' }
-  return { title: post.title, description: post.excerpt }
+  if (!post) return { title: 'Not Found' }
+  
+  const locale = await getLocale()
+  const title = locale === 'ar' ? post.title : (post.title_en || post.title)
+  const description = locale === 'ar' ? post.excerpt : (post.excerpt_en || post.excerpt)
+  return { title, description }
 }
 
 function pickRelated(post: Post, all: Post[]): Post[] {
@@ -42,20 +47,22 @@ function pickRelated(post: Post, all: Post[]): Post[] {
   return source.slice(0, 3)
 }
 
-// Function removed as we will fetch directly from db
-
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug: rawSlug } = await params
   const slug = normalizeSlug(rawSlug)
   const post = await postsService.getPostBySlug(slug)
   if (!post || (post.type !== 'news' && post.type !== 'activity')) notFound()
 
+  const locale = await getLocale()
   const [allPosts, dbCategories] = await Promise.all([
     postsService.getPosts(undefined, true),
     categoriesService.getAllCategories(),
   ])
   const newsPosts = allPosts.filter((p) => p.type === 'news' || p.type === 'activity')
-  const mappedCategories = dbCategories.map(c => ({ key: c.key, label: c.label_ar }))
+  const mappedCategories = dbCategories.map(c => ({ 
+    key: c.key, 
+    label: locale === 'ar' ? c.label_ar : (c.label_en || c.label_ar) 
+  }))
 
   const sorted = [...newsPosts].sort(
     (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
@@ -94,3 +101,4 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     />
   )
 }
+

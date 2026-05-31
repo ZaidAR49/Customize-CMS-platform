@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { Post, PostType } from '@/types/post'
 import { PostCard } from './PostCard'
 import { PostFilter } from './PostFilter'
+import { useTranslations } from 'next-intl'
 
 interface PostGridProps {
   posts: Post[]
@@ -51,6 +52,7 @@ export function PostGrid({
   initialCategory = 'all',
   dbCategories,
 }: PostGridProps) {
+  const t = useTranslations('newsPage')
   const [activeFilter, setActiveFilter] = useState<PostType | 'all'>('all')
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
   const [activeCategory, setActiveCategory] = useState(
@@ -141,12 +143,12 @@ export function PostGrid({
       {filteredPosts.length === 0 ? (
         <div className="py-16 text-center">
           <div className="text-5xl mb-4">📭</div>
-          <p className="text-lg text-(--fcps-gray-text)">لا توجد نتائج مطابقة للتصفية الحالية</p>
+          <p className="text-lg text-(--fcps-gray-text)">{t('noResults')}</p>
         </div>
       ) : (
         <>
           <div className="mb-4 text-sm text-(--fcps-gray-text)">
-            عرض {paginatedPosts.length} من أصل {filteredPosts.length} نتيجة
+            {t('resultsCount', { count: paginatedPosts.length, total: filteredPosts.length })}
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {paginatedPosts.map((post) => (
@@ -160,7 +162,7 @@ export function PostGrid({
               onClick={() => goToPage(safePage - 1)}
               disabled={safePage === 1}
             >
-              السابق
+              {t('prev')}
             </button>
             {Array.from({ length: totalPages }).map((_, idx) => {
               const page = idx + 1
@@ -183,7 +185,7 @@ export function PostGrid({
               onClick={() => goToPage(safePage + 1)}
               disabled={safePage === totalPages}
             >
-              التالي
+              {t('next')}
             </button>
           </div>
         </>

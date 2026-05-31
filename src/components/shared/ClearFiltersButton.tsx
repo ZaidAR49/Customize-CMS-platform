@@ -8,9 +8,10 @@ interface ClearFiltersButtonProps {
   onClear: () => void
   disabled?: boolean
   className?: string
+  label?: string
 }
 
-export function ClearFiltersButton({ onClear, disabled, className }: ClearFiltersButtonProps) {
+export function ClearFiltersButton({ onClear, disabled, className, label }: ClearFiltersButtonProps) {
   return (
     <Button
       type="button"
@@ -24,7 +25,8 @@ export function ClearFiltersButton({ onClear, disabled, className }: ClearFilter
       )}
     >
       <RotateCcw className="h-3.5 w-3.5" />
-      مسح التصفية
+      {label || 'مسح التصفية'}
     </Button>
   )
 }
+

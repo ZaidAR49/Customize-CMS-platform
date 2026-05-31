@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 const STORAGE_KEY = 'fcps-comment-draft'
 
@@ -20,6 +21,7 @@ interface SavedDraft {
 }
 
 export function PostCommentForm({ postId }: PostCommentFormProps) {
+  const t = useTranslations('newsPage.comments')
   const [body, setBody] = useState('')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -60,7 +62,7 @@ export function PostCommentForm({ postId }: PostCommentFormProps) {
 
       const data = (await res.json()) as { error?: string; ok?: boolean }
       if (!res.ok) {
-        toast.error(data.error ?? 'تعذّر إرسال التعليق')
+        toast.error(data.error ?? t('error'))
         return
       }
 
@@ -74,9 +76,9 @@ export function PostCommentForm({ postId }: PostCommentFormProps) {
       }
 
       setBody('')
-      toast.success('تم إرسال تعليقك وسيُعرض بعد المراجعة')
+      toast.success(t('success'))
     } catch {
-      toast.error('تعذّر إرسال التعليق')
+      toast.error(t('error'))
     } finally {
       setPending(false)
     }
@@ -84,17 +86,17 @@ export function PostCommentForm({ postId }: PostCommentFormProps) {
 
   return (
     <div className="border-t border-[#e8e8e8] pt-8">
-      <h3 className="mb-6 text-xl font-bold text-[#1a1a1a]">اترك تعليقاً</h3>
+      <h3 className="mb-6 text-xl font-bold text-[#1a1a1a]">{t('leaveComment')}</h3>
 
       <p className="mb-6 text-sm text-[#777777]">
-        لن يتم نشر عنوان بريدك الإلكتروني. الحقول الإلزامية مشار إليها بـ{' '}
+        {t('emailDisclaimer')}{' '}
         <span className="text-red-500">*</span>
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid gap-2">
           <Label htmlFor="comment-body">
-            التعليق <span className="text-red-500">*</span>
+            {t('commentLabel')} <span className="text-red-500">*</span>
           </Label>
           <Textarea
             id="comment-body"
@@ -104,14 +106,14 @@ export function PostCommentForm({ postId }: PostCommentFormProps) {
             rows={6}
             disabled={pending}
             className="resize-y"
-            placeholder="اكتب تعليقك هنا..."
+            placeholder={t('commentPlaceholder')}
           />
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="grid gap-2">
             <Label htmlFor="comment-name">
-              الاسم <span className="text-red-500">*</span>
+              {t('nameLabel')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="comment-name"
@@ -123,7 +125,7 @@ export function PostCommentForm({ postId }: PostCommentFormProps) {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="comment-email">
-              البريد الإلكتروني <span className="text-red-500">*</span>
+              {t('emailLabel')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="comment-email"
@@ -146,7 +148,7 @@ export function PostCommentForm({ postId }: PostCommentFormProps) {
             className="mt-1"
             disabled={pending}
           />
-          <span>احفظ اسمي، بريدي الإلكتروني، والموقع الإلكتروني في هذا المتصفح</span>
+          <span>{t('rememberMe')}</span>
         </label>
 
         <div className="flex justify-start gap-2">
@@ -155,13 +157,13 @@ export function PostCommentForm({ postId }: PostCommentFormProps) {
             disabled={pending}
             className="bg-[#0073aa] px-8 hover:bg-[#005580]"
           >
-            {pending ? 'جاري الإرسال...' : 'إرسال التعليق'}
+            {pending ? t('submitting') : t('submit')}
           </Button>
           <Button
             type="button"
             variant="outline"
             onClick={() => {
-              if (window.confirm('هل أنت متأكد من مسح جميع الحقول؟')) {
+              if (window.confirm(t('clearConfirm'))) {
                 setBody('')
                 setName('')
                 setEmail('')
@@ -171,10 +173,11 @@ export function PostCommentForm({ postId }: PostCommentFormProps) {
             disabled={pending}
             className="text-red-500 border-red-200 hover:bg-red-50"
           >
-            مسح
+            {t('clear')}
           </Button>
         </div>
       </form>
     </div>
   )
 }
+
