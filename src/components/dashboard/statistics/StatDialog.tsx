@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import type { OrganizationStatRow } from '@/types/organization';
 import { ReadOnlyField } from '@/components/dashboard/ReadOnlyField';
 import { Activity, Users, Heart, Star, Award, BookOpen, UserPlus, FileText, Briefcase, HandHeart, Globe } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface StatDialogProps {
   open: boolean;
@@ -38,6 +39,8 @@ const AVAILABLE_ICONS = [
 ];
 
 export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDialogProps) {
+  const t = useTranslations('dashboardStatistics');
+  const locale = useLocale();
   const [formData, setFormData] = useState<Partial<OrganizationStatRow>>({});
 
   useEffect(() => {
@@ -68,15 +71,15 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg" dir="rtl">
-        <DialogHeader>
-          <DialogTitle>{stat ? 'تعديل إحصائية' : 'إضافة إحصائية'}</DialogTitle>
+      <DialogContent className="sm:max-w-lg" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+        <DialogHeader className={locale === 'ar' ? 'text-right' : 'text-left'}>
+          <DialogTitle>{stat ? t('dialogEditTitle') : t('dialogAddTitle')}</DialogTitle>
         </DialogHeader>
         <form id="stat-form" onSubmit={handleSubmit} className="grid gap-4 py-4">
           {stat ? (
             <ReadOnlyField
               id="stat-updated-by"
-              label="آخر تحديث بواسطة"
+              label={t('lastUpdatedBy')}
               value={
                 stat.updatedByName?.trim() ||
                 (stat.updated_by ? 'مستخدم محذوف' : 'غير محدد')
@@ -85,7 +88,7 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
           ) : null}
 
           <div className="grid gap-2">
-            <Label htmlFor="stat-key">المفتاح (باللغة الإنجليزية، فريد)</Label>
+            <Label className={locale === 'ar' ? 'text-right' : 'text-left'} htmlFor="stat-key">{t('keyField')}</Label>
             <Input
               id="stat-key"
               value={formData.key || ''}
@@ -93,25 +96,27 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
               disabled={pending}
               dir="ltr"
               className="text-left"
-              placeholder="e.g. families_served"
+              placeholder={t('keyPlaceholder')}
               required
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="stat-label-ar">العنوان (بالعربية)</Label>
+              <Label className={locale === 'ar' ? 'text-right' : 'text-left'} htmlFor="stat-label-ar">{t('labelArField')}</Label>
               <Input
                 id="stat-label-ar"
                 value={formData.label_ar || ''}
                 onChange={(e) => handleChange('label_ar', e.target.value)}
                 disabled={pending}
                 required
-                placeholder="مثال: العائلات المستفيدة"
+                placeholder={t('labelArPlaceholder')}
+                className={locale === 'ar' ? '' : 'text-right'}
+                dir="auto"
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="stat-label-en">العنوان (بالإنجليزية)</Label>
+              <Label className={locale === 'ar' ? 'text-right' : 'text-left'} htmlFor="stat-label-en">{t('labelEnField')}</Label>
               <Input
                 id="stat-label-en"
                 value={formData.label_en || ''}
@@ -119,25 +124,27 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
                 disabled={pending}
                 dir="ltr"
                 className="text-left"
-                placeholder="Example: Beneficiary Families"
+                placeholder={t('labelEnPlaceholder')}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="stat-value">القيمة</Label>
+              <Label className={locale === 'ar' ? 'text-right' : 'text-left'} htmlFor="stat-value">{t('valueField')}</Label>
               <Input
                 id="stat-value"
                 value={formData.value || ''}
                 onChange={(e) => handleChange('value', e.target.value)}
                 disabled={pending}
                 required
-                placeholder="مثال: +1000 أو 50"
+                placeholder={t('valuePlaceholder')}
+                className={locale === 'ar' ? '' : 'text-left'}
+                dir="ltr"
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="stat-order">الترتيب</Label>
+              <Label className={locale === 'ar' ? 'text-right' : 'text-left'} htmlFor="stat-order">{t('orderField')}</Label>
               <Input
                 id="stat-order"
                 type="number"
@@ -150,16 +157,16 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="stat-icon">الأيقونة</Label>
-            <div className="flex gap-2">
+            <Label className={locale === 'ar' ? 'text-right' : 'text-left'} htmlFor="stat-icon">{t('iconField')}</Label>
+            <div className={`flex gap-2 ${locale === 'ar' ? '' : 'flex-row-reverse'}`}>
               <select
                 id="stat-icon"
-                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className={`flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${locale === 'ar' ? '' : 'text-left'}`}
                 value={formData.icon || ''}
                 onChange={(e) => handleChange('icon', e.target.value)}
                 disabled={pending}
               >
-                <option value="">-- بدون أيقونة --</option>
+                <option value="">{t('noIcon')}</option>
                 {AVAILABLE_ICONS.map((item) => (
                   <option key={item.name} value={item.name}>
                     {item.name}
@@ -177,16 +184,18 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="stat-desc-ar">وصف إضافي (عربي) - اختياري</Label>
+              <Label className={locale === 'ar' ? 'text-right' : 'text-left'} htmlFor="stat-desc-ar">{t('descArField')}</Label>
               <Input
                 id="stat-desc-ar"
                 value={formData.description_ar || ''}
                 onChange={(e) => handleChange('description_ar', e.target.value)}
                 disabled={pending}
+                className={locale === 'ar' ? '' : 'text-right'}
+                dir="auto"
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="stat-desc-en">وصف إضافي (إنجليزي) - اختياري</Label>
+              <Label className={locale === 'ar' ? 'text-right' : 'text-left'} htmlFor="stat-desc-en">{t('descEnField')}</Label>
               <Input
                 id="stat-desc-en"
                 value={formData.description_en || ''}
@@ -198,15 +207,15 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
             </div>
           </div>
         </form>
-        <DialogFooter className="gap-2 sm:justify-start">
+        <DialogFooter className={`gap-2 ${locale === 'ar' ? 'sm:justify-start' : 'sm:justify-end'}`}>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
-            إلغاء
+            {t('cancelBtn')}
           </Button>
           <Button
             type="button"
             variant="outline"
             onClick={() => {
-              if (window.confirm('هل أنت متأكد من مسح الحقول؟')) {
+              if (window.confirm(t('clearConfirm'))) {
                 if (stat) {
                   setFormData(stat);
                 } else {
@@ -226,10 +235,10 @@ export function StatDialog({ open, onOpenChange, stat, onSave, pending }: StatDi
             disabled={pending}
             className="text-red-500 border-red-200 hover:bg-red-50"
           >
-            مسح
+            {t('clearBtn')}
           </Button>
           <Button type="submit" form="stat-form" disabled={pending || !formData.key || !formData.label_ar || !formData.value}>
-            {pending ? 'جاري الحفظ...' : 'حفظ'}
+            {pending ? t('savingBtn') : t('saveBtn')}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import type { AppUser } from '@/types/user'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface DeleteUserDialogProps {
   user: AppUser | null
@@ -20,27 +21,31 @@ export function DeleteUserDialog({
   onConfirm,
 }: DeleteUserDialogProps) {
   const isSelf = !!user && user.id === currentUserId
+  const t = useTranslations('dashboardUsers')
+  const locale = useLocale()
 
   return (
     <Dialog open={!!user} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md" dir="rtl">
-        <DialogHeader>
-          <DialogTitle>تأكيد حذف المستخدم</DialogTitle>
+      <DialogContent className="sm:max-w-md" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+        <DialogHeader className={locale === 'ar' ? 'text-right' : 'text-left'}>
+          <DialogTitle>{t('deleteConfirmTitle')}</DialogTitle>
           <DialogDescription>
-            هل أنت متأكد من حذف المستخدم <strong>{user?.name}</strong>؟ لا يمكن التراجع عن هذا الإجراء.
+            {t.rich('deleteConfirmDesc', {
+              name: () => <strong>{user?.name}</strong>
+            })}
             {isSelf ? (
-              <span className="mt-2 block font-medium text-amber-800">
-                سيتم تسجيل خروجك تلقائياً بعد حذف حسابك.
+              <span className={`mt-2 block font-medium text-amber-800 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
+                {t('deleteSelfSignout')}
               </span>
             ) : null}
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="gap-2 sm:justify-start">
+        <DialogFooter className={`gap-2 ${locale === 'ar' ? 'sm:justify-start' : 'sm:justify-end'}`}>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
-            إلغاء
+            {t('cancelBtn')}
           </Button>
           <Button type="button" variant="destructive" onClick={onConfirm} disabled={pending}>
-            {pending ? 'جاري الحذف...' : 'حذف نهائي'}
+            {pending ? t('deletingBtn') : t('finalDeleteBtn')}
           </Button>
         </DialogFooter>
       </DialogContent>

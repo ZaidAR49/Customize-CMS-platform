@@ -1,20 +1,26 @@
 import { OrganizationSettingsForm } from '@/components/dashboard/OrganizationSettingsForm'
 import { organizationService } from '@/lib/services/organization.service'
+import { getTranslations } from 'next-intl/server'
 
-export const metadata = { title: 'معلومات المنظمة' }
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'dashboardSettings' })
+  return { title: t('titleManagement') }
+}
 
-export default async function DashboardSettingsPage() {
+export default async function DashboardSettingsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
   const org = await organizationService.getOrganization()
+  const t = await getTranslations({ locale, namespace: 'dashboardSettings' })
 
   return (
     <div>
-      <h2 className="mb-2 text-2xl font-bold text-(--fcps-dark)">معلومات المنظمة</h2>
+      <h2 className="mb-2 text-2xl font-bold text-(--fcps-dark)">{t('titleManagement')}</h2>
       <p className="mb-8 text-sm text-(--fcps-gray-text)">
-        {org
-          ? 'تعديل الحقول المخزّنة في جدول المنظمة (النصوص ثنائية اللغة، التواصل، روابط التواصل الاجتماعي، والبيانات الوصفية).'
-          : 'لا يوجد سجل بعد. أنشئ أول سجل للمنظمة (الاسم بالعربية إلزامي). يمكنك لاحقاً تعديل كل الحقول من هنا.'}
+        {org ? t('descriptionExisting') : t('descriptionNew')}
       </p>
       <OrganizationSettingsForm key={org?.id ?? 'new'} organization={org} />
     </div>
   )
 }
+

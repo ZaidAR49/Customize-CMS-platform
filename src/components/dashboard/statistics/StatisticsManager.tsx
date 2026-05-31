@@ -16,6 +16,7 @@ import type { OrganizationStatRow } from '@/types/organization';
 import { StatDialog } from './StatDialog';
 import { DeleteStatDialog } from './DeleteStatDialog';
 import { createOrganizationStatAction, updateOrganizationStatAction, deleteOrganizationStatAction } from '@/actions/organization-stats.actions';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface StatisticsManagerProps {
   initialStats: OrganizationStatRow[];
@@ -23,6 +24,8 @@ interface StatisticsManagerProps {
 }
 
 export function StatisticsManager({ initialStats, isAdmin }: StatisticsManagerProps) {
+  const t = useTranslations('dashboardStatistics');
+  const locale = useLocale();
   const [stats, setStats] = useState<OrganizationStatRow[]>(initialStats);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStat, setEditingStat] = useState<OrganizationStatRow | null>(null);
@@ -48,13 +51,13 @@ export function StatisticsManager({ initialStats, isAdmin }: StatisticsManagerPr
       if (result.success) {
         setStats((prev) => prev.filter((s) => s.id !== id));
         setStatToDelete(null);
-        toast.success('تم حذف الإحصائية');
+        toast.success(t('successDelete'));
       } else {
-        toast.error(result.error ?? 'تعذّر حذف الإحصائية');
+        toast.error(result.error ?? t('errorDelete'));
       }
     } catch (e) {
       console.error(e);
-      toast.error('حدث خطأ أثناء الحذف');
+      toast.error(t('errorDeleteGeneric'));
     } finally {
       setPending(false);
     }
@@ -82,7 +85,7 @@ export function StatisticsManager({ initialStats, isAdmin }: StatisticsManagerPr
       }
     } catch (e) {
       console.error(e);
-      alert('حدث خطأ أثناء الحفظ');
+      alert(t('errorSaveGeneric'));
     } finally {
       setPending(false);
     }
@@ -91,55 +94,55 @@ export function StatisticsManager({ initialStats, isAdmin }: StatisticsManagerPr
   return (
     <div className="space-y-4">
       {isAdmin && (
-        <div className="flex justify-end">
+        <div className={`flex ${locale === 'ar' ? 'justify-end' : 'justify-start'}`}>
           <Button onClick={handleOpenAdd} className="gap-2">
             <Plus className="h-4 w-4" />
-            إضافة إحصائية
+            {t('addStat')}
           </Button>
         </div>
       )}
 
       <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
-        <Table dir="rtl">
+        <Table dir={locale === 'ar' ? 'rtl' : 'ltr'}>
           <TableHeader>
             <TableRow className="bg-(--fcps-bg-soft) hover:bg-(--fcps-bg-soft)">
-              <TableHead className="w-[100px] text-right font-semibold text-(--fcps-dark)">المفتاح</TableHead>
-              <TableHead className="text-right font-semibold text-(--fcps-dark)">العنوان (عربي)</TableHead>
-              <TableHead className="text-right font-semibold text-(--fcps-dark)">القيمة</TableHead>
-              <TableHead className="text-right font-semibold text-(--fcps-dark)">الأيقونة</TableHead>
-              <TableHead className="text-right font-semibold text-(--fcps-dark)">الترتيب</TableHead>
-              {isAdmin && <TableHead className="text-right font-semibold text-(--fcps-dark)">الإجراءات</TableHead>}
+              <TableHead className={`${locale === 'ar' ? 'text-right' : 'text-left'} font-semibold text-(--fcps-dark)`}>{t('tableKey')}</TableHead>
+              <TableHead className={`${locale === 'ar' ? 'text-right' : 'text-left'} font-semibold text-(--fcps-dark)`}>{locale === 'ar' ? t('tableTitleAr') : t('tableTitleAr')}</TableHead>
+              <TableHead className={`${locale === 'ar' ? 'text-right' : 'text-left'} font-semibold text-(--fcps-dark)`}>{t('tableValue')}</TableHead>
+              <TableHead className={`${locale === 'ar' ? 'text-right' : 'text-left'} font-semibold text-(--fcps-dark)`}>{t('tableIcon')}</TableHead>
+              <TableHead className={`${locale === 'ar' ? 'text-right' : 'text-left'} font-semibold text-(--fcps-dark)`}>{t('tableOrder')}</TableHead>
+              {isAdmin && <TableHead className={`${locale === 'ar' ? 'text-right' : 'text-left'} font-semibold text-(--fcps-dark)`}>{t('tableActions')}</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {stats.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={isAdmin ? 6 : 5} className="text-center text-(--fcps-gray-text) h-32">
-                  لا توجد إحصائيات.
+                  {t('emptyStats')}
                 </TableCell>
               </TableRow>
             ) : (
               stats.map((stat) => (
                 <TableRow key={stat.id} className="group">
                   <TableCell className="font-medium">{stat.key}</TableCell>
-                  <TableCell>{stat.label_ar}</TableCell>
+                  <TableCell>{locale === 'ar' ? stat.label_ar : stat.label_en || stat.label_ar}</TableCell>
                   <TableCell>{stat.value}</TableCell>
                   <TableCell>{stat.icon || '-'}</TableCell>
                   <TableCell>{stat.display_order}</TableCell>
                   {isAdmin && (
                     <TableCell>
-                      <div className="flex gap-2">
+                      <div className={`flex gap-2 ${locale === 'ar' ? '' : 'justify-start'}`}>
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
                           className="h-8 gap-1 px-2 text-(--fcps-gray-text) hover:text-(--fcps-primary)"
                           onClick={() => handleOpenEdit(stat)}
-                          title="تعديل الإحصائية"
+                          title={t('editTitle')}
                           disabled={pending}
                         >
                           <Pencil className="h-4 w-4" />
-                          <span className="text-xs">تعديل</span>
+                          <span className="text-xs">{t('editAction')}</span>
                         </Button>
                         <Button
                           type="button"
@@ -147,11 +150,11 @@ export function StatisticsManager({ initialStats, isAdmin }: StatisticsManagerPr
                           size="sm"
                           className="h-8 gap-1 px-2 text-(--fcps-gray-text) hover:text-red-600 disabled:opacity-40"
                           onClick={() => setStatToDelete(stat)}
-                          title="حذف الإحصائية"
+                          title={t('deleteTitle')}
                           disabled={pending}
                         >
                           <Trash2 className="h-4 w-4" />
-                          <span className="text-xs">حذف</span>
+                          <span className="text-xs">{t('deleteAction')}</span>
                         </Button>
                       </div>
                     </TableCell>
