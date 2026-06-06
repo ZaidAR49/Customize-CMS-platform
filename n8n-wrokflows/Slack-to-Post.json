@@ -38,7 +38,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer xoxb-11287696010291-11278705453319-yBeK3BWnLYOYZNc8pcApul08"
+              "value": "Bearer xoxb-xxxxx (replace with your Slack Bot Token)"
             }
           ]
         },
