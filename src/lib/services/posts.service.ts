@@ -79,6 +79,7 @@ function mapPost(row: RawPost): Post {
       name: row.author?.name ?? 'إدارة الجمعية',
       avatarUrl: row.author?.avatar_url ?? '',
     },
+    isBotGenerated: row.is_bot_generated ?? false,
   };
 }
 

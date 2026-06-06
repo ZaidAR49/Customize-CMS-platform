@@ -25,4 +25,5 @@ export interface Post {
     name: string
     avatarUrl: string
   }
+  isBotGenerated?: boolean
 }

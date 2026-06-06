@@ -10,7 +10,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 export default async function DashboardPostsPage() {
   const allPosts = await postsService.getPosts()
-  const posts = allPosts.filter((post) => post.type !== 'center' && post.type !== 'program')
+  const posts = allPosts.filter((post) => post.type !== 'center')
   const t = await getTranslations('dashboardPosts')
 
   return (

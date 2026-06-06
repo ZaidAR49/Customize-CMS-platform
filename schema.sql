@@ -122,15 +122,15 @@ CREATE TABLE public.category_translations (
 -- posts
 -- -----------------------------------------------------------------------------
 CREATE TABLE public.posts (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  type public.post_type NOT NULL,
-  metadata jsonb DEFAULT '{}',
-  published bool DEFAULT false,
-  published_at timestamptz DEFAULT now(),
-  author_id uuid NOT NULL,
-  tags text [] DEFAULT '{}',
-  category_id uuid REFERENCES public.categories (id),
-  CONSTRAINT fk_posts_author FOREIGN KEY (author_id) REFERENCES public.users (id)
+    id               UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+    type             post_type   NOT NULL DEFAULT 'posts',  -- enum: 'news','posts','activities','top_employees','program','centers','center'
+    metadata         JSONB       NULL     DEFAULT '{}',
+    published        BOOLEAN     NULL     DEFAULT false,
+    published_at     TIMESTAMPTZ NULL     DEFAULT now(),
+    author_id        UUID        NULL     REFERENCES public.users(id),
+    tags             TEXT[]      NULL     DEFAULT '{}',
+    category_id      UUID        NULL     REFERENCES public.categories(id),
+    is_bot_generated BOOLEAN     NOT NULL DEFAULT false
 );
 -- -----------------------------------------------------------------------------
 -- post_translations

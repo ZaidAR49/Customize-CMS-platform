@@ -54,7 +54,14 @@ export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '
           {posts.map((post) => (
             <TableRow key={post.id} className="hover:bg-(--fcps-bg-soft)/50">
               <TableCell className="max-w-[min(280px,40vw)] font-medium">
-                <TruncateFullTextPopup text={locale === 'ar' ? post.title : (post.title_en || post.title)} dialogTitle={t('tableHeaders.title')} />
+                <div className="flex items-center gap-2">
+                  <TruncateFullTextPopup text={locale === 'ar' ? post.title : (post.title_en || post.title)} dialogTitle={t('tableHeaders.title')} />
+                  {post.isBotGenerated && (
+                    <Badge variant="outline" className="border-purple-200 bg-purple-50 text-purple-700 whitespace-nowrap text-[10px] h-5">
+                      {locale === 'ar' ? 'بوت' : 'Bot'}
+                    </Badge>
+                  )}
+                </div>
               </TableCell>
               <TableCell>
                 <Badge variant="secondary" className="text-xs">

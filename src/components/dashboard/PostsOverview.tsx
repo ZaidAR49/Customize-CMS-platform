@@ -17,7 +17,7 @@ import {
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { deletePostAction } from '@/actions/posts.actions'
 import type { Post } from '@/types/post'
-import { FileText, Layers3, Tags, ChevronDown, Plus } from 'lucide-react'
+import { FileText, Layers3, Tags, ChevronDown, Plus, Bot, ArrowUpDown } from 'lucide-react'
 import { ClearFiltersButton } from '@/components/shared/ClearFiltersButton'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { cn } from '@/lib/utils'
@@ -35,11 +35,13 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [activeTag, setActiveTag] = useState<string>('all')
+  const [activeBot, setActiveBot] = useState<string>('all')
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest')
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [postToDelete, setPostToDelete] = useState<Post | null>(null)
 
   const visiblePosts = useMemo(() => {
-    return posts.filter((post) => post.type !== 'center' && post.type !== 'program')
+    return posts.filter((post) => post.type !== 'center')
   }, [posts])
 
   const availableCategories = useMemo(() => {
@@ -65,23 +67,34 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
     return visiblePosts.filter((post) => {
       const categoryMatch = activeCategory === 'all' || post.category === activeCategory
       const tagMatch = activeTag === 'all' || (post.tags ?? []).includes(activeTag)
+      const botMatch = activeBot === 'all' || (activeBot === 'yes' ? post.isBotGenerated : !post.isBotGenerated)
       const matchesSearch =
         !searchQuery.trim() ||
         post.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.title_en?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.excerpt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.descripcion?.toLowerCase().includes(searchQuery.toLowerCase())
-      return categoryMatch && tagMatch && matchesSearch
+      return categoryMatch && tagMatch && botMatch && matchesSearch
     })
-  }, [activeCategory, activeTag, searchQuery, visiblePosts])
+  }, [activeCategory, activeTag, activeBot, searchQuery, visiblePosts])
+
+  const sortedPosts = useMemo(() => {
+    return [...filteredPosts].sort((a, b) => {
+      const dateA = new Date(a.publishedAt).getTime()
+      const dateB = new Date(b.publishedAt).getTime()
+      return sortBy === 'newest' ? dateB - dateA : dateA - dateB
+    })
+  }, [filteredPosts, sortBy])
 
   const hasActiveFilters =
-    activeCategory !== 'all' || activeTag !== 'all' || searchQuery.trim() !== ''
+    activeCategory !== 'all' || activeTag !== 'all' || activeBot !== 'all' || searchQuery.trim() !== '' || sortBy !== 'newest'
 
   function clearFilters() {
     setActiveCategory('all')
     setSearchQuery('')
     setActiveTag('all')
+    setActiveBot('all')
+    setSortBy('newest')
   }
 
   const stats = [
@@ -150,7 +163,7 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
             <h3 className="text-sm font-medium text-(--fcps-dark)">{t('filterTitle')}</h3>
             <ClearFiltersButton onClear={clearFilters} disabled={!hasActiveFilters} />
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
               <label className="mb-2 block text-sm font-medium text-(--fcps-dark)">
                 {t('filterByCategory')}
@@ -197,35 +210,83 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
                   {activeTag === 'all' ? t('allTags') : activeTag}
                   <ChevronDown className="h-4 w-4" />
                 </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" side="bottom" className="w-(--radix-popper-anchor-width)">
+                    <DropdownMenuRadioGroup value={activeTag} onValueChange={setActiveTag}>
+                      <DropdownMenuRadioItem value="all">{t('allTags')}</DropdownMenuRadioItem>
+                      {availableTags.map((tag) => (
+                        <DropdownMenuRadioItem key={tag} value={tag}>
+                          {tag}
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-(--fcps-dark)">
+                {locale === 'ar' ? 'الترتيب' : 'Sort Order'}
+              </label>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className={cn(
+                    buttonVariants({ variant: 'outline' }),
+                    'w-full justify-between border-(--fcps-primary)/20 bg-white text-(--fcps-dark) hover:bg-(--fcps-bg-soft)'
+                  )}
+                >
+                  <span className="flex items-center gap-2">
+                    <ArrowUpDown className="h-4 w-4 text-(--fcps-gray-text)" />
+                    {sortBy === 'newest'
+                      ? (locale === 'ar' ? 'من الأحدث إلى الأقدم' : 'Newest to Oldest')
+                      : (locale === 'ar' ? 'من الأقدم إلى الأحدث' : 'Oldest to Newest')}
+                  </span>
+                  <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" side="bottom" className="w-(--radix-popper-anchor-width)">
-                  <DropdownMenuRadioGroup value={activeTag} onValueChange={setActiveTag}>
-                    <DropdownMenuRadioItem value="all">{t('allTags')}</DropdownMenuRadioItem>
-                    {availableTags.map((tag) => (
-                      <DropdownMenuRadioItem key={tag} value={tag}>
-                        {tag}
-                      </DropdownMenuRadioItem>
-                    ))}
+                  <DropdownMenuRadioGroup value={sortBy} onValueChange={(val) => setSortBy(val as 'newest' | 'oldest')}>
+                    <DropdownMenuRadioItem value="newest">
+                      {locale === 'ar' ? 'من الأحدث إلى الأقدم' : 'Newest to Oldest'}
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="oldest">
+                      {locale === 'ar' ? 'من الأقدم إلى الأحدث' : 'Oldest to Newest'}
+                    </DropdownMenuRadioItem>
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-(--fcps-dark)">
-              {t('searchLabel')}
-            </label>
-            <SearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder={t('searchPlaceholder')}
-              aria-label={t('searchLabel')}
-            />
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="flex-1">
+              <label className="mb-2 block text-sm font-medium text-(--fcps-dark)">
+                {t('searchLabel')}
+              </label>
+              <SearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder={t('searchPlaceholder')}
+                aria-label={t('searchLabel')}
+              />
+            </div>
+            <div className="flex items-center h-10 self-start md:self-end">
+              <label className="flex items-center gap-2 cursor-pointer select-none rounded-md border border-(--fcps-primary)/20 bg-white px-4 py-2 hover:bg-(--fcps-bg-soft) transition-colors h-10">
+                <input
+                  type="checkbox"
+                  checked={activeBot === 'yes'}
+                  onChange={(e) => setActiveBot(e.target.checked ? 'yes' : 'all')}
+                  className="h-4 w-4 rounded border-gray-300 text-(--fcps-primary) focus:ring-(--fcps-primary) cursor-pointer accent-(--fcps-primary)"
+                />
+                <Bot className="h-4 w-4 text-purple-600" />
+                <span className="text-sm font-medium text-(--fcps-dark)">
+                  {locale === 'ar' ? 'منشأ بواسطة بوت' : 'Created By Bot'}
+                </span>
+              </label>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      <PostsTable posts={filteredPosts} onDelete={deletePost} pendingDeleteId={pendingDeleteId} editUrlPrefix={`/${locale}/dashboard/posts`} />
+      <PostsTable posts={sortedPosts} onDelete={deletePost} pendingDeleteId={pendingDeleteId} editUrlPrefix={`/${locale}/dashboard/posts`} />
 
       <Dialog open={!!postToDelete} onOpenChange={(open) => !open && setPostToDelete(null)}>
         <DialogContent className="sm:max-w-md" dir={locale === 'ar' ? 'rtl' : 'ltr'}>

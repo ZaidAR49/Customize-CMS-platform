@@ -7,7 +7,7 @@ import { getTranslations } from 'next-intl/server'
 export default async function DashboardPage() {
   const t = await getTranslations('dashboardOverview')
   const allPosts = await postsService.getPosts()
-  const posts = allPosts.filter((post) => post.type !== 'center' && post.type !== 'program')
+  const posts = allPosts.filter((post) => post.type !== 'center')
   const stats = [
     { label: t('totalPosts'), value: posts.length, icon: FileText, color: 'bg-blue-500' },
     { label: t('totalLikes'), value: posts.reduce((sum, p) => sum + p.likes, 0), icon: Heart, color: 'bg-red-500' },
