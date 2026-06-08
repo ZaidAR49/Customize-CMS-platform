@@ -213,7 +213,7 @@ export function CommentsModerationTable({ comments }: Props) {
 
       <p className="text-xs text-(--fcps-gray-text)">
         {t.rich('apiNote', {
-           api: () => (
+           api: (
              <code className="rounded bg-(--fcps-bg-soft) px-1" dir="ltr">
                POST /api/comments
              </code>
