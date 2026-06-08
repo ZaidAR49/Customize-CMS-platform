@@ -294,7 +294,7 @@ export function PostsOverview({ posts }: PostsOverviewProps) {
             <DialogTitle className={locale === 'ar' ? 'text-right' : 'text-left'}>{t('confirmDeleteTitle')}</DialogTitle>
             <DialogDescription className={locale === 'ar' ? 'text-right' : 'text-left'}>
               {t.rich('confirmDeleteDesc', {
-                title: () => <strong>{postToDelete?.title}</strong>
+                title: <strong>{postToDelete?.title}</strong>
               })}
             </DialogDescription>
           </DialogHeader>

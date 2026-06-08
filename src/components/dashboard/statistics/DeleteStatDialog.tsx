@@ -35,7 +35,7 @@ export function DeleteStatDialog({
           <DialogTitle>{t('confirmDeleteTitle')}</DialogTitle>
           <DialogDescription>
             {t.rich('confirmDeleteDesc', {
-              title: () => <strong className="text-foreground mx-1">{locale === 'ar' ? stat?.label_ar : stat?.label_en || stat?.label_ar}</strong>
+              title: <strong className="text-foreground mx-1">{locale === 'ar' ? stat?.label_ar : stat?.label_en || stat?.label_ar}</strong>
             })}
             {stat?.key ? (
               <span className={`mt-2 block rounded-md border bg-muted/40 px-3 py-2 font-mono text-xs text-foreground/90 ${locale === 'ar' ? 'text-left' : ''}`} dir="ltr">

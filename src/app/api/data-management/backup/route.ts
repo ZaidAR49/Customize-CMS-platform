@@ -19,27 +19,39 @@ export async function GET() {
     const [
       usersRes,
       categoriesRes,
+      categoryTransRes,
       postsRes,
+      postTransRes,
       commentsRes,
       orgRes,
+      orgTransRes,
       orgStatsRes,
+      orgStatsTransRes,
     ] = await Promise.all([
       supabase.from('users').select('*').order('created_at', { ascending: true }),
       supabase.from('categories').select('*').order('created_at', { ascending: true }),
+      supabase.from('category_translations').select('*').order('created_at', { ascending: true }),
       supabase.from('posts').select('*').order('published_at', { ascending: true }),
+      supabase.from('post_translations').select('*').order('created_at', { ascending: true }),
       supabase.from('post_comments').select('*').order('created_at', { ascending: true }),
       supabase.from('organization').select('*'),
+      supabase.from('organization_translations').select('*').order('created_at', { ascending: true }),
       supabase.from('organization_stats').select('*').order('display_order', { ascending: true }),
+      supabase.from('organization_stats_translations').select('*').order('created_at', { ascending: true }),
     ])
 
     // Surface any Supabase errors
     const errors = [
       usersRes.error,
       categoriesRes.error,
+      categoryTransRes.error,
       postsRes.error,
+      postTransRes.error,
       commentsRes.error,
       orgRes.error,
+      orgTransRes.error,
       orgStatsRes.error,
+      orgStatsTransRes.error,
     ].filter(Boolean)
 
     if (errors.length > 0) {
@@ -50,14 +62,29 @@ export async function GET() {
       _meta: {
         version: 1,
         exported_at: new Date().toISOString(),
-        tables: ['users', 'categories', 'posts', 'post_comments', 'organization', 'organization_stats'],
+        tables: [
+          'users',
+          'categories',
+          'category_translations',
+          'posts',
+          'post_translations',
+          'post_comments',
+          'organization',
+          'organization_translations',
+          'organization_stats',
+          'organization_stats_translations',
+        ],
       },
       users: usersRes.data ?? [],
       categories: categoriesRes.data ?? [],
+      category_translations: categoryTransRes.data ?? [],
       posts: postsRes.data ?? [],
+      post_translations: postTransRes.data ?? [],
       post_comments: commentsRes.data ?? [],
       organization: orgRes.data ?? [],
+      organization_translations: orgTransRes.data ?? [],
       organization_stats: orgStatsRes.data ?? [],
+      organization_stats_translations: orgStatsTransRes.data ?? [],
     }
 
     return NextResponse.json(backup)

@@ -7,10 +7,14 @@ import { NextResponse } from 'next/server'
 const VALID_TABLES = [
   'users',
   'categories',
+  'category_translations',
   'posts',
+  'post_translations',
   'post_comments',
   'organization',
+  'organization_translations',
   'organization_stats',
+  'organization_stats_translations',
 ] as const
 
 type TableName = (typeof VALID_TABLES)[number]
@@ -21,21 +25,29 @@ type TableName = (typeof VALID_TABLES)[number]
  * auth.users and cannot be safely bulk-deleted here.
  */
 const WIPE_DELETE_ORDER: TableName[] = [
-  'organization_stats', // FK → organization, users
-  'post_comments',      // FK → posts, users
-  'posts',              // FK → users, categories
-  'organization',       // FK → users
-  'categories',         // no FK deps
+  'organization_stats_translations', // FK → organization_stats
+  'organization_stats',              // FK → organization, users
+  'organization_translations',        // FK → organization
+  'post_comments',                   // FK → posts, users
+  'post_translations',               // FK → posts
+  'posts',                           // FK → users, categories
+  'category_translations',           // FK → categories
+  'categories',                      // no FK deps
+  'organization',                    // no FK deps (once stats/translations are deleted)
 ]
 
 /** Insertion order respects FK constraints (parents before children). */
 const INSERT_ORDER: TableName[] = [
   'users',
   'categories',
+  'category_translations',
   'organization',
+  'organization_translations',
   'posts',
+  'post_translations',
   'post_comments',
   'organization_stats',
+  'organization_stats_translations',
 ]
 
 /**
@@ -119,6 +131,17 @@ export async function POST(request: Request) {
     if (rows.length === 0) continue
 
     if (table === 'organization') {
+      // Delete child translations first to avoid FK constraints in merge mode
+      const { error: delTransError } = await supabase
+        .from('organization_translations')
+        .delete()
+        .not('id', 'is', null)
+
+      if (delTransError) {
+        results[table].error = `فشل حذف ترجمات المؤسسة الحالية: ${delTransError.message}`
+        continue
+      }
+
       // Single-row table: always delete existing row(s) then insert fresh.
       const { error: delError } = await supabase
         .from('organization')

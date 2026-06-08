@@ -235,7 +235,7 @@ export function GalleryManager({
         <div className="sticky top-[4.5rem] z-30 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-(--fcps-primary)/20 bg-white px-4 py-3 shadow-md">
           <p className="text-sm font-medium text-(--fcps-dark)">
             {t.rich('selectedCount', {
-              count: () => <span className="font-bold text-(--fcps-primary)">{selectedCount}</span>,
+              count: <span className="font-bold text-(--fcps-primary)">{selectedCount}</span>,
               max: MAX_SELECT
             })}
           </p>
