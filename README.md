@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Specialized CMS Platform
 
-## Getting Started
+A high-performance, secure, and multilingual Content Management System (CMS) designed for organization settings, news publication, and program management. Built on **Next.js 16 (App Router)** and **Supabase (PostgreSQL)**, this platform implements advanced caching architectures, secure edge-routing middleware, and robust Role-Based Access Control (RBAC).
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Key Architectural Features
+
+### 1. Data Caching & Incremental Static Regeneration (ISR)
+* **Pre-rendered Detail Pages:** Program, Center, and News detail pages are statically pre-rendered (SSG) at build time and cached at the edge. They utilize Incremental Static Regeneration (ISR) with a `revalidate` period of 1 hour, allowing high-availability page loads with sub-millisecond response times.
+* **Service-Level Caching:** Layout dependencies (like navigation links, category headers, and organization settings displayed in the global footer) are cached using Next.js `unstable_cache` to eliminate redundant database roundtrips.
+* **On-Mutation Cache Invalidation:** Server Actions automatically trigger targeted cache invalidation via `revalidateTag` and type-specific `revalidatePath` helper routines upon creation, modification, or deletion of content.
+
+### 2. Multi-Tier Security & Role-Based Access Control (RBAC)
+* **Edge Routing Interceptor:** Next.js `proxy.ts` acts as an edge-level firewall, intercepting incoming requests to secure areas (`/dashboard/*`) and redirecting unauthenticated traffic before rendering occurs.
+* **Granular Role Hierarchy:** Integrates `NextAuth.js` to manage secure sessions, enforcing authorization checks on Server Actions and API endpoints based on user roles (`Admin`, `Editor`, `Viewer`).
+* **Secured API Surfaces:** Administrative actions—such as social scrapers (`/api/apify`), database backup managers (`/api/data-management/*`), and draft-state posts—are guarded programmatically against data leakage and unauthorized consumption.
+
+### 3. Native Multilingual Support (i18n)
+* **Arabic & English Support:** Fully integrated with `next-intl` to support localized layouts (RTL for Arabic, LTR for English).
+* **Database Translation Tables:** Employs a database translation schema (`post_translations`, `category_translations`, etc.) to separate core records from dynamic localized metadata, preventing redundancy and ensuring clean schema expansion.
+
+### 4. Backup, Restore & Data Portability
+* **Automated Data Export:** Administrator interface allowing full database state backups across all core and localization tables.
+* **Referential-Integrity Restoration:** The restore engine handles complex table dependencies, utilizing defined order resolution (wipe and insert queues) to guarantee conflict-free database imports and prevent Foreign Key constraint violations.
+
+### 5. Automated Media Pipelines
+* **Facebook Content Importer:** Utilizes `Apify` scraping APIs to automatically parse and import external social posts.
+* **Cloudinary Storage CDN:** Scraped media binaries are automatically uploaded to Cloudinary to provide persistent CDN image delivery, shielding layouts from expiring social CDN links.
+
+---
+
+## 🛠️ Technology Stack
+
+* **Frontend:** Next.js 16.2 (Turbopack, Server Actions), React 19, TailwindCSS, TypeScript.
+* **Backend Services:** Supabase PostgreSQL Client, Next-Auth (Google Provider).
+* **Localization:** next-intl.
+* **Validations & Linting:** Zod, ESLint.
+
+---
+
+## ⚙️ Getting Started & Local Development
+
+### 1. Environment Configuration
+Create a `.env.local` file in the root directory and configure the following parameters:
+
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# NextAuth Configuration
+NEXTAUTH_SECRET=your_nextauth_jwt_secret
+NEXTAUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
+GOOGLE_CLIENT_SECRET=your_google_oauth_client_secret
+
+# External Integrations
+APIFY_TOKEN=your_apify_api_token
+CLOUDINARY_URL=your_cloudinary_connection_string
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Installation
+Install the project dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Spin Up Development Server
+Run the local dev server using Next.js compiler:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 4. Build for Production
+Verify types, linting, and compile the optimized static production bundle:
+```bash
+npm run build
+```
