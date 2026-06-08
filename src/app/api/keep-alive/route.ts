@@ -1,10 +1,22 @@
 import supabase from '@/lib/supabase'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 // Force dynamic execution to ensure the database is hit on every request (prevents build-time static caching)
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Verify the request is coming from Vercel's cron scheduler.
+  // Vercel sends: Authorization: Bearer <CRON_SECRET>
+  const authHeader = request.headers.get('authorization')
+  const cronSecret = process.env.CRON_SECRET
+
+  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json(
+      { status: 'error', message: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
   try {
     if (!supabase) {
       throw new Error('Supabase client is not initialized')
