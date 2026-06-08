@@ -3,7 +3,7 @@
 import { requireAdmin } from '@/lib/auth';
 import { categoriesService } from '@/lib/services/categories.service';
 import { categorySchema, zodErrorToFieldErrors } from '@/lib/validations/categories.schema';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 export async function createCategoryAction(data: unknown) {
   try {
@@ -20,6 +20,7 @@ export async function createCategoryAction(data: unknown) {
 
     const category = await categoriesService.createCategory(parsed.data);
 
+    revalidateTag('categories', 'max');
     revalidatePath('/dashboard/categories');
     revalidatePath('/');
 
@@ -45,6 +46,7 @@ export async function updateCategoryAction(id: string, data: unknown) {
 
     const category = await categoriesService.updateCategory(id, parsed.data);
 
+    revalidateTag('categories', 'max');
     revalidatePath('/dashboard/categories');
     revalidatePath('/');
 
@@ -61,6 +63,7 @@ export async function deleteCategoryAction(id: string) {
 
     await categoriesService.deleteCategory(id);
 
+    revalidateTag('categories', 'max');
     revalidatePath('/dashboard/categories');
     revalidatePath('/');
 

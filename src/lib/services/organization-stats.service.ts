@@ -1,6 +1,7 @@
 import supabase from '@/lib/supabase';
 import { pickJoinedUserName } from '@/lib/user-display';
 import type { OrganizationStatRow } from '@/types/organization';
+import { unstable_cache } from 'next/cache';
 
 const ORG_STAT_SELECT = '*, updated_by_user:users!organization_stats_updated_by_fkey(name), translations:organization_stats_translations(lang, label, description)';
 
@@ -27,13 +28,20 @@ function mapOrganizationStat(row: RawOrganizationStat): OrganizationStatRow {
 
 export const organizationStatsService = {
   async getAllStats(): Promise<OrganizationStatRow[]> {
-    const { data, error } = await supabase
-      .from('organization_stats')
-      .select(ORG_STAT_SELECT)
-      .order('display_order', { ascending: true });
+    const fetchFunc = async () => {
+      const { data, error } = await supabase
+        .from('organization_stats')
+        .select(ORG_STAT_SELECT)
+        .order('display_order', { ascending: true });
 
-    if (error) throw error;
-    return ((data as RawOrganizationStat[]) ?? []).map(mapOrganizationStat);
+      if (error) throw error;
+      return ((data as RawOrganizationStat[]) ?? []).map(mapOrganizationStat);
+    };
+
+    return unstable_cache(fetchFunc, ['organization_stats'], {
+      tags: ['organization_stats'],
+      revalidate: 3600,
+    })();
   },
 
   async createStat(statData: Partial<OrganizationStatRow>): Promise<OrganizationStatRow> {

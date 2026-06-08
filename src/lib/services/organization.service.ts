@@ -1,6 +1,7 @@
 import supabase from '@/lib/supabase';
 import { pickJoinedUserName } from '@/lib/user-display';
 import type { OrganizationRow } from '@/types/organization';
+import { unstable_cache } from 'next/cache';
 
 const ORG_SELECT = '*, updated_by_user:users!organization_updated_by_fkey(name), translations:organization_translations(lang, name, tagline, about, mission, vision)';
 
@@ -33,14 +34,21 @@ function mapOrganization(row: RawOrganization): OrganizationRow {
 
 export const organizationService = {
   async getOrganization(): Promise<OrganizationRow | null> {
-    const { data, error } = await supabase
-      .from('organization')
-      .select(ORG_SELECT)
-      .limit(1)
-      .single();
+    const fetchFunc = async () => {
+      const { data, error } = await supabase
+        .from('organization')
+        .select(ORG_SELECT)
+        .limit(1)
+        .single();
 
-    if (error && error.code !== 'PGRST116') throw error;
-    return data ? mapOrganization(data as RawOrganization) : null;
+      if (error && error.code !== 'PGRST116') throw error;
+      return data ? mapOrganization(data as RawOrganization) : null;
+    };
+
+    return unstable_cache(fetchFunc, ['organization'], {
+      tags: ['organization'],
+      revalidate: 3600,
+    })();
   },
 
   async updateOrganization(id: string, orgData: Record<string, unknown>): Promise<OrganizationRow> {

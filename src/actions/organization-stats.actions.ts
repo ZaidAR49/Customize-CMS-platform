@@ -4,7 +4,7 @@ import { requireAdmin } from '@/lib/auth';
 import { organizationStatsService } from '@/lib/services/organization-stats.service';
 import { organizationService } from '@/lib/services/organization.service';
 import { organizationStatSchema, zodErrorToFieldErrors } from '@/lib/validations/organization-stats.schema';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 export async function createOrganizationStatAction(data: unknown) {
   try {
@@ -32,6 +32,7 @@ export async function createOrganizationStatAction(data: unknown) {
 
     const stat = await organizationStatsService.createStat(payload);
 
+    revalidateTag('organization_stats', 'max');
     revalidatePath('/dashboard/statistics');
     revalidatePath('/');
 
@@ -62,6 +63,7 @@ export async function updateOrganizationStatAction(id: string, data: unknown) {
 
     const stat = await organizationStatsService.updateStat(id, payload);
 
+    revalidateTag('organization_stats', 'max');
     revalidatePath('/dashboard/statistics');
     revalidatePath('/');
 
@@ -78,6 +80,7 @@ export async function deleteOrganizationStatAction(id: string) {
 
     await organizationStatsService.deleteStat(id);
 
+    revalidateTag('organization_stats', 'max');
     revalidatePath('/dashboard/statistics');
     revalidatePath('/');
 

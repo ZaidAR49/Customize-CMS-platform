@@ -1,5 +1,6 @@
 import supabase from '@/lib/supabase';
 import type { CategoryRow } from '@/types/category';
+import { unstable_cache } from 'next/cache';
 
 const CATEGORY_SELECT = '*, translations:category_translations(lang, label, description)';
 
@@ -24,13 +25,20 @@ function mapCategory(row: RawCategory): CategoryRow {
 
 export const categoriesService = {
   async getAllCategories(): Promise<CategoryRow[]> {
-    const { data, error } = await supabase
-      .from('categories')
-      .select(CATEGORY_SELECT)
-      .order('display_order', { ascending: true });
+    const fetchFunc = async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select(CATEGORY_SELECT)
+        .order('display_order', { ascending: true });
 
-    if (error) throw error;
-    return ((data as RawCategory[]) ?? []).map(mapCategory);
+      if (error) throw error;
+      return ((data as RawCategory[]) ?? []).map(mapCategory);
+    };
+
+    return unstable_cache(fetchFunc, ['categories'], {
+      tags: ['categories'],
+      revalidate: 3600,
+    })();
   },
 
   async createCategory(catData: Partial<CategoryRow>): Promise<CategoryRow> {

@@ -8,7 +8,7 @@ import {
   type UpdateOrganizationInput,
 } from '@/lib/validations/organization.schema';
 import { SOCIAL_PLATFORM_KEYS } from '@/types/organization';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 function normalizeSocial(s: UpdateOrganizationInput['social']) {
   const out: Record<string, string> = {};
@@ -56,6 +56,7 @@ export async function updateOrganizationAction(id: string, data: unknown) {
 
     const org = await organizationService.updateOrganization(id, toDbPayload(parsed.data, session.user.id));
 
+    revalidateTag('organization', 'max');
     revalidatePath('/dashboard/settings');
     revalidatePath('/');
 
@@ -81,6 +82,7 @@ export async function createOrganizationAction(data: unknown) {
 
     const org = await organizationService.createOrganization(toDbPayload(parsed.data, session.user.id));
 
+    revalidateTag('organization', 'max');
     revalidatePath('/dashboard/settings');
     revalidatePath('/');
 
