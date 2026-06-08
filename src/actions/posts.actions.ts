@@ -5,6 +5,35 @@ import { postsService } from '@/lib/services/posts.service';
 import { createPostSchema, updatePostSchema } from '@/lib/validations/posts.schema';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
+function revalidatePostPaths(type: string, slug?: string, id?: string) {
+  revalidatePath('/');
+  revalidatePath('/dashboard/posts');
+  revalidatePath('/dashboard/posts/new');
+  if (id) {
+    revalidatePath(`/dashboard/posts/${id}/edit`);
+    revalidatePath(`/dashboard/programs/${id}/edit`);
+    revalidatePath(`/dashboard/centers/${id}/edit`);
+  }
+
+  if (type === 'program') {
+    revalidatePath('/dashboard/programs');
+    if (slug) {
+      revalidatePath('/[locale]/programs/[slug]', 'page');
+    }
+  } else if (type === 'center') {
+    revalidatePath('/dashboard/centers');
+    if (slug) {
+      revalidatePath('/[locale]/centers/[slug]', 'page');
+    }
+  } else {
+    revalidatePath('/news');
+    if (slug) {
+      revalidatePath('/[locale]/news/[slug]', 'page');
+    }
+  }
+}
+
+
 export async function createPostAction(data: any) {
   try {
     const session = await requireEditor();
@@ -19,10 +48,7 @@ export async function createPostAction(data: any) {
     
     revalidateTag('posts', 'max');
     revalidateTag('post-slug', 'max');
-    revalidatePath('/dashboard/posts');
-    revalidatePath('/dashboard/posts/new');
-    revalidatePath('/news');
-    revalidatePath('/[locale]/news/[slug]', 'page');
+    revalidatePostPaths(post.type, post.slug, post.id);
     
     return { success: true, data: post };
   } catch (error: any) {
@@ -44,10 +70,7 @@ export async function updatePostAction(id: string, data: any) {
     
     revalidateTag('posts', 'max');
     revalidateTag('post-slug', 'max');
-    revalidatePath('/dashboard/posts');
-    revalidatePath(`/dashboard/posts/${postId}/edit`);
-    revalidatePath('/news');
-    revalidatePath('/[locale]/news/[slug]', 'page');
+    revalidatePostPaths(post.type, post.slug, post.id);
     
     return { success: true, data: post };
   } catch (error: any) {
@@ -59,12 +82,19 @@ export async function deletePostAction(id: string) {
   try {
     await requireEditor();
 
+    const post = await postsService.getPostById(id);
     await postsService.deletePost(id);
     revalidateTag('posts', 'max');
     revalidateTag('post-slug', 'max');
-    revalidatePath('/dashboard/posts');
-    revalidatePath('/news');
-    revalidatePath('/[locale]/news/[slug]', 'page');
+    if (post) {
+      revalidatePostPaths(post.type, post.slug, id);
+    } else {
+      revalidatePath('/');
+      revalidatePath('/dashboard/posts');
+      revalidatePath('/dashboard/programs');
+      revalidatePath('/dashboard/centers');
+      revalidatePath('/news');
+    }
     
     return { success: true };
   } catch (error: any) {
@@ -83,9 +113,7 @@ export async function togglePostPublishAction(id: string, published: boolean) {
     
     revalidateTag('posts', 'max');
     revalidateTag('post-slug', 'max');
-    revalidatePath('/dashboard/posts');
-    revalidatePath('/news');
-    revalidatePath('/[locale]/news/[slug]', 'page');
+    revalidatePostPaths(post.type, post.slug, post.id);
     
     return { success: true, data: post };
   } catch (error: any) {

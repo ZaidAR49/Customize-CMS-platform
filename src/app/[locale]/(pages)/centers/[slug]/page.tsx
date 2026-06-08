@@ -4,6 +4,18 @@ import { preparePostHtml } from '@/lib/post-html'
 import type { Metadata } from 'next'
 import { getLocale } from 'next-intl/server'
 
+export const revalidate = 3600
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  try {
+    const posts = await postsService.getPosts('center', true)
+    return posts.map((p) => ({ slug: p.slug }))
+  } catch {
+    return []
+  }
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const center = await postsService.getPostBySlug(slug)
