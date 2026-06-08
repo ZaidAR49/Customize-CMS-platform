@@ -31,7 +31,7 @@ export function DeleteUserDialog({
           <DialogTitle>{t('deleteConfirmTitle')}</DialogTitle>
           <DialogDescription>
             {t.rich('deleteConfirmDesc', {
-              name: <strong>{user?.name}</strong>
+              name: <strong>{user?.name}</strong> as any
             })}
             {isSelf ? (
               <span className={`mt-2 block font-medium text-amber-800 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>

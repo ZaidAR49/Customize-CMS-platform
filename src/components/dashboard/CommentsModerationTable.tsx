@@ -217,7 +217,7 @@ export function CommentsModerationTable({ comments }: Props) {
              <code className="rounded bg-(--fcps-bg-soft) px-1" dir="ltr">
                POST /api/comments
              </code>
-           )
+           ) as any
         })}
       </p>
     </div>

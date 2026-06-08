@@ -53,9 +53,9 @@ export function SendRoleEmailDialog({
           <DialogDescription className="space-y-2">
             <span className="block">
               {t.rich('emailPromptDesc', {
-                name: <strong>{prompt?.name}</strong>,
-                email: <span dir="ltr">({prompt?.email})</span>,
-                role: <strong>{roleLabel}</strong>
+                name: <strong>{prompt?.name}</strong> as any,
+                email: <span dir="ltr">({prompt?.email})</span> as any,
+                role: <strong>{roleLabel}</strong> as any
               })}
             </span>
           </DialogDescription>

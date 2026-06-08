@@ -159,7 +159,7 @@ export function DataManagementClient() {
 
             <label className="mb-1 block text-sm font-medium text-gray-700">
               {t.rich('dialogConfirmLabel', {
-                 phrase: <span className="font-bold text-red-600">{CONFIRM_PHRASE}</span>
+                 phrase: <span className="font-bold text-red-600">{CONFIRM_PHRASE}</span> as any
               })}
             </label>
             <input

@@ -54,7 +54,7 @@ export function DeleteGalleryImagesDialog({
           </div>
           <DialogDescription className={locale === 'ar' ? 'text-right' : 'text-left'}>
             {t.rich('typeToConfirm', {
-               word: <span className="font-mono font-semibold text-foreground">{CONFIRM_WORD}</span>
+               word: <span className="font-mono font-semibold text-foreground">{CONFIRM_WORD}</span> as any
             })}
           </DialogDescription>
         </DialogHeader>
