@@ -11,10 +11,19 @@ function toDatabasePostType(type: string | null | undefined): string {
 
 export async function GET() {
   try {
-    const { data, error } = await supabase
+    const session = await getServerSession(authOptions)
+    const isAdminOrEditor = session && ['admin', 'editor'].includes(session.user.role)
+
+    let query = supabase
       .from('posts')
       .select('*')
       .order('created_at', { ascending: false })
+
+    if (!isAdminOrEditor) {
+      query = query.eq('published', true)
+    }
+
+    const { data, error } = await query
 
     if (error) throw error
     return NextResponse.json(data)

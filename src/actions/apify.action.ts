@@ -1,10 +1,12 @@
 'use server';
 import { ApifyClient } from 'apify-client';
 import { uploadImagesToCloudinary } from '@/actions/cloudinary.actions';
+import { requireEditor } from '@/lib/auth';
 const apify = new ApifyClient({ token: process.env.APIFY_TOKEN });
 
 export async function importFacebookPost(postUrl: string) {
     try {
+        await requireEditor();
         const run = await apify.actor('apify/facebook-posts-scraper').call({
             startUrls: [{ url: postUrl }],
             maxPosts: 1
