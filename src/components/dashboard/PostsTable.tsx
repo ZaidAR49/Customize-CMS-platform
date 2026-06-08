@@ -7,7 +7,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Trash2, Eye } from 'lucide-react'
 import type { Post } from '@/types/post'
 import { formatSiteDate, formatSiteNumber } from '@/lib/date-format'
 import { TruncateFullTextPopup } from '@/components/ui/truncate-full-text'
@@ -89,6 +89,26 @@ export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '
               )}
               <TableCell>
                 <div className="flex gap-2">
+                  {post.published && post.slug ? (
+                    <a
+                      href={
+                        post.type === 'program'
+                          ? `/${locale}/programs/${post.slug}`
+                          : post.type === 'center'
+                          ? `/${locale}/centers/${post.slug}`
+                          : `/${locale}/news/${post.slug}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                        buttonVariants({ variant: 'ghost', size: 'sm' }),
+                        'h-8 w-8 p-0 text-(--fcps-gray-text) hover:text-(--fcps-primary)'
+                      )}
+                      title={locale === 'ar' ? 'عرض المنشور' : 'View Post'}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </a>
+                  ) : null}
                   {post.id && isEditor ? (
                     <Link
                       href={`${editUrlPrefix}/${post.id}/edit`}
@@ -96,6 +116,7 @@ export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '
                         buttonVariants({ variant: 'ghost', size: 'sm' }),
                         'h-8 w-8 p-0 text-(--fcps-gray-text) hover:text-(--fcps-primary)'
                       )}
+                      title={locale === 'ar' ? 'تعديل' : 'Edit'}
                     >
                       <Pencil className="h-4 w-4" />
                     </Link>
@@ -107,6 +128,7 @@ export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '
                       className="h-8 w-8 p-0 text-(--fcps-gray-text) hover:text-red-500"
                       onClick={() => onDelete(post)}
                       disabled={pendingDeleteId === post.id}
+                      title={locale === 'ar' ? 'حذف' : 'Delete'}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
