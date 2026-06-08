@@ -1,6 +1,7 @@
 import supabase from '@/lib/supabase';
 import { normalizeSlug } from '@/lib/slug';
 import type { Post } from '@/types/post';
+import { unstable_cache } from 'next/cache';
 
 const POST_SELECT =
   '*, author:users(name, avatar_url), category:categories!posts_category_id_fkey(id, key, translations:category_translations(lang, label)), translations:post_translations(lang, slug, title, description, excerpt)';
@@ -85,17 +86,29 @@ function mapPost(row: RawPost): Post {
 
 export const postsService = {
   async getPosts(type?: string, publishedOnly: boolean = false): Promise<Post[]> {
-    let query = supabase
-      .from('posts')
-      .select(POST_SELECT)
-      .order('published_at', { ascending: false });
+    const fetchFunc = async () => {
+      let query = supabase
+        .from('posts')
+        .select(POST_SELECT)
+        .order('published_at', { ascending: false });
 
-    if (type) query = query.eq('type', toDatabasePostType(type));
-    if (publishedOnly) query = query.eq('published', true);
+      if (type) query = query.eq('type', toDatabasePostType(type));
+      if (publishedOnly) query = query.eq('published', true);
 
-    const { data, error } = await query;
-    if (error) throw error;
-    return (data ?? []).map(mapPost);
+      const { data, error } = await query;
+      if (error) throw error;
+      return (data ?? []).map(mapPost);
+    };
+
+    if (!publishedOnly) {
+      return fetchFunc();
+    }
+
+    const cacheKey = ['posts', type ?? 'all'];
+    return unstable_cache(fetchFunc, cacheKey, {
+      tags: cacheKey,
+      revalidate: 3600,
+    })();
   },
 
   async getPostById(id: string): Promise<Post | null> {
@@ -112,28 +125,40 @@ export const postsService = {
   async getPostBySlug(slug: string, publishedOnly = true): Promise<Post | null> {
     const normalized = normalizeSlug(slug)
 
-    // Find the post ID via the translation slug
-    const { data: transData, error: transError } = await supabase
-      .from('post_translations')
-      .select('post_id')
-      .eq('slug', normalized)
-      .single()
-    if (transError && transError.code !== 'PGRST116') throw transError
-    if (transData) {
-      const post = await this.getPostById(transData.post_id)
-      if (publishedOnly && post && !post.published) return null
-      return post
+    const fetchFunc = async () => {
+      // Find the post ID via the translation slug
+      const { data: transData, error: transError } = await supabase
+        .from('post_translations')
+        .select('post_id')
+        .eq('slug', normalized)
+        .single()
+      if (transError && transError.code !== 'PGRST116') throw transError
+      if (transData) {
+        const post = await this.getPostById(transData.post_id)
+        if (publishedOnly && post && !post.published) return null
+        return post
+      }
+
+      // Fallback: match after NFC normalization (encoding / copy-paste differences)
+      let listQuery = supabase.from('posts').select(POST_SELECT)
+      if (publishedOnly) listQuery = listQuery.eq('published', true)
+
+      const { data: rows, error: listError } = await listQuery
+      if (listError) throw listError
+
+      const match = (rows ?? []).find((row: any) => normalizeSlug(row.slug ?? '') === normalized)
+      return match ? mapPost(match) : null
+    };
+
+    if (!publishedOnly) {
+      return fetchFunc();
     }
 
-    // Fallback: match after NFC normalization (encoding / copy-paste differences)
-    let listQuery = supabase.from('posts').select(POST_SELECT)
-    if (publishedOnly) listQuery = listQuery.eq('published', true)
-
-    const { data: rows, error: listError } = await listQuery
-    if (listError) throw listError
-
-    const match = (rows ?? []).find((row: any) => normalizeSlug(row.slug ?? '') === normalized)
-    return match ? mapPost(match) : null
+    const cacheKey = ['post-slug', normalized];
+    return unstable_cache(fetchFunc, cacheKey, {
+      tags: cacheKey,
+      revalidate: 3600,
+    })();
   },
 
   async createPost(postData: any): Promise<Post> {

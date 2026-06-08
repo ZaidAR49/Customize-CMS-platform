@@ -8,7 +8,7 @@ import type { Metadata } from 'next'
 import type { Post } from '@/types/post'
 import { getLocale } from 'next-intl/server'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600
 export const dynamicParams = true
 
 export async function generateStaticParams() {
@@ -74,12 +74,12 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const related = pickRelated(post, newsPosts)
 
   const latestPosts = sorted.slice(0, 5)
-  const latestWithCounts = await Promise.all(
-    latestPosts.map(async (p) => ({
-      ...p,
-      commentCount: p.id ? await commentsService.countApprovedForPost(p.id) : 0,
-    }))
-  )
+  const latestPostIds = latestPosts.map((p) => p.id).filter(Boolean) as string[]
+  const commentCounts = await commentsService.getApprovedCommentCounts(latestPostIds)
+  const latestWithCounts = latestPosts.map((p) => ({
+    ...p,
+    commentCount: p.id ? (commentCounts[p.id] ?? 0) : 0,
+  }))
 
   let approvedComments: Awaited<ReturnType<typeof commentsService.listApprovedForPost>> = []
   if (post.id) {

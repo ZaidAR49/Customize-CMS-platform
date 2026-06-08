@@ -1,5 +1,6 @@
 import supabase from '@/lib/supabase'
 import type { PostCommentRow, PostCommentWithPost } from '@/types/comment'
+import { unstable_cache } from 'next/cache'
 
 export const commentsService = {
   async listRecentApproved(limit = 5) {
@@ -15,15 +16,23 @@ export const commentsService = {
   },
 
   async listApprovedForPost(postId: string) {
-    const { data, error } = await supabase
-      .from('post_comments')
-      .select('id, author_name, body, created_at')
-      .eq('post_id', postId)
-      .eq('status', 'approved')
-      .order('created_at', { ascending: true })
+    const fetchFunc = async () => {
+      const { data, error } = await supabase
+        .from('post_comments')
+        .select('id, author_name, body, created_at')
+        .eq('post_id', postId)
+        .eq('status', 'approved')
+        .order('created_at', { ascending: true })
 
-    if (error) throw error
-    return data ?? []
+      if (error) throw error
+      return data ?? []
+    };
+
+    const cacheKey = ['comments', postId];
+    return unstable_cache(fetchFunc, cacheKey, {
+      tags: ['comments', `comments-${postId}`],
+      revalidate: 3600,
+    })();
   },
 
   async countApprovedForPost(postId: string): Promise<number> {
@@ -35,6 +44,37 @@ export const commentsService = {
 
     if (error) throw error
     return count ?? 0
+  },
+
+  async getApprovedCommentCounts(postIds: string[]): Promise<Record<string, number>> {
+    const fetchFunc = async () => {
+      if (!postIds || postIds.length === 0) return {}
+      const { data, error } = await supabase
+        .from('post_comments')
+        .select('post_id')
+        .in('post_id', postIds)
+        .eq('status', 'approved')
+
+      if (error) throw error
+
+      const counts: Record<string, number> = {}
+      postIds.forEach(id => {
+        counts[id] = 0
+      })
+      data?.forEach((row: any) => {
+        if (row.post_id) {
+          counts[row.post_id] = (counts[row.post_id] || 0) + 1
+        }
+      })
+      return counts
+    };
+
+    const sortedIds = [...postIds].sort();
+    const cacheKey = ['comments-counts', ...sortedIds];
+    return unstable_cache(fetchFunc, cacheKey, {
+      tags: ['comments', 'comments-counts'],
+      revalidate: 3600,
+    })();
   },
 
   async listForModeration(): Promise<PostCommentWithPost[]> {

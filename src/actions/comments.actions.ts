@@ -1,7 +1,7 @@
 'use server'
 
 import { getServerSession } from 'next-auth'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { authOptions } from '@/lib/auth'
 import { commentsService } from '@/lib/services/comments.service'
 import { moderateCommentSchema } from '@/lib/validations/comment.schema'
@@ -26,7 +26,9 @@ export async function moderateCommentAction(raw: unknown) {
       moderated_by: session.user.id,
     })
 
+    revalidateTag('comments', 'max')
     revalidatePath('/dashboard/comments')
+    revalidatePath('/[locale]/news/[slug]', 'page')
     return { success: true as const }
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'تعذّر تحديث التعليق'

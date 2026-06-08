@@ -3,7 +3,7 @@
 import { requireEditor } from '@/lib/auth';
 import { postsService } from '@/lib/services/posts.service';
 import { createPostSchema, updatePostSchema } from '@/lib/validations/posts.schema';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 export async function createPostAction(data: any) {
   try {
@@ -17,9 +17,12 @@ export async function createPostAction(data: any) {
     const postData = { ...parsed.data, author_id: session.user.id };
     const post = await postsService.createPost(postData);
     
+    revalidateTag('posts', 'max');
+    revalidateTag('post-slug', 'max');
     revalidatePath('/dashboard/posts');
     revalidatePath('/dashboard/posts/new');
     revalidatePath('/news');
+    revalidatePath('/[locale]/news/[slug]', 'page');
     
     return { success: true, data: post };
   } catch (error: any) {
@@ -39,9 +42,12 @@ export async function updatePostAction(id: string, data: any) {
     const { id: postId, ...updateData } = parsed.data;
     const post = await postsService.updatePost(postId, updateData);
     
+    revalidateTag('posts', 'max');
+    revalidateTag('post-slug', 'max');
     revalidatePath('/dashboard/posts');
     revalidatePath(`/dashboard/posts/${postId}/edit`);
     revalidatePath('/news');
+    revalidatePath('/[locale]/news/[slug]', 'page');
     
     return { success: true, data: post };
   } catch (error: any) {
@@ -54,8 +60,11 @@ export async function deletePostAction(id: string) {
     await requireEditor();
 
     await postsService.deletePost(id);
+    revalidateTag('posts', 'max');
+    revalidateTag('post-slug', 'max');
     revalidatePath('/dashboard/posts');
     revalidatePath('/news');
+    revalidatePath('/[locale]/news/[slug]', 'page');
     
     return { success: true };
   } catch (error: any) {
@@ -72,8 +81,11 @@ export async function togglePostPublishAction(id: string, published: boolean) {
       published_at: published ? new Date().toISOString() : null 
     });
     
+    revalidateTag('posts', 'max');
+    revalidateTag('post-slug', 'max');
     revalidatePath('/dashboard/posts');
     revalidatePath('/news');
+    revalidatePath('/[locale]/news/[slug]', 'page');
     
     return { success: true, data: post };
   } catch (error: any) {
