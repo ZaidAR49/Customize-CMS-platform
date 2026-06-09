@@ -15,15 +15,39 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ClearFiltersButton } from '@/components/shared/ClearFiltersButton'
-import { moderateCommentAction } from '@/actions/comments.actions'
-import type { CommentStatus, PostCommentWithPost } from '@/types/comment'
+import { moderateCommentAction, deleteCommentAction } from '@/actions/comments.actions'
+import type { CommentStatus, PostCommentWithPost, PostSummaryEmbed } from '@/types/comment'
 import { formatSiteDateTime } from '@/lib/date-format'
 import { TruncateFullTextPopup } from '@/components/ui/truncate-full-text'
 import { useTranslations, useLocale } from 'next-intl'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
-function postEmbed(posts: PostCommentWithPost['posts']) {
-  if (!posts) return null
-  return Array.isArray(posts) ? posts[0] ?? null : posts
+interface ResolvedPost {
+  type: string
+  slug: string
+  title: string
+  title_en: string
+}
+
+function resolvePost(posts: PostCommentWithPost['posts']): ResolvedPost | null {
+  const embed: PostSummaryEmbed | null = Array.isArray(posts) ? (posts[0] ?? null) : posts
+  if (!embed) return null
+  const trans = Array.isArray(embed.translations) ? embed.translations : []
+  const ar = trans.find((t) => t.lang === 'ar')
+  const en = trans.find((t) => t.lang === 'en')
+  return {
+    type: embed.type,
+    slug: ar?.slug ?? en?.slug ?? '',
+    title: ar?.title ?? en?.title ?? '',
+    title_en: en?.title ?? ar?.title ?? '',
+  }
 }
 
 function publicPostPath(type: string, slug: string) {
@@ -55,6 +79,7 @@ export function CommentsModerationTable({ comments }: Props) {
   const router = useRouter()
   const [filter, setFilter] = useState<'all' | CommentStatus>('all')
   const [pending, startTransition] = useTransition()
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null)
 
   const statusLabels: Record<CommentStatus, string> = {
     pending: t('filterPending'),
@@ -75,6 +100,24 @@ export function CommentsModerationTable({ comments }: Props) {
         router.refresh()
       } else {
         toast.error(res.error ?? t('errorUpdate'))
+      }
+    })
+  }
+
+  function openDeleteDialog(id: string) {
+    setCommentToDelete(id)
+  }
+
+  function confirmDelete() {
+    if (!commentToDelete) return
+    startTransition(async () => {
+      const res = await deleteCommentAction({ id: commentToDelete })
+      setCommentToDelete(null)
+      if (res.success) {
+        toast.success(t('successDelete'))
+        router.refresh()
+      } else {
+        toast.error(res.error ?? t('error'))
       }
     })
   }
@@ -122,15 +165,15 @@ export function CommentsModerationTable({ comments }: Props) {
               </TableRow>
             ) : (
               rows.map((c) => {
-                const post = postEmbed(c.posts)
-                const href = post ? publicPostPath(post.type, post.slug) : '#'
+                const post = resolvePost(c.posts)
+                const href = post?.slug ? publicPostPath(post.type, post.slug) : '#'
 
                 return (
                   <TableRow key={c.id} className="align-top hover:bg-(--fcps-bg-soft)/50">
                     <TableCell className="max-w-[180px] whitespace-normal wrap-break-word">
                       {post ? (
                         <TruncateFullTextPopup
-                          text={locale === 'ar' ? post.title : ((post as any).title_en || post.title)}
+                          text={locale === 'ar' ? post.title : (post.title_en || post.title)}
                           dialogTitle={t('dialogTitlePost')}
                           className="font-medium text-(--fcps-primary)"
                           renderDialogFooter={(close) => (
@@ -181,26 +224,57 @@ export function CommentsModerationTable({ comments }: Props) {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1 sm:flex-row">
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          className="text-emerald-700 border-emerald-200 hover:bg-emerald-50"
-                          disabled={pending || c.status === 'approved'}
-                          onClick={() => act(c.id, 'approved')}
-                        >
-                          {t('approve')}
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          className="text-red-600 border-red-200 hover:bg-red-50"
-                          disabled={pending || c.status === 'rejected'}
-                          onClick={() => act(c.id, 'rejected')}
-                        >
-                          {t('reject')}
-                        </Button>
+                        {/* Approved: only Delete */}
+                        {c.status === 'approved' && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="text-red-600 border-red-200 hover:bg-red-50"
+                            disabled={pending}
+                            onClick={() => openDeleteDialog(c.id)}
+                          >
+                            {t('delete')}
+                          </Button>
+                        )}
+                        {/* Rejected: only Approve */}
+                        {c.status === 'rejected' && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="text-emerald-700 border-emerald-200 hover:bg-emerald-50"
+                            disabled={pending}
+                            onClick={() => act(c.id, 'approved')}
+                          >
+                            {t('approve')}
+                          </Button>
+                        )}
+                        {/* Pending: Approve + Reject */}
+                        {c.status === 'pending' && (
+                          <>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              className="text-emerald-700 border-emerald-200 hover:bg-emerald-50"
+                              disabled={pending}
+                              onClick={() => act(c.id, 'approved')}
+                            >
+                              {t('approve')}
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              className="text-red-600 border-red-200 hover:bg-red-50"
+                              disabled={pending}
+                              onClick={() => act(c.id, 'rejected')}
+                            >
+                              {t('reject')}
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -210,6 +284,34 @@ export function CommentsModerationTable({ comments }: Props) {
           </TableBody>
         </Table>
       </div>
+
+      {/* Delete confirmation dialog */}
+      <Dialog open={!!commentToDelete} onOpenChange={(open) => !open && setCommentToDelete(null)}>
+        <DialogContent className="sm:max-w-md" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+          <DialogHeader>
+            <DialogTitle>{t('confirmDeleteTitle')}</DialogTitle>
+            <DialogDescription>{t('confirmDelete')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className={`gap-2 ${locale === 'ar' ? 'sm:justify-start' : 'sm:justify-end'}`}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setCommentToDelete(null)}
+              disabled={pending}
+            >
+              {t('cancel')}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={pending}
+            >
+              {pending ? t('deleting') : t('finalDelete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <p className="text-xs text-(--fcps-gray-text)">
         {t.rich('apiNote', {
@@ -223,4 +325,3 @@ export function CommentsModerationTable({ comments }: Props) {
     </div>
   )
 }
-

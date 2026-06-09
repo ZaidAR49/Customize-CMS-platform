@@ -6,7 +6,7 @@ export const commentsService = {
   async listRecentApproved(limit = 5) {
     const { data, error } = await supabase
       .from('post_comments')
-      .select('id, author_name, body, created_at, posts(title, slug)')
+      .select('id, author_name, body, created_at, posts(type, translations:post_translations(lang, slug, title))')
       .eq('status', 'approved')
       .order('created_at', { ascending: false })
       .limit(limit)
@@ -84,9 +84,8 @@ export const commentsService = {
         `
         *,
         posts (
-          title,
-          slug,
-          type
+          type,
+          translations:post_translations(lang, slug, title)
         )
       `
       )
@@ -136,5 +135,14 @@ export const commentsService = {
     if (error) throw error
     if (!data) throw new Error('Comment not found')
     return data as PostCommentRow
+  },
+
+  async deleteComment(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('post_comments')
+      .delete()
+      .eq('id', id)
+
+    if (error) throw error
   },
 }

@@ -12,10 +12,15 @@ export interface PostCommentRow {
   moderated_by: string | null
 }
 
-export interface PostSummaryEmbed {
-  title: string
+export interface PostTranslationEmbed {
+  lang: string
   slug: string
+  title: string
+}
+
+export interface PostSummaryEmbed {
   type: string
+  translations: PostTranslationEmbed[] | null
 }
 
 export type PostCommentWithPost = PostCommentRow & {

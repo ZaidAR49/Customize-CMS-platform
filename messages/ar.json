@@ -249,6 +249,25 @@
       "aboutLabel": "ℹ️ أخبرني عن الجمعية"
     }
   },
+  "dashboardNav": {
+    "headerTitle": "لوحة التحكم",
+    "headerSubtitle": "إدارة المحتوى",
+    "overview": "لوحة التحكم",
+    "posts": "المقالات",
+    "gallery": "المعرض",
+    "users": "المستخدمون",
+    "statistics": "الإحصائيات",
+    "categories": "التصنيفات",
+    "settings": "معلومات المنظمة",
+    "comments": "التعليقات",
+    "dataManagement": "إدارة البيانات",
+    "programs": "البرامج والمشاريع",
+    "centers": "مراكز الجمعية",
+    "viewSite": "عرض الموقع",
+    "logoTitle": "الصفحة الرئيسية",
+    "logoAlt": "الشعار — الصفحة الرئيسية",
+    "signOut": "تسجيل الخروج"
+  },
   "dashboardCategories": {
     "title": "إدارة التصنيفات",
     "description": "عرض وإدارة تصنيفات المقالات والمحتوى؛ يمكن للمسؤول إضافة، تعديل، أو حذف التصنيفات المستخدمة في الموقع.",
@@ -348,7 +367,11 @@
     "approve": "قبول",
     "reject": "رفض",
     "delete": "حذف",
-    "confirmDelete": "هل أنت متأكد من حذف هذا التعليق؟",
+    "confirmDeleteTitle": "تأكيد حذف التعليق",
+    "confirmDelete": "هل أنت متأكد من حذف هذا التعليق نهائياً؟ لا يمكن التراجع عن هذا الإجراء.",
+    "cancel": "إلغاء",
+    "deleting": "جاري الحذف...",
+    "finalDelete": "حذف نهائي",
     "statusApproved": "موافق عليه",
     "statusPending": "قيد الانتظار",
     "statusRejected": "مرفوض",

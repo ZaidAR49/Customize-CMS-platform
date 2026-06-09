@@ -59,6 +59,7 @@ function mapPost(row: RawPost): Post {
   return {
     id: row.id,
     slug: postAr.slug ?? postEn.slug ?? '',
+    slug_en: postEn.slug || undefined,
     title: titleAr,
     title_en: titleEn,
     excerpt: excerptAr,

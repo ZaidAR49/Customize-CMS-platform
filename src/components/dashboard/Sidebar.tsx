@@ -20,21 +20,23 @@ import {
 import { cn } from '@/lib/utils'
 import { signOut } from 'next-auth/react'
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
-
-const sidebarItems = [
-  { label: 'لوحة التحكم', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'المقالات', href: '/dashboard/posts', icon: FileText },
-  { label: 'المعرض', href: '/dashboard/gallery', icon: Images },
-  { label: 'المستخدمون', href: '/dashboard/users', icon: Users },
-  { label: 'الاحصائيات', href: '/dashboard/statistics', icon: BarChart3 },
-  { label: 'التصنيفات', href: '/dashboard/categories', icon: FolderOpen },
-  { label: 'معلومات المنظمة', href: '/dashboard/settings', icon: Building2 },
-  { label: 'التعليقات', href: '/dashboard/comments', icon: MessageSquare },
-  { label: 'إدارة البيانات', href: '/dashboard/data-management', icon: DatabaseBackup },
-]
+import { useTranslations } from 'next-intl'
 
 export function Sidebar() {
+  const t = useTranslations('dashboardNav')
   const pathname = usePathname()
+
+  const sidebarItems = [
+    { label: t('overview'),        href: '/dashboard',                icon: LayoutDashboard },
+    { label: t('posts'),           href: '/dashboard/posts',          icon: FileText        },
+    { label: t('gallery'),         href: '/dashboard/gallery',        icon: Images          },
+    { label: t('users'),           href: '/dashboard/users',          icon: Users           },
+    { label: t('statistics'),      href: '/dashboard/statistics',     icon: BarChart3       },
+    { label: t('categories'),      href: '/dashboard/categories',     icon: FolderOpen      },
+    { label: t('settings'),        href: '/dashboard/settings',       icon: Building2       },
+    { label: t('comments'),        href: '/dashboard/comments',       icon: MessageSquare   },
+    { label: t('dataManagement'),  href: '/dashboard/data-management',icon: DatabaseBackup  },
+  ]
 
   return (
     <aside className="sticky top-0 flex h-screen w-64 flex-col border-l bg-(--fcps-bg-soft)">
@@ -43,13 +45,13 @@ export function Sidebar() {
         <Link
           href="/"
           className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-(--fcps-bg-soft) bg-white shadow-sm transition-opacity hover:opacity-90"
-          title="الصفحة الرئيسية"
+          title={t('logoTitle')}
         >
-          <img src="/images/logo.png" alt="الشعار — الصفحة الرئيسية" width={40} height={40} className="object-contain" />
+          <img src="/images/logo.png" alt={t('logoAlt')} width={40} height={40} className="object-contain" />
         </Link>
         <div>
-          <h2 className="text-sm font-bold text-(--fcps-dark)">لوحة التحكم</h2>
-          <p className="text-xs text-(--fcps-gray-text)">إدارة المحتوى</p>
+          <h2 className="text-sm font-bold text-(--fcps-dark)">{t('headerTitle')}</h2>
+          <p className="text-xs text-(--fcps-gray-text)">{t('headerSubtitle')}</p>
         </div>
       </div>
 
@@ -86,9 +88,9 @@ export function Sidebar() {
           )}
         >
           <Target className="h-4 w-4" />
-          البرامج والمشاريع
+          {t('programs')}
         </Link>
-        
+
         <Link
           href="/dashboard/centers"
           className={cn(
@@ -99,8 +101,9 @@ export function Sidebar() {
           )}
         >
           <MapPin className="h-4 w-4" />
-          مراكز الجمعية
+          {t('centers')}
         </Link>
+
         <Link
           href="/"
           target="_blank"
@@ -108,7 +111,7 @@ export function Sidebar() {
           className="mt-3 flex w-full items-center gap-3 rounded-lg border border-dashed border-(--fcps-primary)/30 bg-white/80 px-4 py-2.5 text-sm font-medium text-(--fcps-primary) transition-all hover:bg-white hover:shadow-sm"
         >
           <ExternalLink className="h-4 w-4 shrink-0" />
-          عرض الموقع
+          {t('viewSite')}
         </Link>
       </nav>
 
@@ -122,7 +125,7 @@ export function Sidebar() {
           className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-(--fcps-gray-text) transition-colors hover:bg-white hover:text-red-500"
         >
           <LogOut className="h-4 w-4" />
-          تسجيل الخروج
+          {t('signOut')}
         </button>
       </div>
     </aside>
