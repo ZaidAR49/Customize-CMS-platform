@@ -9,7 +9,7 @@ type RawPost = Record<string, any>;
 
 function normalizePostType(type: string | null | undefined): Post['type'] {
   if (type === 'activities') return 'activity';
-  if (type === 'posts') return 'program';
+  if (type === 'posts') return 'news';
   if (type === 'top_employees') return 'center';
   if (type === 'activity' || type === 'program' || type === 'center') return type;
   return 'news';

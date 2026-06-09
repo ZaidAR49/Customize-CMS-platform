@@ -89,26 +89,28 @@ export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '
               )}
               <TableCell>
                 <div className="flex gap-2">
-                  {post.published && post.slug ? (
-                    <a
-                      href={
-                        post.type === 'program'
-                          ? `/${locale}/programs/${post.slug}`
-                          : post.type === 'center'
-                          ? `/${locale}/centers/${post.slug}`
-                          : `/${locale}/news/${post.slug}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={cn(
-                        buttonVariants({ variant: 'ghost', size: 'sm' }),
-                        'h-8 w-8 p-0 text-(--fcps-gray-text) hover:text-(--fcps-primary)'
-                      )}
-                      title={locale === 'ar' ? 'عرض المنشور' : 'View Post'}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </a>
-                  ) : null}
+                  {post.published && post.slug ? (() => {
+                    const previewPath =
+                      post.type === 'program'
+                        ? `/${locale}/programs/${post.slug}`
+                        : post.type === 'center'
+                        ? `/${locale}/centers/${post.slug}`
+                        : `/${locale}/news/${post.slug}`
+                    return (
+                      <a
+                        href={previewPath}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(
+                          buttonVariants({ variant: 'ghost', size: 'sm' }),
+                          'h-8 w-8 p-0 text-(--fcps-gray-text) hover:text-(--fcps-primary)'
+                        )}
+                        title={locale === 'ar' ? 'عرض المنشور' : 'View Post'}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </a>
+                    )
+                  })() : null}
                   {post.id && isEditor ? (
                     <Link
                       href={`${editUrlPrefix}/${post.id}/edit`}
