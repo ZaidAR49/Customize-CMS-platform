@@ -135,7 +135,7 @@ export const postsService = {
         .single()
       if (transError && transError.code !== 'PGRST116') throw transError
       if (transData) {
-        const post = await this.getPostById(transData.post_id)
+        const post = await postsService.getPostById(transData.post_id)
         if (publishedOnly && post && !post.published) return null
         return post
       }
@@ -216,7 +216,7 @@ export const postsService = {
       if (transError) throw transError;
     }
 
-    const fullPost = await this.getPostById(postId);
+    const fullPost = await postsService.getPostById(postId);
     if (!fullPost) throw new Error('Post not found after insert');
     return fullPost;
   },
@@ -306,7 +306,7 @@ export const postsService = {
     }
 
 
-    const fullPost = await this.getPostById(id);
+    const fullPost = await postsService.getPostById(id);
     if (!fullPost) throw new Error('Post not found after update');
     return fullPost;
   },
