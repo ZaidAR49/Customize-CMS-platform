@@ -8,6 +8,8 @@ import { organizationStatsService } from '@/lib/services/organization-stats.serv
 import { postsService } from '@/lib/services/posts.service'
 import { getLocale } from 'next-intl/server'
 
+export const revalidate = 3600
+
 function parseHeroSlides(metadata: unknown, locale: string): string[] {
   if (!metadata || typeof metadata !== 'object') return []
   

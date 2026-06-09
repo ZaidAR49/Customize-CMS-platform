@@ -8,19 +8,7 @@ import type { Metadata } from 'next'
 import type { Post } from '@/types/post'
 import { getLocale } from 'next-intl/server'
 
-export const revalidate = 3600
-export const dynamicParams = true
-
-export async function generateStaticParams() {
-  try {
-    const posts = await postsService.getPosts(undefined, true)
-    return posts
-      .filter((p) => p.type === 'news' || p.type === 'activity')
-      .map((p) => ({ slug: p.slug }))
-  } catch {
-    return []
-  }
-}
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({
   params,
