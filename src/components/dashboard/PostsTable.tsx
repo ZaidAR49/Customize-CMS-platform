@@ -90,12 +90,13 @@ export function PostsTable({ posts, pendingDeleteId, onDelete, editUrlPrefix = '
               <TableCell>
                 <div className="flex gap-2">
                   {post.published && post.slug ? (() => {
+                    const activeSlug = locale === 'en' ? (post.slug_en || post.slug) : post.slug
                     const previewPath =
                       post.type === 'program'
-                        ? `/${locale}/programs/${post.slug}`
+                        ? `/${locale}/programs/${activeSlug}`
                         : post.type === 'center'
-                        ? `/${locale}/centers/${post.slug}`
-                        : `/${locale}/news/${post.slug}`
+                        ? `/${locale}/centers/${activeSlug}`
+                        : `/${locale}/news/${activeSlug}`
                     return (
                       <a
                         href={previewPath}

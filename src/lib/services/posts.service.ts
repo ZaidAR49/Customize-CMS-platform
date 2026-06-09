@@ -155,7 +155,8 @@ export const postsService = {
       return fetchFunc();
     }
 
-    const cacheKey = ['post-slug', normalized];
+    const safeTag = encodeURIComponent(normalized);
+    const cacheKey = ['post-slug', safeTag];
     return unstable_cache(fetchFunc, cacheKey, {
       tags: cacheKey,
       revalidate: 3600,

@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import Link from 'next/link'
+import { Link, useRouter } from '@/i18n/navigation'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 import type { Post } from '@/types/post'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { formatSiteDate } from '@/lib/date-format'
@@ -107,16 +106,18 @@ export function PostSidebar({ latestPosts, categories }: PostSidebarProps) {
               </div>
             ) : (
               <div className="space-y-1">
-                {matchingPosts.map((post) => (
-                  <Link
-                    key={post.id}
-                    href={`/news/${post.slug}`}
-                    onClick={() => {
-                      setIsFocused(false)
-                      setSearch('')
-                    }}
-                    className="flex items-center gap-3 rounded-lg p-2 transition-all hover:bg-gray-50 active:bg-gray-100 group"
-                  >
+                {matchingPosts.map((post) => {
+                  const activeSlug = locale === 'en' ? (post.slug_en || post.slug) : post.slug
+                  return (
+                    <Link
+                      key={post.id}
+                      href={`/news/${activeSlug}`}
+                      onClick={() => {
+                        setIsFocused(false)
+                        setSearch('')
+                      }}
+                      className="flex items-center gap-3 rounded-lg p-2 transition-all hover:bg-gray-50 active:bg-gray-100 group"
+                    >
                     {post.coverImage ? (
                       <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-md border border-gray-100">
                         <Image
@@ -149,7 +150,7 @@ export function PostSidebar({ latestPosts, categories }: PostSidebarProps) {
                       </div>
                     </div>
                   </Link>
-                ))}
+                )})}
               </div>
             )}
           </div>
@@ -159,15 +160,18 @@ export function PostSidebar({ latestPosts, categories }: PostSidebarProps) {
       <div className="rounded-lg bg-[#f9f9f9] p-5">
         <h3 className="mb-4 text-lg font-bold text-[#1a1a1a]">{t('latestPosts')}</h3>
         <ol className="space-y-3 text-sm">
-          {latestPosts.map((post) => (
-            <li key={post.id} className="leading-relaxed text-[#333333]">
-              <span className="text-[#777777]">{post.commentCount ?? 0} · </span>
-              <Link href={`/news/${post.slug}`} className="font-medium text-[#0073aa] hover:text-[#005580]">
+          {latestPosts.map((post) => {
+            const activeSlug = locale === 'en' ? (post.slug_en || post.slug) : post.slug
+            return (
+              <li key={post.id} className="leading-relaxed text-[#333333]">
+                <span className="text-[#777777]">{post.commentCount ?? 0} · </span>
+                <Link href={`/news/${activeSlug}`} className="font-medium text-[#0073aa] hover:text-[#005580]">
                 {locale === 'ar' ? post.title : (post.title_en || post.title)}
               </Link>
-              <span className="text-[#777777]"> · {formatSiteDate(post.publishedAt)}</span>
-            </li>
-          ))}
+                <span className="text-[#777777]"> · {formatSiteDate(post.publishedAt)}</span>
+              </li>
+            )
+          })}
         </ol>
       </div>
 

@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { ChevronRight } from 'lucide-react'
 import { PostMediaGallery } from '@/components/news/post-detail/PostMediaGallery'
 import { PostShareBar } from '@/components/news/post-detail/PostShareBar'
@@ -75,7 +75,8 @@ export function PostContent({
   const description = locale === 'ar' ? post.descripcion : (post.descripcion_en || post.descripcion)
   const excerpt = locale === 'ar' ? post.excerpt : (post.excerpt_en || post.excerpt)
 
-  const postUrl = getPublicPostUrl(post.slug)
+  const activeSlug = locale === 'en' ? (post.slug_en || post.slug) : post.slug
+  const postUrl = getPublicPostUrl(activeSlug, locale)
   const categoryLabel =
     post.categoryLabel ?? typeBreadcrumbLabels[post.type] ?? t('breadcrumbs.news')
   const postBodyHtml =
@@ -109,18 +110,21 @@ export function PostContent({
               {title}
             </h1>
 
-            {previousPost && (
-              <Link
-                href={`/news/${previousPost.slug}`}
-                className="mb-6 flex items-start gap-2 text-sm text-[#0073aa] hover:text-[#005580]"
-              >
-                <ChevronRight className={`mt-0.5 h-4 w-4 shrink-0 ${locale === 'en' ? 'rotate-180' : ''}`} aria-hidden />
-                <span>
-                  <span className="block text-[#777777]">{formatSiteDate(previousPost.publishedAt)}</span>
-                  <span className="font-medium">{locale === 'ar' ? previousPost.title : (previousPost.title_en || previousPost.title)}</span>
-                </span>
-              </Link>
-            )}
+            {previousPost && (() => {
+              const previousActiveSlug = locale === 'en' ? (previousPost.slug_en || previousPost.slug) : previousPost.slug
+              return (
+                <Link
+                  href={`/news/${previousActiveSlug}`}
+                  className="mb-6 flex items-start gap-2 text-sm text-[#0073aa] hover:text-[#005580]"
+                >
+                  <ChevronRight className={`mt-0.5 h-4 w-4 shrink-0 ${locale === 'en' ? 'rotate-180' : ''}`} aria-hidden />
+                  <span>
+                    <span className="block text-[#777777]">{formatSiteDate(previousPost.publishedAt)}</span>
+                    <span className="font-medium">{locale === 'ar' ? previousPost.title : (previousPost.title_en || previousPost.title)}</span>
+                  </span>
+                </Link>
+              )
+            })()}
 
             <PostMediaGallery
               coverImage={post.coverImage}

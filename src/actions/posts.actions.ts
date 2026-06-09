@@ -131,7 +131,9 @@ export async function getSearchPostsAction() {
       data: filtered.map((p) => ({
         id: p.id,
         slug: p.slug,
+        slug_en: p.slug_en,
         title: p.title,
+        title_en: p.title_en,
         publishedAt: p.publishedAt,
         type: p.type,
         coverImage: p.coverImage,

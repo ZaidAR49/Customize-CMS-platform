@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import type { Post } from '@/types/post'
@@ -23,12 +23,13 @@ export function RelatedPosts({ posts }: RelatedPostsProps) {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {posts.map((post) => {
           const title = locale === 'ar' ? post.title : (post.title_en || post.title)
+          const activeSlug = locale === 'en' ? (post.slug_en || post.slug) : post.slug
           return (
             <article
               key={post.id}
               className="group overflow-hidden rounded-lg border border-[#e0e0e0] bg-white shadow-sm transition-shadow hover:shadow-md"
             >
-              <Link href={`/news/${post.slug}`} className="relative block aspect-[16/10] overflow-hidden bg-(--fcps-bg-soft)">
+              <Link href={`/news/${activeSlug}`} className="relative block aspect-[16/10] overflow-hidden bg-(--fcps-bg-soft)">
                 {post.coverImage ? (
                   <Image
                     src={post.coverImage}
@@ -50,7 +51,7 @@ export function RelatedPosts({ posts }: RelatedPostsProps) {
                 <p className="mb-2 text-xs text-[#777777]">{formatSiteDate(post.publishedAt)}</p>
                 <h4 className="mb-3 text-base font-bold leading-snug text-[#1a1a1a]">
                   <Link
-                    href={`/news/${post.slug}`}
+                    href={`/news/${activeSlug}`}
                     className="transition-colors hover:text-[#0073aa]"
                   >
                     {title}
@@ -58,7 +59,7 @@ export function RelatedPosts({ posts }: RelatedPostsProps) {
                 </h4>
                 <Separator className="mb-3" />
                 <Link
-                  href={`/news/${post.slug}`}
+                  href={`/news/${activeSlug}`}
                   className="inline-flex items-center gap-1 text-sm font-medium text-[#0073aa] hover:text-[#005580]"
                 >
                   {t('readMore')}

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -26,6 +26,7 @@ export function PostCard({ post }: PostCardProps) {
 
   const title = locale === 'ar' ? post.title : (post.title_en || post.title)
   const excerpt = locale === 'ar' ? post.excerpt : (post.excerpt_en || post.excerpt)
+  const activeSlug = locale === 'en' ? (post.slug_en || post.slug) : post.slug
 
   const typeLabels: Record<string, string> = {
     news: t('newsBadge') || 'أخبار',
@@ -69,7 +70,7 @@ export function PostCard({ post }: PostCardProps) {
 
         {/* Title */}
         <h3 className="mb-2 text-lg font-bold leading-tight text-(--fcps-dark) transition-colors group-hover:text-(--fcps-primary)">
-          <Link href={`/news/${post.slug}`} className="block">
+          <Link href={`/news/${activeSlug}`} className="block">
             {title}
           </Link>
         </h3>
@@ -82,7 +83,7 @@ export function PostCard({ post }: PostCardProps) {
         {/* Footer */}
         <div className="flex items-center justify-between border-t pt-3">
           <Link
-            href={`/news/${post.slug}`}
+            href={`/news/${activeSlug}`}
             className="flex items-center gap-1 text-sm font-medium text-(--fcps-primary) transition-colors hover:text-(--fcps-primary-dark)"
           >
             {tCard('readMore') || 'اقرأ المزيد'}
