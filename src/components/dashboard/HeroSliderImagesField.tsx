@@ -335,7 +335,7 @@ export function HeroSliderImagesField({
       >
         <DialogContent className="sm:max-w-3xl max-h-[85vh] flex flex-col p-6 overflow-hidden">
           <DialogHeader className="text-right">
-            <DialogTitle>اختيار صور من مكتبة Cloudinary</DialogTitle>
+            <DialogTitle>اختيار صور من مكتبة الصور</DialogTitle>
             <DialogDescription>
               حدد الصور التي تريد إضافتها للشريط الترحيبي ({slides.length} / {MAX_SLIDES})
             </DialogDescription>

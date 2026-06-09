@@ -51,7 +51,7 @@ export async function deleteCommentAction(raw: unknown) {
 
     await commentsService.deleteComment(parsed.data.id)
 
-    revalidateTag('comments')
+    revalidateTag('comments', 'max')
     revalidatePath('/dashboard/comments')
     revalidatePath('/[locale]/news/[slug]', 'page')
     return { success: true as const }

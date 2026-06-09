@@ -136,7 +136,7 @@ export function PostImageGallery({
       setLibNextCursor(result.nextCursor)
     } catch (e) {
       console.error(e)
-      toast.error('تعذّر تحميل مكتبة الصور من Cloudinary')
+      toast.error('تعذّر تحميل مكتبة الصور')
     } finally {
       setIsLibLoading(false)
     }
@@ -313,7 +313,7 @@ export function PostImageGallery({
             className="h-8 border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs gap-1.5"
           >
             <ImageIcon className="h-3.5 w-3.5 text-blue-500" />
-            اختيار من مكتبة Cloudinary
+            اختيار من مكتبة الصور
           </Button>
           <Badge variant="secondary" className="bg-slate-100 text-slate-600 border border-slate-200 py-1 text-xs">
             {gallery.length} / {maxImages} صورة
@@ -390,7 +390,7 @@ export function PostImageGallery({
         <DialogContent className="sm:max-w-3xl max-h-[85vh] flex flex-col p-6 overflow-hidden bg-white rounded-2xl shadow-xl border border-slate-100 animate-in fade-in-0 duration-200">
           <DialogHeader className="text-right">
             <DialogTitle className="text-lg font-bold text-slate-800">
-              مكتبة صور Cloudinary
+              مكتبة الصور
             </DialogTitle>
             <DialogDescription className="text-sm text-slate-500 mt-1">
               اختر الصور التي ترغب في إضافتها إلى المقال الحالي. يمكنك تحديد عدة صور. (الصور الحالية: {gallery.length} / {maxImages})
@@ -449,12 +449,12 @@ export function PostImageGallery({
             ) : isLibLoading ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3">
                 <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
-                <p className="text-sm font-medium text-slate-500">جاري تحميل الصور من Cloudinary...</p>
+                <p className="text-sm font-medium text-slate-500">جاري تحميل الصور...</p>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-2">
                 <ImageIcon className="h-10 w-10 text-slate-300" />
-                <p className="text-sm font-medium text-slate-500">لا توجد صور في مكتبة Cloudinary</p>
+                <p className="text-sm font-medium text-slate-500">لا توجد صور في مكتبة الصور</p>
               </div>
             )}
 

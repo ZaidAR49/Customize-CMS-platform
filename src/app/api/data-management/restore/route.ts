@@ -78,13 +78,13 @@ export async function POST(request: Request) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: 'ملف JSON غير صالح' }, { status: 400 })
+    return NextResponse.json({ error: 'ملف نسخة احتياطية غير صالح' }, { status: 400 })
   }
 
   // ── Schema validation ───────────────────────────────────────────────────────
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     return NextResponse.json(
-      { error: 'بنية النسخة الاحتياطية غير صحيحة: يجب أن تكون كائن JSON' },
+      { error: 'بنية ملف النسخة الاحتياطية غير صحيحة' },
       { status: 400 }
     )
   }

@@ -314,13 +314,7 @@ export function CommentsModerationTable({ comments }: Props) {
       </Dialog>
 
       <p className="text-xs text-(--fcps-gray-text)">
-        {t.rich('apiNote', {
-           api: (
-             <code className="rounded bg-(--fcps-bg-soft) px-1" dir="ltr">
-               POST /api/comments
-             </code>
-           ) as any
-        })}
+        {t('apiNote')}
       </p>
     </div>
   )
