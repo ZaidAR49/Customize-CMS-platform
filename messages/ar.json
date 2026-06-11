@@ -757,7 +757,10 @@
     "totalLikes": "إجمالي الإعجابات",
     "users": "المستخدمون",
     "pendingDrafts": "مسودات معلقة",
-    "latestPosts": "آخر المقالات"
+    "latestPosts": "آخر المقالات",
+    "totalVisits": "إجمالي الزيارات",
+    "uniqueVisitors": "الزوار الفريدون",
+    "fromLastMonth": "مقارنة بالشهر الماضي"
   },
   "lightbox": {
     "viewImage": "عرض الصورة",

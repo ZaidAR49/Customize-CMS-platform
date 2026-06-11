@@ -17,6 +17,18 @@ const nextConfig: NextConfig = {
         source: '/ingest/:path*',
         destination: 'https://eu.i.posthog.com/:path*',
       },
+      {
+        source: '/:locale(en|ar)/ingest/static/:path*',
+        destination: 'https://eu-assets.i.posthog.com/static/:path*',
+      },
+      {
+        source: '/:locale(en|ar)/ingest/array/:path*',
+        destination: 'https://eu-assets.i.posthog.com/array/:path*',
+      },
+      {
+        source: '/:locale(en|ar)/ingest/:path*',
+        destination: 'https://eu.i.posthog.com/:path*',
+      },
     ]
   },
   skipTrailingSlashRedirect: true,

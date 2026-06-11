@@ -757,7 +757,10 @@
     "totalLikes": "Total Likes",
     "users": "Users",
     "pendingDrafts": "Pending Drafts",
-    "latestPosts": "Latest Posts"
+    "latestPosts": "Latest Posts",
+    "totalVisits": "Total Visits",
+    "uniqueVisitors": "Unique Visitors",
+    "fromLastMonth": "from last month"
   },
   "lightbox": {
     "viewImage": "View Image",

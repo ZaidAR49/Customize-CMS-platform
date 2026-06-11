@@ -31,6 +31,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   // Skip all paths that should not be internationalized.
-  // This skips the folders "api", "_next", all files with an extension (e.g. .png, .css), and favicon.ico.
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)'],
+  // This skips the folders "api", "ingest", "_next", all files with an extension (e.g. .png, .css), and favicon.ico.
+  matcher: ['/((?!api|ingest|_next/static|_next/image|favicon.ico|.*\\..*).*)'],
 }
