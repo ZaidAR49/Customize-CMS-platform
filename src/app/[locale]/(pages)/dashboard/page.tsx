@@ -4,6 +4,7 @@ import { postsService } from '@/lib/services/posts.service'
 import { FileText, Heart, Users } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { PostHogCards } from '@/components/dashboard/PostHogCards'
+import { AnalyticsCharts } from '@/components/dashboard/AnalyticsCharts'
 
 export default async function DashboardPage() {
   const t = await getTranslations('dashboardOverview')
@@ -35,6 +36,11 @@ export default async function DashboardPage() {
           </Card>
         ))}
         <PostHogCards />
+      </div>
+
+      {/* Analytics Charts */}
+      <div className="mb-8">
+        <AnalyticsCharts />
       </div>
 
       {/* Recent Posts */}

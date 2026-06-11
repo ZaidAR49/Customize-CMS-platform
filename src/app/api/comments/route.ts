@@ -34,6 +34,7 @@ export async function POST(req: Request) {
         has_email: !!email,
       },
     })
+    await posthog.flush()
 
     return NextResponse.json({ ok: true })
   } catch (e: unknown) {

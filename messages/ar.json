@@ -760,7 +760,15 @@
     "latestPosts": "آخر المقالات",
     "totalVisits": "إجمالي الزيارات",
     "uniqueVisitors": "الزوار الفريدون",
-    "fromLastMonth": "مقارنة بالشهر الماضي"
+    "fromLastMonth": "مقارنة بالشهر الماضي",
+    "logins": "تسجيل الدخول",
+    "forms": "النماذج",
+    "comments": "التعليقات",
+    "likes": "الإعجابات",
+    "trafficTitle": "نمو حركة الموقع (Website Traffic Growth)",
+    "trafficSubtitle": "الزيارات اليومية في الـ 30 يوماً الماضية",
+    "engagementTitle": "تفاعل المستخدمين (User Engagement)",
+    "engagementSubtitle": "الإجراءات المتخذة في الـ 30 يوماً الماضية"
   },
   "lightbox": {
     "viewImage": "عرض الصورة",

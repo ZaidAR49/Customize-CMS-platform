@@ -18,7 +18,7 @@ const PREDEFINED_QUERIES: Record<string, any> = {
   },
   engagement_breakdown: {
     kind: 'HogQLQuery',
-    query: "SELECT event, count() AS total_count FROM events WHERE event IN ('contact_form_submitted', 'post_liked', 'document_clicked') AND timestamp >= now() - INTERVAL 30 DAY GROUP BY event ORDER BY total_count DESC"
+    query: "SELECT event, count() AS total_count FROM events WHERE event IN ('contact_form_submitted', 'post_liked', 'comment_submitted') AND timestamp >= now() - INTERVAL 30 DAY GROUP BY event ORDER BY total_count DESC"
   }
 }
 

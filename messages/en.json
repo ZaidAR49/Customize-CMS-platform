@@ -760,7 +760,15 @@
     "latestPosts": "Latest Posts",
     "totalVisits": "Total Visits",
     "uniqueVisitors": "Unique Visitors",
-    "fromLastMonth": "from last month"
+    "fromLastMonth": "from last month",
+    "logins": "Logins",
+    "forms": "Forms",
+    "comments": "Comments",
+    "likes": "Likes",
+    "trafficTitle": "Website Traffic Growth",
+    "trafficSubtitle": "Daily visits in the last 30 days",
+    "engagementTitle": "User Engagement",
+    "engagementSubtitle": "Actions taken in the last 30 days"
   },
   "lightbox": {
     "viewImage": "View Image",
