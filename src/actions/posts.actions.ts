@@ -4,7 +4,7 @@ import { requireEditor } from '@/lib/auth';
 import { postsService } from '@/lib/services/posts.service';
 import { createPostSchema, updatePostSchema } from '@/lib/validations/posts.schema';
 import { revalidatePath, revalidateTag } from 'next/cache';
-import { getPostHogClient } from '@/lib/posthog-server';
+
 
 function revalidatePostPaths(type: string, slug?: string, id?: string) {
   revalidatePath('/');
@@ -51,17 +51,6 @@ export async function createPostAction(data: any) {
     revalidateTag('post-slug', 'max');
     revalidatePostPaths(post.type, post.slug, post.id);
 
-    const posthog = getPostHogClient()
-    posthog.capture({
-      distinctId: session.user.email ?? session.user.id,
-      event: 'post_created',
-      properties: {
-        post_id: post.id,
-        post_type: post.type,
-        post_title: post.title,
-        published: post.published,
-      },
-    })
 
     return { success: true, data: post };
   } catch (error: any) {
@@ -109,16 +98,6 @@ export async function deletePostAction(id: string) {
       revalidatePath('/news');
     }
 
-    const posthog = getPostHogClient()
-    posthog.capture({
-      distinctId: session.user.email ?? session.user.id,
-      event: 'post_deleted',
-      properties: {
-        post_id: id,
-        post_type: post?.type,
-        post_title: post?.title,
-      },
-    })
 
     return { success: true };
   } catch (error: any) {
@@ -139,18 +118,6 @@ export async function togglePostPublishAction(id: string, published: boolean) {
     revalidateTag('post-slug', 'max');
     revalidatePostPaths(post.type, post.slug, post.id);
 
-    if (published) {
-      const posthog = getPostHogClient()
-      posthog.capture({
-        distinctId: session.user.email ?? session.user.id,
-        event: 'post_published',
-        properties: {
-          post_id: post.id,
-          post_type: post.type,
-          post_title: post.title,
-        },
-      })
-    }
 
     return { success: true, data: post };
   } catch (error: any) {
