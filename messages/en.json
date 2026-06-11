@@ -768,7 +768,14 @@
     "trafficTitle": "Website Traffic Growth",
     "trafficSubtitle": "Daily visits in the last 30 days",
     "engagementTitle": "User Engagement",
-    "engagementSubtitle": "Actions taken in the last 30 days"
+    "engagementSubtitle": "Actions taken in the last 30 days",
+    "errorTrackingTitle": "Top Errors",
+    "errorTrackingSubtitle": "Most common errors in the last 30 days",
+    "errorColumnError": "Error",
+    "errorColumnOccurrences": "Occurrences",
+    "visitorCountriesTitle": "Visitor Geography",
+    "visitorCountriesSubtitle": "Visits by country in the last 30 days",
+    "visitorCountriesLabel": "Visits"
   },
   "lightbox": {
     "viewImage": "View Image",

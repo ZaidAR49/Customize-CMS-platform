@@ -768,7 +768,14 @@
     "trafficTitle": "نمو حركة الموقع (Website Traffic Growth)",
     "trafficSubtitle": "الزيارات اليومية في الـ 30 يوماً الماضية",
     "engagementTitle": "تفاعل المستخدمين (User Engagement)",
-    "engagementSubtitle": "الإجراءات المتخذة في الـ 30 يوماً الماضية"
+    "engagementSubtitle": "الإجراءات المتخذة في الـ 30 يوماً الماضية",
+    "errorTrackingTitle": "أعلى الأخطاء",
+    "errorTrackingSubtitle": "الأخطاء الأكثر شيوعاً في الـ 30 يوماً الماضية",
+    "errorColumnError": "الخطأ",
+    "errorColumnOccurrences": "التكرار",
+    "visitorCountriesTitle": "جغرافيا الزوار",
+    "visitorCountriesSubtitle": "الزيارات حسب الدول في الـ 30 يوماً الماضية",
+    "visitorCountriesLabel": "زيارة"
   },
   "lightbox": {
     "viewImage": "عرض الصورة",

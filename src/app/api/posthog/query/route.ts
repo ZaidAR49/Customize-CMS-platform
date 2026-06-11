@@ -19,6 +19,14 @@ const PREDEFINED_QUERIES: Record<string, any> = {
   engagement_breakdown: {
     kind: 'HogQLQuery',
     query: "SELECT event, count() AS total_count FROM events WHERE event IN ('contact_form_submitted', 'post_liked', 'comment_submitted') AND timestamp >= now() - INTERVAL 30 DAY GROUP BY event ORDER BY total_count DESC"
+  },
+  error_tracking: {
+    kind: 'HogQLQuery',
+    query: "SELECT properties.error_message AS error_detail, count() AS occurrences FROM events WHERE event = 'app_error' AND timestamp >= now() - INTERVAL 30 DAY GROUP BY error_detail ORDER BY occurrences DESC LIMIT 5"
+  },
+  visitor_countries: {
+    kind: 'HogQLQuery',
+    query: "SELECT properties.$geoip_country_name AS country, count() AS total_visits FROM events WHERE event = '$pageview' AND timestamp >= now() - INTERVAL 30 DAY AND properties.$geoip_country_name IS NOT NULL GROUP BY country ORDER BY total_visits DESC LIMIT 5"
   }
 }
 

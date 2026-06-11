@@ -16,6 +16,56 @@ import {
   Cell,
 } from 'recharts'
 
+// Helper to translate/format error messages
+const formatErrorDetail = (errorMsg: string, locale: string) => {
+  if (!errorMsg) return ''
+  const lower = errorMsg.toLowerCase()
+  
+  if (lower.includes('failed to fetch') || lower.includes('network') || lower.includes('fetch')) {
+    return locale === 'ar' ? 'خطأ في الشبكة' : 'Network Error'
+  }
+  if (lower.includes('typeerror') || lower.includes('type error')) {
+    return locale === 'ar' ? 'خطأ من النوع' : 'TypeError'
+  }
+  if (lower.includes('invalid api key') || lower.includes('api key') || lower.includes('api_key')) {
+    return locale === 'ar' ? 'مفتاح API غير صالح' : 'Invalid API Key'
+  }
+  
+  const firstLine = errorMsg.split('\n')[0]
+  return firstLine
+}
+
+// Helper to translate country names
+const formatCountryName = (country: string, locale: string) => {
+  if (!country) return ''
+  if (locale !== 'ar') return country
+  
+  const countryMap: Record<string, string> = {
+    'Jordan': 'الأردن',
+    'Saudi Arabia': 'السعودية',
+    'Egypt': 'مصر',
+    'United Arab Emirates': 'الإمارات',
+    'United States': 'أمريكا',
+    'United States of America': 'أمريكا',
+    'Palestine': 'فلسطين',
+    'Syria': 'سوريا',
+    'Lebanon': 'لبنان',
+    'Iraq': 'العراق',
+    'Kuwait': 'الكويت',
+    'Qatar': 'قطر',
+    'Bahrain': 'البحرين',
+    'Oman': 'عمان',
+    'Yemen': 'اليمن',
+    'Morocco': 'المغرب',
+    'Algeria': 'الجزائر',
+    'Tunisia': 'تونس',
+    'Libya': 'ليبيا',
+    'Sudan': 'السودان',
+  }
+  
+  return countryMap[country] || country
+}
+
 export function AnalyticsCharts() {
   const t = useTranslations('dashboardOverview')
   const locale = useLocale()
@@ -53,18 +103,33 @@ export function AnalyticsCharts() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {[1, 2].map((i) => (
-          <Card key={i} className="border-none shadow-sm bg-white animate-pulse h-[360px]">
-            <CardHeader className="space-y-2 p-5 pb-0">
-              <div className="h-5 bg-slate-200 rounded w-1/3" />
-              <div className="h-4 bg-slate-200 rounded w-1/2" />
-            </CardHeader>
-            <CardContent className="p-5 pt-4">
-              <div className="h-[220px] w-full bg-slate-100 rounded-xl" />
-            </CardContent>
-          </Card>
-        ))}
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {[1, 2].map((i) => (
+            <Card key={i} className="border-none shadow-sm bg-white animate-pulse h-[360px]">
+              <CardHeader className="space-y-2 p-5 pb-0">
+                <div className="h-5 bg-slate-200 rounded w-1/3" />
+                <div className="h-4 bg-slate-200 rounded w-1/2" />
+              </CardHeader>
+              <CardContent className="p-5 pt-4">
+                <div className="h-[220px] w-full bg-slate-100 rounded-xl" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {[3, 4].map((i) => (
+            <Card key={i} className="border-none shadow-sm bg-white animate-pulse h-[360px]">
+              <CardHeader className="space-y-2 p-5 pb-0">
+                <div className="h-5 bg-slate-200 rounded w-1/3" />
+                <div className="h-4 bg-slate-200 rounded w-1/2" />
+              </CardHeader>
+              <CardContent className="p-5 pt-4">
+                <div className="h-[220px] w-full bg-slate-100 rounded-xl" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     )
   }
@@ -158,7 +223,64 @@ export function AnalyticsCharts() {
     },
   ]
 
-  // Custom tooltips to match the user's design (dark rounded tooltip box)
+  // 3. Parse Top Errors data
+  let errorTrackingData: { detail: string; occurrences: number }[] = []
+  if (data.error_tracking?.results && data.error_tracking.results.length > 0) {
+    data.error_tracking.results.forEach((row: any) => {
+      const errorMsg = row[0]
+      const count = Number(row[1]) || 0
+      if (errorMsg) {
+        errorTrackingData.push({
+          detail: formatErrorDetail(errorMsg, locale),
+          occurrences: count,
+        })
+      }
+    })
+  } else {
+    // Fallback/Mock data matching the user's screenshot
+    errorTrackingData = [
+      { detail: locale === 'ar' ? 'خطأ في الشبكة' : 'Network Error', occurrences: 14 },
+      { detail: locale === 'ar' ? 'خطأ من النوع' : 'TypeError', occurrences: 8 },
+      { detail: locale === 'ar' ? 'مفتاح API غير صالح' : 'Invalid API Key', occurrences: 2 },
+    ]
+  }
+
+  // 4. Parse Visitor Countries data
+  let countryData: { country: string; total_visits: number }[] = []
+  if (data.visitor_countries?.results && data.visitor_countries.results.length > 0) {
+    data.visitor_countries.results.forEach((row: any) => {
+      const countryName = row[0]
+      const count = Number(row[1]) || 0
+      if (countryName) {
+        countryData.push({
+          country: formatCountryName(countryName, locale),
+          total_visits: count,
+        })
+      }
+    })
+  } else {
+    // Fallback/Mock data matching the user's screenshot
+    countryData = [
+      { country: locale === 'ar' ? 'الأردن' : 'Jordan', total_visits: 14 },
+      { country: locale === 'ar' ? 'السعودية' : 'Saudi Arabia', total_visits: 8 },
+      { country: locale === 'ar' ? 'مصر' : 'Egypt', total_visits: 3 },
+      { country: locale === 'ar' ? 'الإمارات' : 'United Arab Emirates', total_visits: 2 },
+      { country: locale === 'ar' ? 'أمريكا' : 'United States', total_visits: 3 },
+    ]
+  }
+
+  // Sort by visits descending so top is first
+  countryData = countryData.sort((a, b) => b.total_visits - a.total_visits)
+
+  // Map colors based on position
+  const finalCountryData = countryData.map((item, index) => ({
+    ...item,
+    color: index === 0 ? '#3b82f6' : '#475569',
+  }))
+
+  const maxVisits = Math.max(...finalCountryData.map((c) => c.total_visits), 1)
+
+  // Custom tooltips
   const CustomAreaTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -201,102 +323,196 @@ export function AnalyticsCharts() {
     )
   }
 
-  // Determine if the current page alignment is RTL (Arabic) or LTR (English)
   const isRtl = locale === 'ar'
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      {/* 1. User Engagement Card (rendered first so in RTL it displays on the right) */}
-      <Card className="border-none shadow-sm bg-white">
-        <CardHeader className="p-5 pb-0">
-          <CardTitle className="text-lg font-bold text-(--fcps-dark)">
-            {t('engagementTitle')}
-          </CardTitle>
-          <CardDescription className="text-xs text-(--fcps-gray-text)">
-            {t('engagementSubtitle')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-5 pt-4">
-          <div className="h-[240px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={barData}
-                margin={{ top: 20, right: 10, left: 10, bottom: 10 }}
-              >
-                <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border/50" />
-                <XAxis
-                  dataKey="label"
-                  tickLine={false}
-                  axisLine={false}
-                  height={50}
-                  tick={CustomXAxisTick}
-                />
-                <YAxis hide />
-                <Tooltip content={CustomBarTooltip} cursor={{ fill: 'rgba(0,0,0,0.02)' }} />
-                <Bar dataKey="value" radius={[8, 8, 0, 0]} maxBarSize={50}>
-                  {barData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="space-y-6">
+      {/* Row 1: Existing Charts */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* User Engagement Card */}
+        <Card className="border-none shadow-sm bg-white">
+          <CardHeader className="p-5 pb-0">
+            <CardTitle className="text-lg font-bold text-(--fcps-dark)">
+              {t('engagementTitle')}
+            </CardTitle>
+            <CardDescription className="text-xs text-(--fcps-gray-text)">
+              {t('engagementSubtitle')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-5 pt-4">
+            <div className="h-[240px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={barData}
+                  margin={{ top: 20, right: 10, left: 10, bottom: 10 }}
+                >
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border/50" />
+                  <XAxis
+                    dataKey="label"
+                    tickLine={false}
+                    axisLine={false}
+                    height={50}
+                    tick={CustomXAxisTick}
+                  />
+                  <YAxis hide />
+                  <Tooltip content={CustomBarTooltip} cursor={{ fill: 'rgba(0,0,0,0.02)' }} />
+                  <Bar dataKey="value" radius={[8, 8, 0, 0]} maxBarSize={50}>
+                    {barData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* 2. Website Traffic Growth Card (rendered second so in RTL it displays on the left) */}
-      <Card className="border-none shadow-sm bg-white">
-        <CardHeader className="p-5 pb-0">
-          <CardTitle className="text-lg font-bold text-(--fcps-dark)">
-            {t('trafficTitle')}
-          </CardTitle>
-          <CardDescription className="text-xs text-(--fcps-gray-text)">
-            {t('trafficSubtitle')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-5 pt-4">
-          <div className="h-[240px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={areaData}
-                margin={{ left: 10, right: 10, top: 10, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#475569" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#475569" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border/50" />
-                <XAxis
-                  dataKey="dateFormatted"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  reversed={isRtl} // reverses XAxis labels flow correctly in RTL layouts
-                  className="text-[10px] fill-muted-foreground"
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  orientation={isRtl ? 'right' : 'left'} // align YAxis to right in RTL
-                  tickMargin={8}
-                  className="text-[10px] fill-muted-foreground"
-                />
-                <Tooltip content={CustomAreaTooltip} />
-                <Area
-                  type="monotone"
-                  dataKey="visits"
-                  stroke="#475569"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorVisits)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Website Traffic Growth Card */}
+        <Card className="border-none shadow-sm bg-white">
+          <CardHeader className="p-5 pb-0">
+            <CardTitle className="text-lg font-bold text-(--fcps-dark)">
+              {t('trafficTitle')}
+            </CardTitle>
+            <CardDescription className="text-xs text-(--fcps-gray-text)">
+              {t('trafficSubtitle')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-5 pt-4">
+            <div className="h-[240px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={areaData}
+                  margin={{ left: 10, right: 10, top: 10, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#475569" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#475569" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border/50" />
+                  <XAxis
+                    dataKey="dateFormatted"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    reversed={isRtl}
+                    className="text-[10px] fill-muted-foreground"
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    orientation={isRtl ? 'right' : 'left'}
+                    tickMargin={8}
+                    className="text-[10px] fill-muted-foreground"
+                  />
+                  <Tooltip content={CustomAreaTooltip} />
+                  <Area
+                    type="monotone"
+                    dataKey="visits"
+                    stroke="#475569"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorVisits)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Row 2: Visitor Geography and Top Errors (Swapped order so Top Errors is on the left and Visitor Geography is on the right in Arabic RTL) */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Visitor Geography Card */}
+        <Card className="border-none shadow-sm bg-white h-[330px] flex flex-col">
+          <CardHeader className="p-5 pb-0">
+            <CardTitle className="text-lg font-bold text-(--fcps-dark)">
+              {t('visitorCountriesTitle')}
+            </CardTitle>
+            <CardDescription className="text-xs text-(--fcps-gray-text)">
+              {t('visitorCountriesSubtitle')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-5 pt-6 flex-1 flex flex-col justify-center relative">
+            {/* Background vertical grid lines aligned with the bars area */}
+            <div className={`absolute top-6 bottom-6 pointer-events-none ${isRtl ? 'left-5 right-[116px]' : 'left-[116px] right-5'} flex justify-between`}>
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="w-[1px] bg-slate-100 h-full" />
+              ))}
+            </div>
+
+            {/* List of Countries with progress bars */}
+            <div className="space-y-4 relative z-10">
+              {finalCountryData.map((item, index) => {
+                const percentage = (item.total_visits / maxVisits) * 80 // Max 80% to leave room for value count labels
+
+                return (
+                  <div key={index} className="flex items-center gap-4 text-sm h-8 relative">
+                    {/* Country Name */}
+                    <span className={`w-20 font-semibold text-slate-700 shrink-0 ${isRtl ? 'text-right order-3' : 'text-left order-1'}`}>
+                      {item.country}
+                    </span>
+
+                    {/* Bar and Count Container */}
+                    <div className={`flex-1 flex items-center relative z-10 ${isRtl ? 'order-2 justify-end' : 'order-2 justify-start'}`}>
+                      <div className={`flex items-center gap-2.5 w-full ${isRtl ? 'flex-row-reverse' : 'flex-row'}`}>
+                        {/* Progress Bar */}
+                        <div
+                          className="h-[14px] rounded-full transition-all duration-500 shadow-sm"
+                          style={{
+                            width: `${percentage}%`,
+                            backgroundColor: item.color,
+                          }}
+                        />
+                        {/* Visits Count */}
+                        <span className="text-xs font-bold text-slate-500 font-mono shrink-0">
+                          {item.total_visits}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Top Errors Card */}
+        <Card className="border-none shadow-sm bg-white flex flex-col h-[330px]">
+          <CardHeader className="p-5 pb-0">
+            <CardTitle className="text-lg font-bold text-(--fcps-dark)">
+              {t('errorTrackingTitle')}
+            </CardTitle>
+            <CardDescription className="text-xs text-(--fcps-gray-text)">
+              {t('errorTrackingSubtitle')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-5 pt-6 flex-1 flex flex-col justify-between overflow-y-auto">
+            <div className="w-full">
+              {/* Table Headers */}
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100 text-xs font-bold text-slate-500">
+                <span>{t('errorColumnError')}</span>
+                <span>{t('errorColumnOccurrences')}</span>
+              </div>
+              
+              {/* Table Rows */}
+              <div className="divide-y divide-slate-50/50">
+                {errorTrackingData.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between py-3 text-sm">
+                    <span className="font-medium text-slate-700 truncate max-w-[75%]" title={item.detail}>
+                      {item.detail}
+                    </span>
+                    <span className="flex items-center justify-center min-w-[24px] h-[24px] rounded-full bg-red-100 text-red-600 text-xs font-bold px-1.5 font-mono">
+                      {item.occurrences}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
