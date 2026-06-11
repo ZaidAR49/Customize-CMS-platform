@@ -5,6 +5,7 @@ import { Heart } from 'lucide-react'
 import { FaFacebookF, FaLinkedinIn, FaInstagram, FaXTwitter } from 'react-icons/fa6'
 import { formatSiteNumber } from '@/lib/date-format'
 import { useTranslations } from 'next-intl'
+import posthog from 'posthog-js'
 
 interface PostShareBarProps {
   postId: string
@@ -54,6 +55,11 @@ export function PostShareBar({ postId, postUrl, postTitle, initialLikes }: PostS
       if (res.ok) {
         setLikes((n) => (typeof data.likes === 'number' ? data.likes : n + 1))
         setLiked(true)
+        posthog.capture('post_liked', {
+          post_id: postId,
+          post_title: postTitle,
+          total_likes: typeof data.likes === 'number' ? data.likes : likes + 1,
+        })
       }
     } finally {
       setPending(false)

@@ -3,6 +3,7 @@ import { Cairo } from 'next/font/google'
 import './globals.css'
 import { ConditionalHeader, ConditionalFooter,ConditionalChatBot } from '@/components/layout/ConditionalLayout'
 import { SessionProvider } from '@/components/providers/SessionProvider'
+import { PostHogIdentifier } from '@/components/providers/PostHogIdentifier'
 import { ScrollToTop } from '@/components/shared/ScrollToTop'
 import { Toaster } from 'sonner'
 import { NextIntlClientProvider } from 'next-intl'
@@ -41,6 +42,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="bg-white text-[#333] antialiased" style={{ fontFamily: 'var(--font-cairo), sans-serif' }}>
         <NextIntlClientProvider>         
         <SessionProvider>
+          <PostHogIdentifier />
           <ConditionalHeader programs={programs} centers={centers} />
           <main className="min-h-screen">{children}</main>
           <ConditionalFooter>

@@ -16,6 +16,7 @@ import { toast } from 'sonner'
 import { DownloadCloud, Loader2 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { useTranslations, useLocale } from 'next-intl'
+import posthog from 'posthog-js'
 
 const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
@@ -181,9 +182,15 @@ export function PostForm({
           onChange('published', post.published)
         }
 
+        posthog.capture('facebook_post_imported', {
+          is_arabic: post.isArabic,
+          has_gallery: Array.isArray(post.images) && post.images.length > 0,
+          post_type: post.type,
+        })
         toast.success(t('fbImportSuccess'))
         setFacebookUrl('')
       } else {
+        posthog.captureException(new Error(result.error || 'Facebook import failed'))
         toast.error(result.error || t('fbImportErrorFail'))
       }
     } catch (err) {

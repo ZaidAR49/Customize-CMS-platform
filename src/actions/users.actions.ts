@@ -5,6 +5,7 @@ import { usersService } from '@/lib/services/users.service';
 import { createUserSchema, updateUserProfileSchema } from '@/lib/validations/users.schema';
 import { revalidatePath } from 'next/cache';
 import { uploadImage } from '@/actions/cloudinary.actions';
+import { getPostHogClient } from '@/lib/posthog-server';
 
 const AVATAR_MAX_BYTES = 4 * 1024 * 1024;
 
@@ -191,6 +192,16 @@ export async function createUserAction(formData: FormData) {
     });
 
     revalidatePath('/dashboard/users');
+
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId: session.user.email ?? session.user.id,
+      event: 'user_created',
+      properties: {
+        new_user_role: parsed.data.role,
+        has_avatar: !!avatarRes.url,
+      },
+    })
 
     return { success: true, data: createdUser };
   } catch (error: any) {

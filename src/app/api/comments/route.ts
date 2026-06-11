@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { commentsService } from '@/lib/services/comments.service'
 import { createCommentSchema } from '@/lib/validations/comment.schema'
+import { getPostHogClient } from '@/lib/posthog-server'
 
 /** Public endpoint: submit a comment (stored as pending for dashboard review). */
 export async function POST(req: Request) {
@@ -22,6 +23,16 @@ export async function POST(req: Request) {
       author_name: author_name.trim(),
       author_email: email,
       body: body.trim(),
+    })
+
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId: email ?? author_name.trim(),
+      event: 'comment_submitted',
+      properties: {
+        post_id,
+        has_email: !!email,
+      },
     })
 
     return NextResponse.json({ ok: true })

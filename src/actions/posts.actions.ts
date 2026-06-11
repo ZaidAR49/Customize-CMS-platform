@@ -4,6 +4,7 @@ import { requireEditor } from '@/lib/auth';
 import { postsService } from '@/lib/services/posts.service';
 import { createPostSchema, updatePostSchema } from '@/lib/validations/posts.schema';
 import { revalidatePath, revalidateTag } from 'next/cache';
+import { getPostHogClient } from '@/lib/posthog-server';
 
 function revalidatePostPaths(type: string, slug?: string, id?: string) {
   revalidatePath('/');
@@ -45,11 +46,23 @@ export async function createPostAction(data: any) {
 
     const postData = { ...parsed.data, author_id: session.user.id };
     const post = await postsService.createPost(postData);
-    
+
     revalidateTag('posts', 'max');
     revalidateTag('post-slug', 'max');
     revalidatePostPaths(post.type, post.slug, post.id);
-    
+
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId: session.user.email ?? session.user.id,
+      event: 'post_created',
+      properties: {
+        post_id: post.id,
+        post_type: post.type,
+        post_title: post.title,
+        published: post.published,
+      },
+    })
+
     return { success: true, data: post };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to create post' };
@@ -80,7 +93,7 @@ export async function updatePostAction(id: string, data: any) {
 
 export async function deletePostAction(id: string) {
   try {
-    await requireEditor();
+    const session = await requireEditor();
 
     const post = await postsService.getPostById(id);
     await postsService.deletePost(id);
@@ -95,7 +108,18 @@ export async function deletePostAction(id: string) {
       revalidatePath('/dashboard/centers');
       revalidatePath('/news');
     }
-    
+
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId: session.user.email ?? session.user.id,
+      event: 'post_deleted',
+      properties: {
+        post_id: id,
+        post_type: post?.type,
+        post_title: post?.title,
+      },
+    })
+
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to delete post' };
@@ -104,17 +128,30 @@ export async function deletePostAction(id: string) {
 
 export async function togglePostPublishAction(id: string, published: boolean) {
   try {
-    await requireEditor();
+    const session = await requireEditor();
 
-    const post = await postsService.updatePost(id, { 
-      published, 
-      published_at: published ? new Date().toISOString() : null 
+    const post = await postsService.updatePost(id, {
+      published,
+      published_at: published ? new Date().toISOString() : null,
     });
-    
+
     revalidateTag('posts', 'max');
     revalidateTag('post-slug', 'max');
     revalidatePostPaths(post.type, post.slug, post.id);
-    
+
+    if (published) {
+      const posthog = getPostHogClient()
+      posthog.capture({
+        distinctId: session.user.email ?? session.user.id,
+        event: 'post_published',
+        properties: {
+          post_id: post.id,
+          post_type: post.type,
+          post_title: post.title,
+        },
+      })
+    }
+
     return { success: true, data: post };
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to update publish status' };

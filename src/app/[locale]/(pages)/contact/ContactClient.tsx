@@ -14,6 +14,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { submitContactFormAction } from '@/actions/malis.actions'
 import type { OrganizationRow } from '@/types/organization'
 import { useTranslations, useLocale } from 'next-intl'
+import posthog from 'posthog-js'
 
 interface ContactClientProps {
   org: OrganizationRow | null;
@@ -51,6 +52,9 @@ export default function ContactClient({ org }: ContactClientProps) {
       setSubmitError(result.error ?? t('form.error'))
       return
     }
+    posthog.capture('contact_form_submitted', {
+      subject: data.subject,
+    })
     setSubmitted(true)
     reset()
     setTimeout(() => setSubmitted(false), 4000)
