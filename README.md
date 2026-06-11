@@ -28,12 +28,18 @@ A high-performance, secure, and multilingual Content Management System (CMS) des
 * **Facebook Content Importer:** Utilizes `Apify` scraping APIs to automatically parse and import external social posts.
 * **Cloudinary Storage CDN:** Scraped media binaries are automatically uploaded to Cloudinary to provide persistent CDN image delivery, shielding layouts from expiring social CDN links.
 
+### 6. PostHog Serverless Analytics & Reporting (Data-Driven Insights)
+* **Secure API Analytics Proxy:** Integrates a secure server-side HogQL query proxy route (`/api/posthog/query`) that keeps Personal API Keys and Project IDs safe from the browser while enabling parallel query composition on the backend.
+* **Bi-directional Layout Metric Cards:** Displays real-time visitor metrics (Total Visits & Unique Visitors) with percentage changes compared to the previous 30 days, complete with RTL/LTR layout constraints (`dir="ltr"` override) for Arabic interfaces.
+* **Interactive Shadcn Charts:** Incorporates custom-styled Responsive Area Charts (Website Traffic Growth) and Bar Charts (User Engagement: Logins, Forms, Comments, and Likes) using Recharts and Shadcn UI, featuring localized date flows and detailed tooltips.
+* **Serverless Flush Reliability:** Guarantees event transmission (e.g. comment submissions) in serverless execution environments by explicitly awaiting PostHog buffer flushes before HTTP response output.
+
 ---
 
 ## 🛠️ Technology Stack
 
-* **Frontend:** Next.js 16.2 (Turbopack, Server Actions), React 19, TailwindCSS, TypeScript.
-* **Backend Services:** Supabase PostgreSQL Client, Next-Auth (Google Provider).
+* **Frontend:** Next.js 16.2 (Turbopack, Server Actions), React 19, Recharts & Shadcn UI, TailwindCSS, TypeScript.
+* **Backend Services:** Supabase PostgreSQL Client, Next-Auth (Google Provider), PostHog Server SDK.
 * **Localization:** next-intl.
 * **Validations & Linting:** Zod, ESLint.
 
@@ -58,6 +64,12 @@ GOOGLE_CLIENT_SECRET=your_google_oauth_client_secret
 # External Integrations
 APIFY_TOKEN=your_apify_api_token
 CLOUDINARY_URL=your_cloudinary_connection_string
+
+# PostHog Analytics Configuration
+NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=your_posthog_project_token
+NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com
+POSTHOG_PROJECT_ID=your_posthog_project_id
+POSTHOG_PERSONAL_API_KEY=your_posthog_personal_api_key
 ```
 
 ### 2. Installation
